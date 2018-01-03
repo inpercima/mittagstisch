@@ -1,0 +1,10 @@
+{
+  "activateLogin": false,
+  "appname": "mittagstisch",
+  "routes": {
+    "defaultRoute": "dash",
+    "showFeatures": true,
+    "showLogin": false
+  },
+  "theme": "deeppurple-amber"
+}
