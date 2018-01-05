@@ -8,7 +8,7 @@
       [routerLink]="routeLink.path"
       routerLinkActive #rla="routerLinkActive"
       [active]="rla.isActive">
-        {{routeLink.path}}
+        {{routeLink.data.title}}
     </a>
   </nav>
   <router-outlet></router-outlet>

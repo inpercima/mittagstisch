@@ -1,0 +1,11 @@
+<mat-accordion>
+  <mat-expansion-panel *ngFor="let item of lunch">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{item.page}}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <p>{{item.food}}</p>
+    <p>{{item.price}}</p>
+  </mat-expansion-panel>
+</mat-accordion>
