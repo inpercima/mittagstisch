@@ -49,6 +49,15 @@ public class MittagstischCrawler {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(MittagstischCrawler.class);
 
+    private MittagstischCrawler() {
+        // not used
+    }
+
+    /**
+     * Creates the output for the lunch in "Kantine 3 (im Tapetenwerk)".
+     *
+     * @return Lunch Information about the lunch
+     */
     public static Lunch lunchInKantine3() throws IOException {
         Lunch lunch = new Lunch("Kantine 3 (im Tapetenwerk)");
         final HtmlPage page = getHtmlPage(URL_KANTINE_3);
@@ -60,32 +69,37 @@ public class MittagstischCrawler {
         return lunch;
     }
 
+    /**
+     * Parses the given page to get information about the lunch.
+     *
+     * @param page The page which should be parsed
+     * @param lunch The lunch which should be used
+     */
     private static void parseKantine3Data(final HtmlPage page, final Lunch lunch) {
+        // details are in paragraphs
         List<HtmlParagraph> list = page.getByXPath(XPATH_LUNCH_KANTINE_3);
-        boolean foundDay = false;
 
+        boolean found = false;
         for (HtmlParagraph p : list) {
-            if (foundDay) {
-                if (p.getTextContent().startsWith(getDay(1, true)) || p.getTextContent().startsWith("TÄGLICH")) {
-                    foundDay = false;
-                } else {
-                    final String text = p.getTextContent();
-                    if (!text.trim().isEmpty()) {
-                        lunch.setFood(lunch.getFood() == null ? text : lunch.getFood() + "<br><br>" + text);
-                    }
-                }
-            }
             if (p.getTextContent().startsWith(getDay(0, true))) {
-                foundDay = true;
+                found = true;
+            } else if (p.getTextContent().startsWith(getDay(1, true)) || p.getTextContent().startsWith("TÄGLICH")) {
+                break;
+            }
+            if (found) {
+                final String text = p.getTextContent();
+                if (!text.trim().isEmpty()) {
+                    lunch.setFood(lunch.getFood() == null ? text : lunch.getFood() + "<br><br>" + text);
+                }
             }
         }
     }
 
     public static Lunch lunchInLebensmittelSeidel() throws IOException {
-        Lunch lunch = new Lunch("Lebensmittel Seidel Imbiss 3");
+        Lunch lunch = new Lunch("Lebensmittel Seidel Imbiss");
         final HtmlPage page = getHtmlPage(URL_LEBENSMITTEL_SEIDEL);
         if (isCorrectWeek(getWeek(XPATH_WEEK_LEBENSMITTEL_SEIDEL, page))) {
-            // parseLunchData(XPATH_LUNCH_LEBENSMITTEL_SEIDEL, page, lunch);
+            // TODO: implement parser
         } else {
             lunch.setFood(OUTDATED);
         }
@@ -96,13 +110,19 @@ public class MittagstischCrawler {
         Lunch lunch = new Lunch("Wullewupp");
         final HtmlPage page = getHtmlPage(URL_WULLEWUPP);
         if (isCorrectWeek(getWeek(XPATH_WEEK_WULLEWUPP, page))) {
-            // parseLunchData(XPATH_LUNCH_WULLEWUPP, page, lunch);
+            // TODO: implement parser
         } else {
             lunch.setFood(OUTDATED);
         }
         return lunch;
     }
 
+    /**
+     * Determine the page to get information of the lunch.
+     *
+     * @param url The URL of the page which should be parsed
+     * @return HtmlPage The page which should be parsed
+     */
     public static HtmlPage getHtmlPage(final String url) throws IOException {
         final WebRequest request = new WebRequest(new URL(url));
         request.setCharset(StandardCharsets.UTF_8);
@@ -110,9 +130,9 @@ public class MittagstischCrawler {
     }
 
     /**
-     * Init webclient with Firefox browser.
+     * Init webclient with firefox browser and some options.
      *
-     * @return WebClient
+     * @return WebClient The initialized client
      */
     private static WebClient initWebClient() {
         final WebClient webClient = new WebClient(BrowserVersion.FIREFOX_52);
@@ -124,18 +144,24 @@ public class MittagstischCrawler {
         return webClient;
     }
 
+    /**
+     * Determine the information of the week.
+     * 
+     * @param xpath The path to the inforamtion of week
+     * @param page The page to be parsed
+     * @return String The content including week information
+     */
     public static String getWeek(final String xpath, final HtmlPage page) {
-        String weekText = "";
-        if (xpath == XPATH_WEEK_KANTINE_3) {
-            final HtmlHeading1 h1 = (HtmlHeading1) page.getByXPath(xpath).get(0);
-            weekText = h1.getTextContent();
-        } else {
-            final HtmlSpan span = (HtmlSpan) page.getByXPath(xpath).get(0);
-            weekText = span.getTextContent();
-        }
-        return weekText;
+        return xpath == XPATH_WEEK_KANTINE_3 ? ((HtmlHeading1) page.getByXPath(xpath).get(0)).getTextContent()
+                : ((HtmlSpan) page.getByXPath(xpath).get(0)).getTextContent();
     }
 
+    /**
+     * Checks if the dates in the determined week are up-to-date.
+     * 
+     * @param weekText The determined information of week.
+     * @return boolean True if up-to-date otherwise false
+     */
     private static boolean isCorrectWeek(final String weekText) {
         LocalDate now = LocalDate.now();
         final TemporalField field = WeekFields.of(Locale.GERMAN).dayOfWeek();
@@ -148,6 +174,13 @@ public class MittagstischCrawler {
                         || weekText.contains(lastDay.format(DateTimeFormatter.ofPattern("dd.MMMM"))));
     }
 
+    /**
+     * Determine the day name for checks.
+     * 
+     * @param value The number of days added to the current day
+     * @param toUppercase True if the result should be in uppercase otherwise false
+     * @return String
+     */
     private static String getDay(final int value, final boolean toUppercase) {
         String day = LocalDate.now().plusDays(value).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN);
         return toUppercase ? day.toUpperCase() : day;
