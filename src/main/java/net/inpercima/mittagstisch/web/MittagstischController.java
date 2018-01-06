@@ -16,7 +16,15 @@ public class MittagstischController {
     @GetMapping(value = "/today")
     public List<Lunch> listToday() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
+        lunch.add(MittagstischCrawler.lunchInKaiserbad(true));
         lunch.add(MittagstischCrawler.lunchInKantine3());
+        return lunch;
+    }
+
+    @GetMapping(value = "/next-week")
+    public List<Lunch> listNextWeek() throws IOException {
+        final List<Lunch> lunch = new ArrayList<>();
+        lunch.add(MittagstischCrawler.lunchInKaiserbad(false));
         return lunch;
     }
 

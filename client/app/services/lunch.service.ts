@@ -14,4 +14,8 @@ export class LunchService {
     return this.http.get<Array<Lunch>>('/today');
   }
 
+  public getNextWeek(): Observable<Array<Lunch>> {
+    return this.http.get<Array<Lunch>>('/next-week');
+  }
+
 }

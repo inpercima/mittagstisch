@@ -5,10 +5,10 @@ import { LunchService } from '../../services/lunch.service';
 import { Lunch } from '../../models/lunch';
 
 @Component({
-  selector: 'mt-today',
-  templateUrl: './today.component.html',
+  selector: 'mt-next-week',
+  templateUrl: './next-week.component.html',
 })
-export class TodayComponent implements OnInit {
+export class NextWeekComponent implements OnInit {
 
   private panelOpenState: boolean = false;
 
@@ -21,7 +21,7 @@ export class TodayComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.lunchService.get().subscribe(lunch => {
+    this.lunchService.getNextWeek().subscribe(lunch => {
       this.lunch = lunch;
       this.loaded = true;
     });

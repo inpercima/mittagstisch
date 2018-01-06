@@ -8,7 +8,7 @@ import { MaterialModule } from '../material/material.module';
 import { DashComponent } from '../../components/dash/dash.component';
 import { TodayComponent } from '../../components/today/today.component';
 import { TomorrowComponent } from '../../components/tomorrow/tomorrow.component';
-import { WeekComponent } from '../../components/week/week.component';
+import { NextWeekComponent } from '../../components/next-week/next-week.component';
 
 import { LunchService } from '../../services/lunch.service';
 
@@ -17,7 +17,7 @@ import { LunchService } from '../../services/lunch.service';
     DashComponent,
     TodayComponent,
     TomorrowComponent,
-    WeekComponent,
+    NextWeekComponent,
   ],
   imports: [
     CommonModule,
