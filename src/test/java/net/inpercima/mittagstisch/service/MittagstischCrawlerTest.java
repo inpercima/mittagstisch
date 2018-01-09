@@ -57,9 +57,9 @@ public class MittagstischCrawlerTest {
     @Test
     @Ignore("javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure")
     public void lebensmittelSeidel() throws Exception {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(MittagstischCrawler.URL_LEBENSMITTEL_SEIDEL);
+        final HtmlPage page = MittagstischUtil.getHtmlPage(MittagstischCrawler.LEBENSMITTEL_SEIDEL_URL);
         assertThat(page.getTitleText(), is("Lebensmittel & Imbiss Seidel"));
-        assertThat(MittagstischUtil.getWeek(MittagstischCrawler.XPATH_WEEK_LEBENSMITTEL_SEIDEL, page),
+        assertThat(MittagstischUtil.getWeek(MittagstischCrawler.LEBENSMITTEL_SEIDEL_CSS_WEEK, page),
                 containsString("Woche"));
     }
 
@@ -73,9 +73,9 @@ public class MittagstischCrawlerTest {
     @Test
     @Ignore("com.gargoylesoftware.htmlunit.ScriptException: illegal character (https://static.parastorage.com/polyfill/v2/polyfill.min.js?rum=0#1")
     public void wullewupp() throws Exception {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(MittagstischCrawler.URL_WULLEWUPP);
+        final HtmlPage page = MittagstischUtil.getHtmlPage(MittagstischCrawler.WULLEWUPP_URL);
         assertThat(page.getTitleText(), is("suppenbar | Speiseplan"));
-        assertThat(MittagstischUtil.getWeek(MittagstischCrawler.XPATH_WEEK_WULLEWUPP, page),
+        assertThat(MittagstischUtil.getWeek(MittagstischCrawler.WULLEWUPP_CSS_WEEK, page),
                 containsString("Wochenplan"));
     }
 

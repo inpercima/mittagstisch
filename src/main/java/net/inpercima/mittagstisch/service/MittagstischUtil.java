@@ -24,6 +24,8 @@ public class MittagstischUtil {
 
     protected static final String NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
 
+    protected static final String TECHNICAL = "Derzeit kann aufgrund einer technische Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
+
     private MittagstischUtil() {
         // not used
     }
@@ -78,18 +80,21 @@ public class MittagstischUtil {
         final LocalDate firstDay = now.with(field, 1);
         final LocalDate lastDay = now.with(field, 5);
 
-        final DateTimeFormatter dd = DateTimeFormatter.ofPattern("dd.");
-        final DateTimeFormatter ddMM = DateTimeFormatter.ofPattern("dd.MM");
-        final DateTimeFormatter ddMMMM = DateTimeFormatter.ofPattern("dd.MMMM");
-        final DateTimeFormatter ddSpaceMMMM = DateTimeFormatter.ofPattern("dd. MMMM YYYY");
+        final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.");
+        final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM");
+        final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM");
+        final DateTimeFormatter dSpaceMMMM = DateTimeFormatter.ofPattern("d. MMMM YYYY");
 
         return
-        // Kaiserbad
-        (weekText.contains(firstDay.format(dd)) && weekText.contains(lastDay.format(ddSpaceMMMM)))
-                // Kantine 3
-                || (weekText.contains(firstDay.format(ddMMMM)) && weekText.contains(lastDay.format(ddMMMM)))
-                // Wullewupp
-                || (weekText.contains(firstDay.format(ddMM)) && weekText.contains(lastDay.format(ddMM)));
+        /* @formatter:off */
+            // Kaiserbad
+            (weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dSpaceMMMM)))
+            // Kantine 3
+            || (weekText.contains(firstDay.format(dMMMM).toUpperCase())
+                    && weekText.contains(lastDay.format(dMMMM).toUpperCase()))
+            // Wullewupp
+            || (weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM)));
+        /* @formatter:on */
     }
 
     /**

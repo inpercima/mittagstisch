@@ -21,17 +21,17 @@ public class MittagstischCrawler {
 
     protected static final String KANTINE_3_URL = "http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/";
 
-    protected static final String URL_LEBENSMITTEL_SEIDEL = "https://lebensmittel-imbiss-seidel.de/imbiss.htm";
+    protected static final String LEBENSMITTEL_SEIDEL_URL = "https://lebensmittel-imbiss-seidel.de/imbiss.htm";
 
-    protected static final String XPATH_LUNCH_LEBENSMITTEL_SEIDEL = "";
+    protected static final String LEBENSMITTEL_SEIDEL_CSS_LUNCH = "";
 
-    protected static final String XPATH_WEEK_LEBENSMITTEL_SEIDEL = "//div[@id='xr_td']/div/div/span";
+    protected static final String LEBENSMITTEL_SEIDEL_CSS_WEEK = "";
 
-    protected static final String XPATH_LUNCH_WULLEWUPP = "";
+    protected static final String WULLEWUPP_CSS_LUNCH = "";
 
-    protected static final String URL_WULLEWUPP = "https://www.wullewupp.de/bar";
+    protected static final String WULLEWUPP_CSS_WEEK = "";
 
-    protected static final String XPATH_WEEK_WULLEWUPP = "//div[@id='SITE_PAGES']/div/div/div/h2/span";
+    protected static final String WULLEWUPP_URL = "https://www.wullewupp.de/bar";
 
     private MittagstischCrawler() {
         // not used
@@ -106,11 +106,15 @@ public class MittagstischCrawler {
     }
 
     public static Lunch lunchInLebensmittelSeidel() {
-        return new Lunch("Lebensmittel Seidel Imbiss");
+        final Lunch lunch = new Lunch("Lebensmittel Seidel Imbiss");
+        lunch.setFood(String.format(MittagstischUtil.TECHNICAL, LEBENSMITTEL_SEIDEL_URL, LEBENSMITTEL_SEIDEL_URL));
+        return lunch;
     }
 
     public static Lunch lunchInWullewupp() {
-        return new Lunch("Wullewupp");
+        final Lunch lunch = new Lunch("Wullewupp");
+        lunch.setFood(String.format(MittagstischUtil.TECHNICAL, WULLEWUPP_URL, WULLEWUPP_URL));
+        return lunch;
     }
 
 }

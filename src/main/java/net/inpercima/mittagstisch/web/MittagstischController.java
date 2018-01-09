@@ -18,6 +18,8 @@ public class MittagstischController {
         final List<Lunch> lunch = new ArrayList<>();
         lunch.add(MittagstischCrawler.lunchInKaiserbad(true));
         lunch.add(MittagstischCrawler.lunchInKantine3());
+        lunch.add(MittagstischCrawler.lunchInLebensmittelSeidel());
+        lunch.add(MittagstischCrawler.lunchInWullewupp());
         return lunch;
     }
 
