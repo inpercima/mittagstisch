@@ -19,6 +19,7 @@ public class MittagstischController {
         lunch.add(MittagstischCrawler.lunchInKaiserbad(true));
         lunch.add(MittagstischCrawler.lunchInKantine3());
         lunch.add(MittagstischCrawler.lunchInLebensmittelSeidel());
+        lunch.add(MittagstischCrawler.lunchInPanLokal());
         lunch.add(MittagstischCrawler.lunchInWullewupp());
         return lunch;
     }

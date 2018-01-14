@@ -26,6 +26,8 @@ public class MittagstischUtil {
 
     protected static final String TECHNICAL = "Derzeit kann aufgrund einer technische Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
+    private static final int IN_NEXT_WEEK = 7;
+
     private MittagstischUtil() {
         // not used
     }
@@ -72,28 +74,35 @@ public class MittagstischUtil {
      * Checks if the dates in the determined week are up-to-date.
      * 
      * @param weekText The determined information of week.
+     * @param days Days added to this day.
      * @return boolean True if up-to-date otherwise false
      */
-    protected static boolean isInWeek(final String weekText, final int value) {
-        final LocalDate now = LocalDate.now().plusDays(value);
+    protected static boolean isInWeek(final String weekText, final int days) {
+        final LocalDate now = LocalDate.now();
+        final LocalDate date = now.plusDays(days);
         final TemporalField field = WeekFields.of(Locale.GERMAN).dayOfWeek();
-        final LocalDate firstDay = now.with(field, 1);
-        final LocalDate lastDay = now.with(field, 5);
+        final LocalDate firstDay = date.with(field, 1);
+        final LocalDate lastDay = date.with(field, 5);
 
         final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.");
         final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM");
         final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM");
         final DateTimeFormatter dSpaceMMMM = DateTimeFormatter.ofPattern("d. MMMM YYYY");
 
-        return
+        final int weekNumber = date.get(WeekFields.of(Locale.GERMAN).weekOfYear());
+        final DateTimeFormatter year = DateTimeFormatter.ofPattern("YYYY");
+
+        return lastDay.isAfter(now) &&
         /* @formatter:off */
             // Kaiserbad
-            (weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dSpaceMMMM)))
+            ((weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dSpaceMMMM)))
             // Kantine 3
             || (weekText.contains(firstDay.format(dMMMM).toUpperCase())
                     && weekText.contains(lastDay.format(dMMMM).toUpperCase()))
+            // Pan Lokal
+            || (weekText.contains(String.valueOf(weekNumber).concat(", ").concat(date.format(year))))
             // Wullewupp
-            || (weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM)));
+            || (weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM))));
         /* @formatter:on */
     }
 
@@ -109,13 +118,23 @@ public class MittagstischUtil {
         return toUppercase ? day.toUpperCase() : day;
     }
 
+    /**
+     * Prepares a lunch with some predefined texts if needed.
+     * 
+     * @param page The page to be parsed
+     * @param name The page name
+     * @param selectorWeek The css selector for the week of the page
+     * @param url The url of the page
+     * @param daily True if the lunch is per day otherwise false
+     * @return String
+     */
     protected static Lunch prepareLunch(final HtmlPage page, final String name, final String selectorWeek,
             final String url, final boolean daily) {
         final Lunch lunch = new Lunch(name);
         final String weekText = MittagstischUtil.getWeek(selectorWeek, page);
-        if (!MittagstischUtil.isInWeek(weekText, 0) && !MittagstischUtil.isInWeek(weekText, 7)) {
+        if (!MittagstischUtil.isInWeek(weekText, 0) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
             lunch.setFood(String.format(OUTDATED, url, url));
-        } else if (MittagstischUtil.isInWeek(weekText, 7) && daily) {
+        } else if (MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK) && daily) {
             lunch.setFood(NEXT_WEEK);
         }
         return lunch;
