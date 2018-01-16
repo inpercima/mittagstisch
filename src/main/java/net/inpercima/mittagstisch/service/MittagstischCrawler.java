@@ -148,7 +148,7 @@ public class MittagstischCrawler {
         // details are in paragraphs per day
         final LocalDate date = LocalDate.now();
         final TemporalField field = WeekFields.of(Locale.GERMAN).dayOfWeek();
-        HtmlParagraph p = page.querySelector(String.format(PAN_LOKAL_CSS_LUNCH, date.get(field) - 2));
+        HtmlParagraph p = page.querySelector(String.format(PAN_LOKAL_CSS_LUNCH, date.get(field)));
         lunch.setFood(p.getTextContent());
     }
 
