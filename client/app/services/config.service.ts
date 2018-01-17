@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import * as config from '../../../config/config.json';
+import * as config from '../../../config/config.default.json';
 
 @Injectable()
 export class ConfigService {

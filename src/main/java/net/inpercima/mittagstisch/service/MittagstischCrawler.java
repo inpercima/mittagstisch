@@ -1,10 +1,6 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -18,7 +14,7 @@ public class MittagstischCrawler {
 
     protected static final String KAISERBAD_CSS_WEEK = "div[id='wochenkarte'] + div h1";
 
-    protected static final String KAISERBAD_URL = "http://kaiserbad-leipzig.de/";
+    protected static final String KAISERBAD_URL = "http://kaiserbad-leipzig.de/#wochenkarte";
 
     protected static final String KANTINE_3_CSS_LUNCH = "main section div div p";
 
@@ -146,9 +142,8 @@ public class MittagstischCrawler {
      */
     private static void parsePanLokalData(final HtmlPage page, final Lunch lunch) {
         // details are in paragraphs per day
-        final LocalDate date = LocalDate.now();
-        final TemporalField field = WeekFields.of(Locale.GERMAN).dayOfWeek();
-        HtmlParagraph p = page.querySelector(String.format(PAN_LOKAL_CSS_LUNCH, date.get(field)));
+        HtmlParagraph p = page.querySelector(String.format(PAN_LOKAL_CSS_LUNCH,
+                MittagstischUtil.getLocalizedDate().get(MittagstischUtil.dayOfWeek())));
         lunch.setFood(p.getTextContent());
     }
 

@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -27,6 +31,8 @@ public class MittagstischUtil {
     protected static final String TECHNICAL = "Derzeit kann aufgrund einer technische Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     private static final int IN_NEXT_WEEK = 7;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MittagstischUtil.class);
 
     private MittagstischUtil() {
         // not used
@@ -78,11 +84,10 @@ public class MittagstischUtil {
      * @return boolean True if up-to-date otherwise false
      */
     protected static boolean isInWeek(final String weekText, final int days) {
-        final LocalDate now = LocalDate.now();
+        final LocalDate now = getLocalizedDate();
         final LocalDate date = now.plusDays(days);
-        final TemporalField field = WeekFields.of(Locale.GERMAN).dayOfWeek();
-        final LocalDate firstDay = date.with(field, 1);
-        final LocalDate lastDay = date.with(field, 5);
+        final LocalDate firstDay = date.with(dayOfWeek(), 1);
+        final LocalDate lastDay = date.with(dayOfWeek(), 5);
 
         final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.");
         final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM");
@@ -114,7 +119,7 @@ public class MittagstischUtil {
      * @return String
      */
     protected static String getDay(final int value, final boolean toUppercase) {
-        String day = LocalDate.now().plusDays(value).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN);
+        String day = getLocalizedDate().plusDays(value).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN);
         return toUppercase ? day.toUpperCase() : day;
     }
 
@@ -138,6 +143,17 @@ public class MittagstischUtil {
             lunch.setFood(NEXT_WEEK);
         }
         return lunch;
+    }
+
+    protected static TemporalField dayOfWeek() {
+        return WeekFields.of(Locale.GERMAN).dayOfWeek();
+    }
+
+    protected static LocalDate getLocalizedDate() {
+        final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
+        final String format = now.format(DateTimeFormatter.ofPattern("dd.MM.YYYY"));
+        LOGGER.debug("Used date in week: '{}'", format);
+        return now;
     }
 
 }
