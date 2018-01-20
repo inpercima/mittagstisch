@@ -137,6 +137,7 @@ public class MittagstischUtil {
             final String url, final boolean daily) {
         final Lunch lunch = new Lunch(name);
         final String weekText = MittagstischUtil.getWeek(selectorWeek, page);
+        LOGGER.debug("prepare for '{}' with weektext '{}'", name, weekText);
         if (!MittagstischUtil.isInWeek(weekText, 0) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
             lunch.setFood(String.format(OUTDATED, url, url));
         } else if (MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK) && daily) {
@@ -152,7 +153,7 @@ public class MittagstischUtil {
     protected static LocalDate getLocalizedDate() {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
         final String format = now.format(DateTimeFormatter.ofPattern("dd.MM.YYYY"));
-        LOGGER.debug("Used date in week: '{}'", format);
+        LOGGER.debug("Used date: '{}'", format);
         return now;
     }
 
