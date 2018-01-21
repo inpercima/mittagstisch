@@ -73,7 +73,7 @@ public class MittagstischUtil {
      * @return String The content including week information
      */
     public static String getWeek(final String selector, final HtmlPage page) {
-        return page.querySelector(selector).getTextContent();
+        return page.querySelector(selector).getTextContent().replaceAll(" ", "");
     }
 
     /**
@@ -89,13 +89,13 @@ public class MittagstischUtil {
         final LocalDate firstDay = date.with(dayOfWeek(), 1);
         final LocalDate lastDay = date.with(dayOfWeek(), 5);
 
-        final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.");
-        final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM");
-        final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM");
-        final DateTimeFormatter dSpaceMMMM = DateTimeFormatter.ofPattern("d. MMMM YYYY");
+        final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.", Locale.GERMANY);
+        final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
+        final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
+        final DateTimeFormatter dSpaceMMMM = DateTimeFormatter.ofPattern("d.MMMMYYYY", Locale.GERMANY);
 
-        final int weekNumber = date.get(WeekFields.of(Locale.GERMAN).weekOfYear());
-        final DateTimeFormatter year = DateTimeFormatter.ofPattern("YYYY");
+        final int weekNumber = date.get(WeekFields.of(Locale.GERMANY).weekOfYear());
+        final DateTimeFormatter year = DateTimeFormatter.ofPattern("YYYY", Locale.GERMANY);
 
         return lastDay.isAfter(now) &&
         /* @formatter:off */
@@ -119,7 +119,7 @@ public class MittagstischUtil {
      * @return String
      */
     protected static String getDay(final int value, final boolean toUppercase) {
-        String day = getLocalizedDate().plusDays(value).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMAN);
+        String day = getLocalizedDate().plusDays(value).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY);
         return toUppercase ? day.toUpperCase() : day;
     }
 
@@ -137,7 +137,7 @@ public class MittagstischUtil {
             final String url, final boolean daily) {
         final Lunch lunch = new Lunch(name);
         final String weekText = MittagstischUtil.getWeek(selectorWeek, page);
-        LOGGER.debug("prepare for '{}' with weektext '{}'", name, weekText);
+        LOGGER.debug("prepare lunch for '{}' with weektext '{}'", name, weekText);
         if (!MittagstischUtil.isInWeek(weekText, 0) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
             lunch.setFood(String.format(OUTDATED, url, url));
         } else if (MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK) && daily) {
@@ -147,7 +147,7 @@ public class MittagstischUtil {
     }
 
     protected static TemporalField dayOfWeek() {
-        return WeekFields.of(Locale.GERMAN).dayOfWeek();
+        return WeekFields.of(Locale.GERMANY).dayOfWeek();
     }
 
     protected static LocalDate getLocalizedDate() {
