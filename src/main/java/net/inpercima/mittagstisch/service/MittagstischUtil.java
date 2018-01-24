@@ -95,7 +95,6 @@ public class MittagstischUtil {
         final DateTimeFormatter dSpaceMMMM = DateTimeFormatter.ofPattern("d.MMMMYYYY", Locale.GERMANY);
 
         final int weekNumber = date.get(WeekFields.of(Locale.GERMANY).weekOfYear());
-        final DateTimeFormatter year = DateTimeFormatter.ofPattern("YYYY", Locale.GERMANY);
 
         return lastDay.isAfter(now) &&
         /* @formatter:off */
@@ -105,7 +104,8 @@ public class MittagstischUtil {
             || (weekText.contains(firstDay.format(dMMMM).toUpperCase())
                     && weekText.contains(lastDay.format(dMMMM).toUpperCase()))
             // Pan Lokal
-            || (weekText.contains(String.valueOf(weekNumber).concat(", ").concat(date.format(year))))
+            || (weekText.contains(String.valueOf(weekNumber)) &&
+             (weekText.contains("KW") || weekText.contains("KARTE")))
             // Wullewupp
             || (weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM))));
         /* @formatter:on */
