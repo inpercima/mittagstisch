@@ -7,6 +7,8 @@ public class Lunch {
     private String food;
 
     private String price;
+    
+    private String status;
 
     public Lunch(final String page) {
         this.page = page;
@@ -34,6 +36,14 @@ public class Lunch {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

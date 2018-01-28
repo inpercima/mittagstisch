@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
@@ -24,15 +23,25 @@ import net.inpercima.mittagstisch.model.Lunch;
 
 public class MittagstischUtil {
 
-    protected static final String OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
+    private static final int IN_NEXT_WEEK = 7;
 
-    protected static final String NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
+    private static final String NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MittagstischUtil.class);
+
+    private static final String OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
+
+    protected static final String STATUS_ERROR = "status-error";
+
+    protected static final String STATUS_SUCCESS = "status-success";
+
+    protected static final String STATUS_WARNING = "status-warning";
 
     protected static final String TECHNICAL = "Derzeit kann aufgrund einer technische Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
-    private static final int IN_NEXT_WEEK = 7;
+    private static final String DATE_FORMAT = "dd.MM.YYYY";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MittagstischUtil.class);
+    private static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     private MittagstischUtil() {
         // not used
@@ -84,43 +93,33 @@ public class MittagstischUtil {
      * @return boolean True if up-to-date otherwise false
      */
     protected static boolean isInWeek(final String weekText, final int days) {
-        final LocalDate now = getLocalizedDate();
-        final LocalDate date = now.plusDays(days);
-        final LocalDate firstDay = date.with(dayOfWeek(), 1);
-        final LocalDate lastDay = date.with(dayOfWeek(), 5);
+        final LocalDate now = getLocalizedDate(days);
+        final LocalDate firstDay = now.with(dayOfWeek(), 1);
+        final LocalDate lastDay = now.with(dayOfWeek(), 5);
 
         final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.", Locale.GERMANY);
         final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
         final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
-        final DateTimeFormatter dSpaceMMMM = DateTimeFormatter.ofPattern("d.MMMMYYYY", Locale.GERMANY);
+        final DateTimeFormatter ddMMMMYYYY = DateTimeFormatter.ofPattern("dd.MMMMYYYY", Locale.GERMANY);
 
-        final int weekNumber = date.get(WeekFields.of(Locale.GERMANY).weekOfYear());
+        final int weekNumber = now.get(WeekFields.of(Locale.GERMANY).weekOfYear());
 
-        return lastDay.isAfter(now) &&
-        /* @formatter:off */
-            // Kaiserbad
-            ((weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dSpaceMMMM)))
-            // Kantine 3
-            || (weekText.contains(firstDay.format(dMMMM).toUpperCase())
-                    && weekText.contains(lastDay.format(dMMMM).toUpperCase()))
-            // Pan Lokal
-            || (weekText.contains(String.valueOf(weekNumber)) &&
-             (weekText.contains("KW") || weekText.contains("KARTE")))
-            // Wullewupp
-            || (weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM))));
-        /* @formatter:on */
-    }
+        final String formatFirsDay = firstDay.format(LOGGER_FORMAT);
+        LOGGER.debug("first day in week '{}'", formatFirsDay);
+        final String formatLastDay = lastDay.format(LOGGER_FORMAT);
+        LOGGER.debug("last day in week '{}'", formatLastDay);
 
-    /**
-     * Determine the day name for checks.
-     * 
-     * @param value The number of days added to the current day
-     * @param toUppercase True if the result should be in uppercase otherwise false
-     * @return String
-     */
-    protected static String getDay(final int value, final boolean toUppercase) {
-        String day = getLocalizedDate().plusDays(value).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY);
-        return toUppercase ? day.toUpperCase() : day;
+        final boolean kaiserbad = weekText.contains(firstDay.format(d))
+                && weekText.contains(lastDay.format(ddMMMMYYYY));
+        final boolean kantine3 = weekText.contains(firstDay.format(dMMMM).toUpperCase())
+                && weekText.contains(lastDay.format(dMMMM).toUpperCase());
+        final boolean pan = weekText.contains(String.valueOf(weekNumber))
+                && (weekText.contains("KW") || weekText.contains("KARTE"));
+        final boolean wullewupp = weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM));
+        final boolean isInweek = lastDay.isAfter(getLocalDate()) && (kaiserbad || kantine3 || pan || wullewupp);
+        LOGGER.debug("is in week: '{}'", isInweek);
+
+        return isInweek;
     }
 
     /**
@@ -131,17 +130,20 @@ public class MittagstischUtil {
      * @param selectorWeek The css selector for the week of the page
      * @param url The url of the page
      * @param daily True if the lunch is per day otherwise false
+     * @param days True if the lunch is for this day otherwise false (tomorrow)
      * @return String
      */
     protected static Lunch prepareLunch(final HtmlPage page, final String name, final String selectorWeek,
-            final String url, final boolean daily) {
+            final String url, final boolean daily, final int days) {
         final Lunch lunch = new Lunch(name);
         final String weekText = MittagstischUtil.getWeek(selectorWeek, page);
         LOGGER.debug("prepare lunch for '{}' with weektext '{}'", name, weekText);
-        if (!MittagstischUtil.isInWeek(weekText, 0) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
+        if (!MittagstischUtil.isInWeek(weekText, days) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
             lunch.setFood(String.format(OUTDATED, url, url));
-        } else if (MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK) && daily) {
+            lunch.setStatus(STATUS_ERROR);
+        } else if (MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK) && daily && days == 0) {
             lunch.setFood(NEXT_WEEK);
+            lunch.setStatus(STATUS_WARNING);
         }
         return lunch;
     }
@@ -150,10 +152,21 @@ public class MittagstischUtil {
         return WeekFields.of(Locale.GERMANY).dayOfWeek();
     }
 
-    protected static LocalDate getLocalizedDate() {
+    private static LocalDate getLocalDate() {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
-        final String format = now.format(DateTimeFormatter.ofPattern("dd.MM.YYYY"));
-        LOGGER.debug("Used date: '{}'", format);
+        final String format = now.format(LOGGER_FORMAT);
+        LOGGER.debug("current date: '{}'", format);
+        return now;
+    }
+
+    /**
+     * @param days True if the lunch is for this day otherwise false (tomorrow)
+     * @return LocalDate
+     */
+    protected static LocalDate getLocalizedDate(final int days) {
+        final LocalDate now = getLocalDate().plusDays(days);
+        final String format = now.format(LOGGER_FORMAT);
+        LOGGER.debug("used date for weekcheck: '{}'", format);
         return now;
     }
 

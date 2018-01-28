@@ -6,6 +6,8 @@ export class Lunch {
 
   price: string;
 
+  status: string;
+
   constructor() {}
 
 }

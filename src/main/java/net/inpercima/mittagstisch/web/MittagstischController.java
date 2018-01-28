@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.inpercima.mittagstisch.model.Lunch;
-import net.inpercima.mittagstisch.service.MittagstischCrawler;
+import net.inpercima.mittagstisch.service.MittagstischKaiserbad;
+import net.inpercima.mittagstisch.service.MittagstischKantine3;
+import net.inpercima.mittagstisch.service.MittagstischLebensmittelImbissSeidel;
+import net.inpercima.mittagstisch.service.MittagstischPanLokal;
+import net.inpercima.mittagstisch.service.MittagstischWullewupp;
 
 @RestController
 public class MittagstischController {
@@ -16,18 +20,29 @@ public class MittagstischController {
     @GetMapping(value = "/today")
     public List<Lunch> listToday() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischCrawler.lunchInKaiserbad(true));
-        lunch.add(MittagstischCrawler.lunchInKantine3());
-        lunch.add(MittagstischCrawler.lunchInLebensmittelSeidel());
-        lunch.add(MittagstischCrawler.lunchInPanLokal());
-        lunch.add(MittagstischCrawler.lunchInWullewupp());
+        lunch.add(MittagstischKaiserbad.prepare(true, 0));
+        lunch.add(MittagstischKantine3.prepare(0));
+        lunch.add(MittagstischLebensmittelImbissSeidel.prepare());
+        lunch.add(MittagstischPanLokal.prepare(0));
+        lunch.add(MittagstischWullewupp.prepare());
+        return lunch;
+    }
+
+    @GetMapping(value = "/tomorrow")
+    public List<Lunch> listTomorrow() throws IOException {
+        final List<Lunch> lunch = new ArrayList<>();
+        lunch.add(MittagstischKaiserbad.prepare(true, 1));
+        lunch.add(MittagstischKantine3.prepare(1));
+        lunch.add(MittagstischLebensmittelImbissSeidel.prepare());
+        lunch.add(MittagstischPanLokal.prepare(1));
+        lunch.add(MittagstischWullewupp.prepare());
         return lunch;
     }
 
     @GetMapping(value = "/next-week")
     public List<Lunch> listNextWeek() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischCrawler.lunchInKaiserbad(false));
+        lunch.add(MittagstischKaiserbad.prepare(false, 0));
         return lunch;
     }
 
