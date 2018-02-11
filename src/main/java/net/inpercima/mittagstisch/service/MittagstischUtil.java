@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
@@ -99,8 +100,9 @@ public class MittagstischUtil {
 
         final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.", Locale.GERMANY);
         final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
+        final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern("dd.MM.YYYY", Locale.GERMANY);
         final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
-        final DateTimeFormatter ddMMMMYYYY = DateTimeFormatter.ofPattern("dd.MMMMYYYY", Locale.GERMANY);
+        final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("d.MMMMYYYY", Locale.GERMANY);
 
         final int weekNumber = now.get(WeekFields.of(Locale.GERMANY).weekOfYear());
 
@@ -109,14 +111,16 @@ public class MittagstischUtil {
         final String formatLastDay = lastDay.format(LOGGER_FORMAT);
         LOGGER.debug("last day in week '{}'", formatLastDay);
 
-        final boolean kaiserbad = weekText.contains(firstDay.format(d))
-                && weekText.contains(lastDay.format(ddMMMMYYYY));
+        final boolean kaiserbad = weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dMMMMYYYY));
         final boolean kantine3 = weekText.contains(firstDay.format(dMMMM).toUpperCase())
                 && weekText.contains(lastDay.format(dMMMM).toUpperCase());
+        final boolean lebensmittelSeidel = weekText.contains(firstDay.format(ddMMYYYY))
+                && weekText.contains(lastDay.format(ddMMYYYY));
         final boolean pan = weekText.contains(String.valueOf(weekNumber))
                 && (weekText.contains("KW") || weekText.contains("KARTE"));
         final boolean wullewupp = weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM));
-        final boolean isInweek = lastDay.isAfter(getLocalDate()) && (kaiserbad || kantine3 || pan || wullewupp);
+        final boolean isInweek = lastDay.isAfter(getLocalDate())
+                && (kaiserbad || kantine3 || lebensmittelSeidel || pan || wullewupp);
         LOGGER.debug("is in week: '{}'", isInweek);
 
         return isInweek;
@@ -130,7 +134,7 @@ public class MittagstischUtil {
      * @param selectorWeek The css selector for the week of the page
      * @param url The url of the page
      * @param daily True if the lunch is per day otherwise false
-     * @param days True if the lunch is for this day otherwise false (tomorrow)
+     * @param days Days added to this day.
      * @return String
      */
     protected static Lunch prepareLunch(final HtmlPage page, final String name, final String selectorWeek,
@@ -160,14 +164,27 @@ public class MittagstischUtil {
     }
 
     /**
-     * @param days True if the lunch is for this day otherwise false (tomorrow)
+     * @param days Days added to this day.
      * @return LocalDate
      */
     protected static LocalDate getLocalizedDate(final int days) {
-        final LocalDate now = getLocalDate().plusDays(days);
-        final String format = now.format(LOGGER_FORMAT);
+        final LocalDate date = getLocalDate().plusDays(days);
+        final String format = date.format(LOGGER_FORMAT);
         LOGGER.debug("used date for weekcheck: '{}'", format);
-        return now;
+        return date;
+    }
+
+    /**
+     * Determine the day name for checks.
+     * 
+     * @param toUppercase True if the result should be in uppercase otherwise false
+     * @param days The number of days added to the current day
+     * @return String
+     */
+    protected static String getDay(final boolean toUppercase, final int days) {
+        String day = MittagstischUtil.getLocalizedDate(days).getDayOfWeek().getDisplayName(TextStyle.FULL,
+                Locale.GERMANY);
+        return toUppercase ? day.toUpperCase() : day;
     }
 
 }

@@ -22,7 +22,7 @@ public class MittagstischController {
         final List<Lunch> lunch = new ArrayList<>();
         lunch.add(MittagstischKaiserbad.prepare(true, 0));
         lunch.add(MittagstischKantine3.prepare(0));
-        lunch.add(MittagstischLebensmittelImbissSeidel.prepare());
+        lunch.add(MittagstischLebensmittelImbissSeidel.prepare(0));
         lunch.add(MittagstischPanLokal.prepare(0));
         lunch.add(MittagstischWullewupp.prepare());
         return lunch;
@@ -33,7 +33,7 @@ public class MittagstischController {
         final List<Lunch> lunch = new ArrayList<>();
         lunch.add(MittagstischKaiserbad.prepare(true, 1));
         lunch.add(MittagstischKantine3.prepare(1));
-        lunch.add(MittagstischLebensmittelImbissSeidel.prepare());
+        lunch.add(MittagstischLebensmittelImbissSeidel.prepare(1));
         lunch.add(MittagstischPanLokal.prepare(1));
         lunch.add(MittagstischWullewupp.prepare());
         return lunch;
