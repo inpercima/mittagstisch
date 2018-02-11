@@ -18,6 +18,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebClientOptions;
 import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import net.inpercima.mittagstisch.model.Lunch;
@@ -44,6 +45,8 @@ public class MittagstischUtil {
 
     private static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
+    private static boolean found = false;
+
     private MittagstischUtil() {
         // not used
     }
@@ -54,7 +57,7 @@ public class MittagstischUtil {
      * @param url The URL of the page which should be parsed
      * @return HtmlPage The page which should be parsed
      */
-    public static HtmlPage getHtmlPage(final String url) throws IOException {
+    protected static HtmlPage getHtmlPage(final String url) throws IOException {
         final WebRequest request = new WebRequest(new URL(url));
         request.setCharset(StandardCharsets.UTF_8);
         return initWebClient().getPage(request);
@@ -82,8 +85,8 @@ public class MittagstischUtil {
      * @param page The page to be parsed
      * @return String The content including week information
      */
-    public static String getWeek(final String selector, final HtmlPage page) {
-        return page.querySelector(selector).getTextContent().replaceAll(" ", "");
+    protected static String getWeek(final String selector, final HtmlPage page) {
+        return page.querySelector(selector).getTextContent().replaceAll(" ", "").trim();
     }
 
     /**
@@ -100,7 +103,7 @@ public class MittagstischUtil {
 
         final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.", Locale.GERMANY);
         final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
-        final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern("dd.MM.YYYY", Locale.GERMANY);
+        final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
         final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
         final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("d.MMMMYYYY", Locale.GERMANY);
 
@@ -127,7 +130,7 @@ public class MittagstischUtil {
     }
 
     /**
-     * Prepares a lunch with some predefined texts if needed.
+     * Prepares a lunch with some predefined content if needed.
      * 
      * @param page The page to be parsed
      * @param name The page name
@@ -152,10 +155,20 @@ public class MittagstischUtil {
         return lunch;
     }
 
+    /**
+     * Gets the TemporalField for day of the week.
+     * 
+     * @return TemporalField
+     */
     protected static TemporalField dayOfWeek() {
         return WeekFields.of(Locale.GERMANY).dayOfWeek();
     }
 
+    /**
+     * Gets the current date.
+     * 
+     * @return LocalDate
+     */
     private static LocalDate getLocalDate() {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
         final String format = now.format(LOGGER_FORMAT);
@@ -164,6 +177,8 @@ public class MittagstischUtil {
     }
 
     /**
+     * Gets the current date with specified days added.
+     * 
      * @param days Days added to this day.
      * @return LocalDate
      */
@@ -185,6 +200,21 @@ public class MittagstischUtil {
         String day = MittagstischUtil.getLocalizedDate(days).getDayOfWeek().getDisplayName(TextStyle.FULL,
                 Locale.GERMANY);
         return toUppercase ? day.toUpperCase() : day;
+    }
+
+    protected static boolean filterNodes(final DomNode node, final int days, final String endText,
+            final boolean uppercase) {
+        final String content = node.getTextContent();
+        if (startsWith(content, uppercase, days)) {
+            found = true;
+        } else if (startsWith(content, uppercase, days + 1) || content.startsWith(endText)) {
+            found = false;
+        }
+        return found && !content.trim().equals(getDay(uppercase, days));
+    }
+
+    private static boolean startsWith(final String content, final boolean uppercase, final int days) {
+        return content.startsWith(MittagstischUtil.getDay(uppercase, days));
     }
 
 }

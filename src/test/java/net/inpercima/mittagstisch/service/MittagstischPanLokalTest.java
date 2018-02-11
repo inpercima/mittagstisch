@@ -1,6 +1,6 @@
 package net.inpercima.mittagstisch.service;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -19,7 +19,8 @@ public class MittagstischPanLokalTest {
     public void panLokal() throws Exception {
         final HtmlPage page = MittagstischUtil.getHtmlPage(MittagstischPanLokal.URL);
         assertThat(page.getTitleText(), is("Mittagessen Archives - Pan"));
-        assertThat(MittagstischUtil.getWeek(MittagstischPanLokal.WEEK, page), containsString("Wochenkarte"));
+        assertThat(MittagstischUtil.getWeek(MittagstischPanLokal.WEEK, page),
+                anyOf(containsString("Wochenkarte"), containsString("Mittagskarte")));
     }
 
     @Test

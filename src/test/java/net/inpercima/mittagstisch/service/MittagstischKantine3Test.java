@@ -31,4 +31,23 @@ public class MittagstischKantine3Test {
         assertThat(lunch.getFood(), not(isEmptyString()));
     }
 
+    @Test
+    public void shouldUpdate() {
+        String updated = MittagstischKantine3.update("Rote Beete Risotto, grüne Erbsen und Salat7,-");
+        assertNotNull(updated);
+        assertThat(updated, is("Rote Beete Risotto, grüne Erbsen und Salat 7,-"));
+
+        updated = MittagstischKantine3.update("Rote Beete Risotto, grüne Erbsen und Salat10,-");
+        assertNotNull(updated);
+        assertThat(updated, is("Rote Beete Risotto, grüne Erbsen und Salat 10,-"));
+        
+        updated = MittagstischKantine3.update("Zitronenhähnchen8,50");
+        assertNotNull(updated);
+        assertThat(updated, is("Zitronenhähnchen 8,50"));
+
+        updated = MittagstischKantine3.update("Zitronenhähnchen10,50");
+        assertNotNull(updated);
+        assertThat(updated, is("Zitronenhähnchen 10,50"));
+    }
+
 }

@@ -1,10 +1,10 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
-import java.time.format.TextStyle;
-import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import net.inpercima.mittagstisch.model.Lunch;
@@ -26,6 +26,7 @@ public class MittagstischKantine3 {
      *
      * @param days The number of days added to the current day
      * @return Lunch Information about the lunch
+     * @throws IOException
      */
     public static Lunch prepare(final int days) throws IOException {
         final HtmlPage page = MittagstischUtil.getHtmlPage(URL);
@@ -45,32 +46,32 @@ public class MittagstischKantine3 {
      * @param days The number of days added to the current day
      */
     private static void parse(final HtmlPage page, final Lunch lunch, final int days) {
-        // details are in paragraphs per day
-        boolean found = false;
-        for (DomNode p : page.querySelectorAll(LUNCH)) {
-            final String content = p.getTextContent();
-            if (content.startsWith(getDay(true, days))) {
-                found = true;
-            } else if (content.startsWith(getDay(true, days + 1)) || content.startsWith("TÄGLICH")) {
-                break;
-            }
-            if (found && !content.trim().isEmpty()) {
-                lunch.setFood(lunch.getFood() == null ? content : lunch.getFood() + "<br><br>" + content);
-            }
-        }
+        String food = page.querySelectorAll(LUNCH).stream()
+                .filter(p -> MittagstischUtil.filterNodes(p, days, "TÄGLICH", true))
+                .map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
+        // Replacement necessary because name of day can be in the paragraph
+        lunch.setFood(food.replace(MittagstischUtil.getDay(true, days), ""));
+
     }
 
     /**
-     * Determine the day name for checks.
+     * Updates the content if there is no space between food and price.
      * 
-     * @param toUppercase True if the result should be in uppercase otherwise false
-     * @param days The number of days added to the current day
-     * @return String
+     * @param content The text in paragraph.
+     * @return
      */
-    private static String getDay(final boolean toUppercase, final int days) {
-        String day = MittagstischUtil.getLocalizedDate(days).getDayOfWeek().getDisplayName(TextStyle.FULL,
-                Locale.GERMANY);
-        return toUppercase ? day.toUpperCase() : day;
+    public static String update(final String content) {
+        String result = content;
+        final String[] pattern = { "\\d+,-", "\\d+,\\d+" };
+        for (int i = 0; i < pattern.length; i++) {
+            final Matcher matcher = Pattern.compile(pattern[i]).matcher(content);
+            if (matcher.find()) {
+                result = content.substring(0, matcher.start()).concat(" ")
+                        .concat(content.substring(matcher.start(), matcher.end()));
+                break;
+            }
+        }
+        return result;
     }
 
 }

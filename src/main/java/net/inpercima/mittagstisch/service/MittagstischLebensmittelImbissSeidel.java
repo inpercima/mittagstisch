@@ -16,8 +16,6 @@ public class MittagstischLebensmittelImbissSeidel {
 
     protected static final String WEEK = "body div div div div div.xr_s19 span:nth-of-type(1)";
 
-    private static boolean found = false;
-
     private MittagstischLebensmittelImbissSeidel() {
         // not used
     }
@@ -48,19 +46,10 @@ public class MittagstischLebensmittelImbissSeidel {
      */
     private static void parse(final HtmlPage page, final Lunch lunch, final int days) {
         // details are in spans per day after span with dayname
-        String food = page.querySelectorAll(LUNCH).stream().filter(span -> filterSpan(span, days))
+        String food = page.querySelectorAll(LUNCH).stream()
+                .filter(span -> MittagstischUtil.filterNodes(span, days, "Änderungen", false))
                 .map(DomNode::getTextContent).collect(Collectors.joining(" "));
-        lunch.setFood(food.replace(MittagstischUtil.getDay(false, days), ""));
-    }
-
-    private static boolean filterSpan(final DomNode span, final int days) {
-        final String content = span.getTextContent();
-        if (content.startsWith(MittagstischUtil.getDay(false, days))) {
-            found = true;
-        } else if (content.startsWith(MittagstischUtil.getDay(false, days + 1)) || content.startsWith("Änderungen")) {
-            found = false;
-        }
-        return found;
+        lunch.setFood(food);
     }
 
 }
