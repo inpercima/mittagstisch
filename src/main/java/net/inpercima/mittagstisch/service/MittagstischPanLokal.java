@@ -27,13 +27,19 @@ public class MittagstischPanLokal {
      * @throws IOException
      */
     public static Lunch prepare(final int days) throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(URL);
-        final Lunch lunch = MittagstischUtil.prepareLunch(page, "PAN Lokal", WEEK, URL, true, days);
-        if (lunch.getFood() == null) {
-            parse(page, lunch, days);
-            lunch.setStatus(MittagstischUtil.STATUS_SUCCESS);
-        }
+        final Lunch lunch = new Lunch("PAN Lokal");
+        lunch.setFood(String.format(MittagstischUtil.TECHNICAL, URL, URL));
+        lunch.setStatus(MittagstischUtil.STATUS_ERROR);
         return lunch;
+
+        // TODO: the page does not exist
+        // final HtmlPage page = MittagstischUtil.getHtmlPage(URL);
+        // final Lunch lunch = MittagstischUtil.prepareLunch(page, "PAN Lokal", WEEK, URL, true, days);
+        // if (lunch.getFood() == null) {
+        //     parse(page, lunch, days);
+        //     lunch.setStatus(MittagstischUtil.STATUS_SUCCESS);
+        // }
+        // return lunch;
     }
 
     /**
