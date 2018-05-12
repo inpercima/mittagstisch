@@ -12,6 +12,7 @@ const routes: Routes = [{
   canActivate: [AuthGuard],
   component: DashComponent,
   path: (<any>config).routes.default,
+  data: { title: 'Dashboard' },
 }, {
   component: TodayComponent,
   path: 'today',
