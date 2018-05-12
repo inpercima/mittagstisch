@@ -14,6 +14,8 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.experimental.UtilityClass;
+
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebClientOptions;
@@ -23,6 +25,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import net.inpercima.mittagstisch.model.Lunch;
 
+@UtilityClass
 public class MittagstischUtil {
 
     private static final int IN_NEXT_WEEK = 7;
@@ -39,17 +42,13 @@ public class MittagstischUtil {
 
     protected static final String STATUS_WARNING = "status-warning";
 
-    protected static final String TECHNICAL = "Derzeit kann aufgrund einer technische Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
+    protected static final String TECHNICAL = "Derzeit kann aufgrund einer technischen Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     private static final String DATE_FORMAT = "dd.MM.YYYY";
 
     private static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     private static boolean found = false;
-
-    private MittagstischUtil() {
-        // not used
-    }
 
     /**
      * Determine the page to get information of the lunch.
@@ -82,18 +81,19 @@ public class MittagstischUtil {
      * Determine the information of the week.
      * 
      * @param selector The selector to the inforamtion of week
-     * @param page The page to be parsed
+     * @param page     The page to be parsed
      * @return String The content including week information
      */
     protected static String getWeek(final String selector, final HtmlPage page) {
-        return page.querySelector(selector).getTextContent().replaceAll(" ", "").trim();
+        return page.querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty()).findFirst()
+                .map(node -> node.getTextContent()).get();
     }
 
     /**
      * Checks if the dates in the determined week are up-to-date.
      * 
      * @param weekText The determined information of week.
-     * @param days Days added to this day.
+     * @param days     Days added to this day.
      * @return boolean True if up-to-date otherwise false
      */
     protected static boolean isInWeek(final String weekText, final int days) {
@@ -122,7 +122,7 @@ public class MittagstischUtil {
         final boolean pan = weekText.contains(String.valueOf(weekNumber))
                 && (weekText.contains("KW") || weekText.contains("KARTE"));
         final boolean wullewupp = weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM));
-        final boolean isInweek = lastDay.isAfter(getLocalDate())
+        final boolean isInweek = lastDay.isAfter(now)
                 && (kaiserbad || kantine3 || lebensmittelSeidel || pan || wullewupp);
         LOGGER.debug("is in week: '{}'", isInweek);
 
@@ -132,12 +132,12 @@ public class MittagstischUtil {
     /**
      * Prepares a lunch with some predefined content if needed.
      * 
-     * @param page The page to be parsed
-     * @param name The page name
+     * @param page         The page to be parsed
+     * @param name         The page name
      * @param selectorWeek The css selector for the week of the page
-     * @param url The url of the page
-     * @param daily True if the lunch is per day otherwise false
-     * @param days Days added to this day.
+     * @param url          The url of the page
+     * @param daily        True if the lunch is per day otherwise false
+     * @param days         Days added to this day.
      * @return String
      */
     protected static Lunch prepareLunch(final HtmlPage page, final String name, final String selectorWeek,
@@ -171,8 +171,6 @@ public class MittagstischUtil {
      */
     private static LocalDate getLocalDate() {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
-        final String format = now.format(LOGGER_FORMAT);
-        LOGGER.debug("current date: '{}'", format);
         return now;
     }
 
@@ -183,8 +181,11 @@ public class MittagstischUtil {
      * @return LocalDate
      */
     protected static LocalDate getLocalizedDate(final int days) {
-        final LocalDate date = getLocalDate().plusDays(days);
-        final String format = date.format(LOGGER_FORMAT);
+        final LocalDate now = getLocalDate();
+        String format = now.format(LOGGER_FORMAT);
+        LOGGER.debug("current date: '{}'", format);
+        final LocalDate date = now.plusDays(days);
+        format = date.format(LOGGER_FORMAT);
         LOGGER.debug("used date for weekcheck: '{}'", format);
         return date;
     }
@@ -193,7 +194,7 @@ public class MittagstischUtil {
      * Determine the day name for checks.
      * 
      * @param toUppercase True if the result should be in uppercase otherwise false
-     * @param days The number of days added to the current day
+     * @param days        The number of days added to the current day
      * @return String
      */
     protected static String getDay(final boolean toUppercase, final int days) {
