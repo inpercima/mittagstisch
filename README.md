@@ -28,18 +28,29 @@ yarn
 ```
 
 # Usage
+## Run
 
 ```
-# build js resources in devMode, no backend given
-yarn run build:dev
+# build client and server in development mode
+./mvnw clean spring-boot:run
 
-# build js resources in prodMode, compressed, no backend given
-yarn run build:prod
+# build client and server in production mode
+./mvnw clean spring-boot:run -Pprod
 
-# build js resources and application in devMode
-./mvnw spring-boot:run
-# open result in browser
-http://localhost:8080/
+# serve on http://localhost:8080/
+```
+
+## Build
+
+```
+# build project
+./mvnw clean package -Pprod
+
+# build project without tests to speed up
+./mvnw clean package -Pprod -DskipTests
+
+# run project as jar
+java -jar target/mittagstisch-*.jar
 ```
 
 # Configuration
