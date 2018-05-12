@@ -1,13 +1,13 @@
-# project specific
+# begin project specific
 
-/public
-config/config.json
+dist/
+config.json
 swaaplate-recovery.json
+node/
 
-# end of project specific
+# end project specific
 
-
-# Created by https://www.gitignore.io/api/node,maven,eclipse
+# Created by https://www.gitignore.io/api/java,node,maven,eclipse,visualstudiocode
 
 ### Eclipse ###
 
@@ -62,11 +62,38 @@ local.properties
 .worksheet
 
 ### Eclipse Patch ###
-# Eclipse Core      
+# Eclipse Core		
 .project
 
-# JDT-specific (Eclipse Java Development Tools)     
+# JDT-specific (Eclipse Java Development Tools)		
 .classpath
+
+# Annotation Processing
+.apt_generated
+
+### Java ###
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 
 ### Maven ###
 target/
@@ -85,7 +112,6 @@ buildNumber.properties
 ### Node ###
 # Logs
 logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -143,4 +169,13 @@ typings/
 .env
 
 
-# End of https://www.gitignore.io/api/node,maven,eclipse
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+
+# End of https://www.gitignore.io/api/java,node,maven,eclipse,visualstudiocode

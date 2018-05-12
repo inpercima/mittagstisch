@@ -23,7 +23,7 @@ public class MittagstischWullewuppTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("page not parsable")
     public void shouldPrepare() {
         final Lunch lunch = MittagstischWullewupp.prepare();
         assertNotNull(lunch);
