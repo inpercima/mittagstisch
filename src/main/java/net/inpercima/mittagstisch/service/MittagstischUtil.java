@@ -206,7 +206,9 @@ public class MittagstischUtil {
 
     protected static boolean filterNodes(final DomNode node, final int days, final String endText,
             final boolean uppercase) {
-        final String content = node.getTextContent();
+
+        // use regex '\u00A0' to match No-Break space (&nbsp;)
+        final String content = node.getTextContent().replace('\u00A0',' ').trim();
         if (startsWith(content, uppercase, days)) {
             found = true;
         } else if (startsWith(content, uppercase, days + 1) || content.startsWith(endText)) {
