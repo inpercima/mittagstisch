@@ -51,7 +51,6 @@ public class MittagstischKantine3 {
                 .map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
         // Replacement necessary because name of day can be in the paragraph
         lunch.setFood(food.replace(MittagstischUtil.getDay(true, days), ""));
-
     }
 
     /**

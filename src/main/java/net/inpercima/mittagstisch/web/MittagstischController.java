@@ -20,9 +20,9 @@ public class MittagstischController {
     @GetMapping(value = "/today")
     public List<Lunch> listToday() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischKaiserbad.prepare(true, 0));
-        lunch.add(MittagstischKantine3.prepare(0));
         lunch.add(MittagstischLebensmittelImbissSeidel.prepare(0));
+        lunch.add(MittagstischKantine3.prepare(0));
+        lunch.add(MittagstischKaiserbad.prepare(true, 0));
         lunch.add(MittagstischPanLokal.prepare(0));
         lunch.add(MittagstischWullewupp.prepare());
         return lunch;
@@ -31,9 +31,9 @@ public class MittagstischController {
     @GetMapping(value = "/tomorrow")
     public List<Lunch> listTomorrow() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischKaiserbad.prepare(true, 1));
-        lunch.add(MittagstischKantine3.prepare(1));
         lunch.add(MittagstischLebensmittelImbissSeidel.prepare(1));
+        lunch.add(MittagstischKantine3.prepare(1));
+        lunch.add(MittagstischKaiserbad.prepare(true, 1));
         lunch.add(MittagstischPanLokal.prepare(1));
         lunch.add(MittagstischWullewupp.prepare());
         return lunch;

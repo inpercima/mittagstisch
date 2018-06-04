@@ -48,6 +48,7 @@ public class MittagstischUtil {
 
     private static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
+    // global b/c of itteration for valid sections
     private static boolean found = false;
 
     /**
@@ -101,11 +102,11 @@ public class MittagstischUtil {
         final LocalDate firstDay = now.with(dayOfWeek(), 1);
         final LocalDate lastDay = now.with(dayOfWeek(), 5);
 
-        final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.", Locale.GERMANY);
+        final DateTimeFormatter d = DateTimeFormatter.ofPattern("dd.", Locale.GERMANY);
         final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
         final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
         final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
-        final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("d.MMMMYYYY", Locale.GERMANY);
+        final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("dd. MMMM YYYY", Locale.GERMANY);
 
         final int weekNumber = now.get(WeekFields.of(Locale.GERMANY).weekOfYear());
 
