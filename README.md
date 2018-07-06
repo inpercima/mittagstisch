@@ -1,4 +1,4 @@
-# About this - mittagstisch
+# mittagstisch
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
 [![dependencies Status](https://david-dm.org/inpercima/mittagstisch/status.svg)](https://david-dm.org/inpercima/mittagstisch)
 [![devDependencies Status](https://david-dm.org/inpercima/mittagstisch/dev-status.svg)](https://david-dm.org/inpercima/mittagstisch?type=dev)
@@ -7,13 +7,13 @@ The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).
 
 This project was generated with [swaaplate](https://github.com/inpercima/swaaplate).
 
-# Prerequisites
-## Node, npm or yarn
+## Prerequisites
+### Node, npm or yarn
 * `node 8.11.3` or higher in combination with
   * `npm 5.6.0` or higher or
   * `yarn 1.7.0` or higher, used in this repository
 
-# Getting started
+## Getting started
 
 ```
 # clone project
@@ -27,8 +27,8 @@ cp src/config.default.json src/config.json
 yarn
 ```
 
-# Usage
-## Run
+## Usage
+### Run
 
 ```
 # build client and server in development mode
@@ -40,7 +40,7 @@ yarn
 # serve on http://localhost:8080/
 ```
 
-## Build
+### Build
 
 ```
 # build project
@@ -53,11 +53,11 @@ yarn
 java -jar target/mittagstisch-*.jar
 ```
 
-# Configuration
-## General
+## Configuration
+### General
 All options have to bet set but some of them do not need to be changed.
 
-## Table of contents
+### Table of contents
 * [appname](#appname)
 * [routes/default](#routesdefault)
 * [routes/features/show](#routesfeaturesshow)
@@ -66,41 +66,41 @@ All options have to bet set but some of them do not need to be changed.
 * [routes/notFound/redirect](#routesnotfoundredirect)
 * [theme](#theme)
 
-## `appname`
+### `appname`
 Applicationwide title of the app, displayed in title and toolbar.
 * default: `mittagstisch`
 * type: `string`
 
-## `routes/default`
+### `routes/default`
 The main route and the redirect route after login if no route is stored.
 * default: `dashboard`
 * type: `string`
 
-## `routes/features/show`
+### `routes/features/show`
 Defines whether feature routes will be displayed or not.
 * default: `true`
 * type: `boolean`
 * values: `true`/`false`
 
-## `routes/login/activate`
+### `routes/login/activate`
 Defines whether a login will be used or not.
 * default: `true`
 * type: `boolean`
 * values: `true`/`false`
 
-## `routes/login/show`
+### `routes/login/show`
 Defines whether login route will be displayed or not.
 * default: `false`
 * type: `boolean`
 * values: `true`/`false`
 
-## `routes/notFound/redirect`
+### `routes/notFound/redirect`
 Defines whether the 404 route will redirect to the default route or not.
 * default: `false`
 * type: `boolean`
 * values: `true`/`false`
 
-## `theme`
+### `theme`
 Name of a build-in theme from angular-material.
 * default: `indigo-pink`
 * type: `string`
