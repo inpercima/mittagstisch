@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
-import { LunchService } from '../../core/lunch.service';
-
-import { Lunch } from '../../core/lunch';
+import { LunchService } from 'src/app/core/lunch.service';
+import { Lunch } from 'src/app/core/lunch';
 
 @Component({
-  selector: 'mt-today',
-  templateUrl: './today.component.html',
+  selector: 'mt-tomorrow',
+  templateUrl: '../today/today.component.html',
+  styleUrls: ['./tomorrow.component.css']
 })
-export class TodayComponent implements OnInit {
+export class TomorrowComponent implements OnInit {
 
   private panelOpenState: boolean;
 
@@ -21,7 +21,7 @@ export class TodayComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.lunchService.get().subscribe(lunch => {
+    this.lunchService.getTomorrow().subscribe(lunch => {
       this.lunch = lunch;
       this.loaded = true;
     });

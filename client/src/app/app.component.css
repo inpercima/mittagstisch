@@ -4,10 +4,22 @@ body {
   overflow-y: scroll;
 }
 
-.mat-card {
+.mat-accordion, .mat-card {
   margin-top: 20px;
 }
 
 .full-width {
   width: 100%;
+}
+
+.status-error {
+  background-color: #ffeaed;
+}
+
+.status-success {
+  background-color: #daf9dc;
+}
+
+.status-warning {
+  background-color: #ffffd1;
 }

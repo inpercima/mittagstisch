@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
-import { LunchService } from '../../core/lunch.service';
-
-import { Lunch } from '../../core/lunch';
+import { LunchService } from 'src/app/core/lunch.service';
+import { Lunch } from 'src/app/core/lunch';
 
 @Component({
   selector: 'mt-next-week',
   templateUrl: '../today/today.component.html',
+  styleUrls: ['./next-week.component.css']
 })
 export class NextWeekComponent implements OnInit {
 
