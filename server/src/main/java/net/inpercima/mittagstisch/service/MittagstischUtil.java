@@ -11,10 +11,8 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -26,13 +24,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import net.inpercima.mittagstisch.model.Lunch;
 
 @UtilityClass
+@Slf4j
 public class MittagstischUtil {
 
     private static final int IN_NEXT_WEEK = 7;
 
     private static final String NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MittagstischUtil.class);
 
     private static final String OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
@@ -69,9 +66,9 @@ public class MittagstischUtil {
      * @return WebClient The initialized client
      */
     private static WebClient initWebClient() {
-        final WebClient webClient = new WebClient(BrowserVersion.FIREFOX_52);
+        final WebClient webClient = new WebClient(BrowserVersion.FIREFOX_60);
         final WebClientOptions options = webClient.getOptions();
-        options.setJavaScriptEnabled(true);
+        options.setJavaScriptEnabled(false);
         options.setUseInsecureSSL(true);
         options.setThrowExceptionOnScriptError(true);
         options.setThrowExceptionOnFailingStatusCode(true);
@@ -80,7 +77,7 @@ public class MittagstischUtil {
 
     /**
      * Determine the information of the week.
-     * 
+     *
      * @param selector The selector to the inforamtion of week
      * @param page     The page to be parsed
      * @return String The content including week information
@@ -92,7 +89,7 @@ public class MittagstischUtil {
 
     /**
      * Checks if the dates in the determined week are up-to-date.
-     * 
+     *
      * @param weekText The determined information of week.
      * @param days     Days added to this day.
      * @return boolean True if up-to-date otherwise false
@@ -111,9 +108,9 @@ public class MittagstischUtil {
         final int weekNumber = now.get(WeekFields.of(Locale.GERMANY).weekOfYear());
 
         final String formatFirsDay = firstDay.format(LOGGER_FORMAT);
-        LOGGER.debug("first day in week '{}'", formatFirsDay);
+        log.debug("first day in week '{}'", formatFirsDay);
         final String formatLastDay = lastDay.format(LOGGER_FORMAT);
-        LOGGER.debug("last day in week '{}'", formatLastDay);
+        log.debug("last day in week '{}'", formatLastDay);
 
         final boolean kaiserbad = weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dMMMMYYYY));
         final boolean kantine3 = weekText.contains(firstDay.format(dMMMM).toUpperCase())
@@ -125,14 +122,14 @@ public class MittagstischUtil {
         final boolean wullewupp = weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM));
         final boolean isInweek = lastDay.isAfter(now)
                 && (kaiserbad || kantine3 || lebensmittelSeidel || pan || wullewupp);
-        LOGGER.debug("is in week: '{}'", isInweek);
+        log.debug("is in week: '{}'", isInweek);
 
         return isInweek;
     }
 
     /**
      * Prepares a lunch with some predefined content if needed.
-     * 
+     *
      * @param page         The page to be parsed
      * @param name         The page name
      * @param selectorWeek The css selector for the week of the page
@@ -145,7 +142,7 @@ public class MittagstischUtil {
             final String url, final boolean daily, final int days) {
         final Lunch lunch = new Lunch(name);
         final String weekText = MittagstischUtil.getWeek(selectorWeek, page);
-        LOGGER.debug("prepare lunch for '{}' with weektext '{}'", name, weekText);
+        log.debug("prepare lunch for '{}' with weektext '{}'", name, weekText);
         if (!MittagstischUtil.isInWeek(weekText, days) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
             lunch.setFood(String.format(OUTDATED, url, url));
             lunch.setStatus(STATUS_ERROR);
@@ -158,7 +155,7 @@ public class MittagstischUtil {
 
     /**
      * Gets the TemporalField for day of the week.
-     * 
+     *
      * @return TemporalField
      */
     protected static TemporalField dayOfWeek() {
@@ -167,7 +164,7 @@ public class MittagstischUtil {
 
     /**
      * Gets the current date.
-     * 
+     *
      * @return LocalDate
      */
     private static LocalDate getLocalDate() {
@@ -177,23 +174,23 @@ public class MittagstischUtil {
 
     /**
      * Gets the current date with specified days added.
-     * 
+     *
      * @param days Days added to this day.
      * @return LocalDate
      */
     protected static LocalDate getLocalizedDate(final int days) {
         final LocalDate now = getLocalDate();
         String format = now.format(LOGGER_FORMAT);
-        LOGGER.debug("current date: '{}'", format);
+        log.debug("current date: '{}'", format);
         final LocalDate date = now.plusDays(days);
         format = date.format(LOGGER_FORMAT);
-        LOGGER.debug("used date for weekcheck: '{}'", format);
+        log.debug("used date for weekcheck: '{}'", format);
         return date;
     }
 
     /**
      * Determine the day name for checks.
-     * 
+     *
      * @param toUppercase True if the result should be in uppercase otherwise false
      * @param days        The number of days added to the current day
      * @return String
@@ -208,7 +205,7 @@ public class MittagstischUtil {
             final boolean uppercase) {
 
         // use regex '\u00A0' to match No-Break space (&nbsp;)
-        final String content = node.getTextContent().replace('\u00A0',' ').trim();
+        final String content = node.getTextContent().replace('\u00A0', ' ').trim();
         if (startsWith(content, uppercase, days)) {
             found = true;
         } else if (startsWith(content, uppercase, days + 1) || content.startsWith(endText)) {
