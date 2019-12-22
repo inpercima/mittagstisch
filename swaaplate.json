@@ -1,0 +1,48 @@
+{
+  "general": {
+    "buildWebDir": "dist",
+    "github": {
+      "use": true,
+      "username": "inpercima"
+    },
+    "installDependencies": true,
+    "selectorPrefix": "mt",
+    "theme": "indigo-pink",
+    "title": "Mittagstisch",
+    "useDocker": false,
+    "useYarn": true
+  },
+  "packageJson": {
+    "author": "Marcel Jänicke",
+    "contributors": [{
+      "name": "Marcel Jänicke",
+      "email": "inpercima@gmail.com"
+    }],
+    "description": "The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).",
+    "homepage": "https://github.com/inpercima/mittagstisch",
+    "name": "mittagstisch",
+    "repository": "https://github.com/inpercima/mittagstisch"
+  },
+  "route": {
+    "default": "dashboard",
+    "features": {
+      "show": true
+    },
+    "login": {
+      "activate": false,
+      "name": "login",
+      "show": false
+    },
+    "notFound": {
+      "name": "not-found",
+      "redirect": false
+    }
+  },
+  "server": {
+    "backend": "java",
+    "htaccess": false,
+    "management": "maven",
+    "packagePath": "net.inpercima.mittagstisch",
+    "serverAsApi": false
+  }
+}

@@ -1,0 +1,12 @@
+#
+# APPLICATION CONFIG
+#
+
+# enable gz compression
+server:
+  compression:
+    enabled: true
+
+spring:
+  profiles:
+    active: dev
