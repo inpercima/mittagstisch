@@ -145,5 +145,8 @@
       }
     }
   },
-  "defaultProject": "mittagstisch"
+  "defaultProject": "mittagstisch",
+  "cli": {
+    "packageManager": "yarn"
+  }
 }
