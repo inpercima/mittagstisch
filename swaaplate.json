@@ -7,6 +7,7 @@
       "username": "inpercima"
     },
     "name": "mittagstisch",
+    "title": "Mittagstisch",
     "useDocker": false
   },
   "client": {
@@ -37,7 +38,6 @@
     },
     "selectorPrefix": "mt",
     "theme": "indigo-pink",
-    "title": "Mittagstisch",
     "useYarn": true
   },
   "server": {
