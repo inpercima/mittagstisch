@@ -8,7 +8,7 @@ public class MittagstischWullewupp {
 
     protected static final String URL = "https://www.wullewupp.de/bar";
 
-    protected static final String WEEK = "";
+    protected static final String WEEK = "div[id='PAGES_CONTAINERinlineContent'] div div div div div div div div div div h2";
 
     private MittagstischWullewupp() {
         // not used
