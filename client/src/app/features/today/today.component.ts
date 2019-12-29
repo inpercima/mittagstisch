@@ -5,8 +5,7 @@ import { Lunch } from 'src/app/core/lunch';
 
 @Component({
   selector: 'mt-today',
-  templateUrl: './today.component.html',
-  styleUrls: ['./today.component.css']
+  templateUrl: '../../shared/lunch-entry/lunch-entry.component.html',
 })
 export class TodayComponent implements OnInit {
 
