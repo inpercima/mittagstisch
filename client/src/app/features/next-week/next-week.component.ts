@@ -5,8 +5,7 @@ import { Lunch } from 'src/app/core/lunch';
 
 @Component({
   selector: 'mt-next-week',
-  templateUrl: '../today/today.component.html',
-  styleUrls: ['./next-week.component.css']
+  templateUrl: '../../shared/lunch-entry/lunch-entry.component.html',
 })
 export class NextWeekComponent implements OnInit {
 
