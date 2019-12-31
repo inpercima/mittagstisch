@@ -16,7 +16,7 @@ public class MittagstischWullewupp extends Mittagstisch {
     }
 
     /**
-     * Parses and returns the output for the lunch in "Lebensmittel Imbiss Seidel".
+     * Parses and returns the output for the lunch in "Wullewupp".
      *
      * @param state
      * @throws IOException

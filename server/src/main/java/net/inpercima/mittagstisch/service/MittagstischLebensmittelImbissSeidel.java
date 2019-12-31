@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import net.inpercima.mittagstisch.model.Lunch;
 import net.inpercima.mittagstisch.model.State;
@@ -28,10 +27,7 @@ public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
      */
     public Lunch parse(final State state) throws IOException {
         // details are in spans per day after span with dayname
-        final HtmlPage htmlPage = MittagstischUtil.getHtmlPage(getUrl());
-        final String food = htmlPage.querySelectorAll(getLunchSelector()).stream()
-                .filter(span -> MittagstischUtil.filterNodes(span, getDays(), "Änderungen", false))
-                .map(DomNode::getTextContent).collect(Collectors.joining(" "));
+        final String food = filter("Änderungen").map(DomNode::getTextContent).collect(Collectors.joining(" "));
         return buildLunch(state, food);
     }
 

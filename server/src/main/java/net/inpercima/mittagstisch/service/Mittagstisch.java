@@ -1,6 +1,10 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
+import java.util.stream.Stream;
+
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -68,12 +72,19 @@ public class Mittagstisch {
         return state;
     }
 
+    public Stream<DomNode> filter(final String filter) throws IOException {
+        final HtmlPage htmlPage = MittagstischUtil.getHtmlPage(getUrl());
+         return htmlPage.querySelectorAll(getLunchSelector()).stream()
+        .filter(span -> MittagstischUtil.filterNodes(span, getDays(), filter, false));
+
+    }
+
      /**
      * Prepares a Lunch with some predefined content if needed.
      *
-     * @return Lunch
      * @param state
      * @param food
+     * @return Lunch
      * @throws IOException
      */
     public Lunch buildLunch(final State state, final String food) {

@@ -5,8 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 import net.inpercima.mittagstisch.model.Lunch;
 import net.inpercima.mittagstisch.model.State;
 
@@ -28,10 +26,8 @@ public class MittagstischKantine3 extends Mittagstisch {
      * @throws IOException
      */
     public Lunch parse(final State state) throws IOException {
-        final HtmlPage htmlPage = MittagstischUtil.getHtmlPage(getUrl());
-        String food = htmlPage.querySelectorAll(getLunchSelector()).stream()
-                .filter(p -> MittagstischUtil.filterNodes(p, getDays(), "TÄGLICH", true))
-                .map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
+        // details are in spans per day after span with dayname
+        String food = filter("TÄGLICH").map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
         // Replacement necessary because name of day can be in the paragraph
         return buildLunch(state, food.replace(MittagstischUtil.getDay(true, getDays()), ""));
     }
