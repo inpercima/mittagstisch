@@ -13,13 +13,13 @@ body {
 }
 
 .status-error {
-  background-color: #ffeaed;
+  background-color: #ffeaed !important;
 }
 
 .status-success {
-  background-color: #daf9dc;
+  background-color: #daf9dc !important;
 }
 
 .status-warning {
-  background-color: #ffffd1;
+  background-color: #ffffd1 !important;
 }

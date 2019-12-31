@@ -1,27 +1,28 @@
 package net.inpercima.mittagstisch.service;
 
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.model.State;
 
-public class MittagstischWullewupp {
+public class MittagstischWullewupp extends Mittagstisch {
 
-    protected static final String LUNCH = "";
-
-    protected static final String URL = "https://www.wullewupp.de/bar";
-
-    protected static final String WEEK = "div[id='PAGES_CONTAINERinlineContent'] div div div div div div div div div div h2";
-
-    private MittagstischWullewupp() {
-        // not used
+    public MittagstischWullewupp(final int days) {
+        this.setLunchSelector("");
+        this.setUrl("https://www.wullewupp.de/bar");
+        this.setWeekSelector("div[id='PAGES_CONTAINERinlineContent'] div div div div div div div div div div h2");
+        this.setName("Wullewupp");
+        this.setDays(days);
+        this.setDaily(true);
+        this.setDissabled(true);
     }
 
     /**
-     * Returns the output for the lunch in "Wullewupp".
+     * Parses and returns the output for the lunch in "Lebensmittel Imbiss Seidel".
+     *
+     * @param state
+     * @throws IOException
      */
-    public static Lunch prepare() {
-        final Lunch lunch = new Lunch("Wullewupp");
-        lunch.setFood(String.format(MittagstischUtil.TECHNICAL, URL, URL));
-        lunch.setStatus(MittagstischUtil.STATUS_ERROR);
-        return lunch;
+    public Lunch parse(final State state) {
+        return buildLunch(state, "");
     }
 
 }

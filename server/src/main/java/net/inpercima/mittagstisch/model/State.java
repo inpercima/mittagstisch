@@ -5,15 +5,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Lunch {
-
-    private String name;
-
-    private String food;
-
-    private String price;
+public class State {
 
     private String status;
 
+    private String statusText;
 
 }

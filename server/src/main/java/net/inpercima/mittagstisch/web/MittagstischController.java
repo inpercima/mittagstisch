@@ -20,29 +20,46 @@ public class MittagstischController {
     @GetMapping(value = "/today")
     public List<Lunch> listToday() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischLebensmittelImbissSeidel.prepare(0));
-        lunch.add(MittagstischKantine3.prepare(0));
-        lunch.add(MittagstischKaiserbad.prepare(true, 0));
-        lunch.add(MittagstischPanLokal.prepare(0));
-        lunch.add(MittagstischWullewupp.prepare());
+        MittagstischLebensmittelImbissSeidel mlis = new MittagstischLebensmittelImbissSeidel(0);
+        lunch.add(mlis.parse(mlis.prepare()));
+
+        MittagstischKantine3 mk3 = new MittagstischKantine3(0);
+        lunch.add(mk3.parse(mk3.prepare()));
+
+        MittagstischWullewupp mw = new MittagstischWullewupp(0);
+        lunch.add(mw.parse(mw.prepare()));
+
+        MittagstischKaiserbad mk = new MittagstischKaiserbad(0);
+        lunch.add(mk.parse(mk.prepare()));
+
+        MittagstischPanLokal mpl = new MittagstischPanLokal(0);
+        lunch.add(mpl.parse(mpl.prepare()));
         return lunch;
     }
 
     @GetMapping(value = "/tomorrow")
     public List<Lunch> listTomorrow() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischLebensmittelImbissSeidel.prepare(1));
-        lunch.add(MittagstischKantine3.prepare(1));
-        lunch.add(MittagstischKaiserbad.prepare(true, 1));
-        lunch.add(MittagstischPanLokal.prepare(1));
-        lunch.add(MittagstischWullewupp.prepare());
+        MittagstischLebensmittelImbissSeidel mlis = new MittagstischLebensmittelImbissSeidel(1);
+        lunch.add(mlis.parse(mlis.prepare()));
+
+        MittagstischKantine3 mk3 = new MittagstischKantine3(1);
+        lunch.add(mk3.parse(mk3.prepare()));
+
+        MittagstischWullewupp mw = new MittagstischWullewupp(1);
+        lunch.add(mw.parse(mw.prepare()));
+
+        MittagstischKaiserbad mk = new MittagstischKaiserbad(1);
+        lunch.add(mk.parse(mk.prepare()));
+
+        MittagstischPanLokal mpl = new MittagstischPanLokal(1);
+        lunch.add(mpl.parse(mpl.prepare()));
         return lunch;
     }
 
     @GetMapping(value = "/next-week")
     public List<Lunch> listNextWeek() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(MittagstischKaiserbad.prepare(false, 0));
         return lunch;
     }
 

@@ -21,25 +21,9 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-import net.inpercima.mittagstisch.model.Lunch;
-
 @UtilityClass
 @Slf4j
 public class MittagstischUtil {
-
-    private static final int IN_NEXT_WEEK = 7;
-
-    private static final String NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
-
-    private static final String OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
-
-    protected static final String STATUS_ERROR = "status-error";
-
-    protected static final String STATUS_SUCCESS = "status-success";
-
-    protected static final String STATUS_WARNING = "status-warning";
-
-    protected static final String TECHNICAL = "Derzeit kann aufgrund einer technischen Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     private static final String DATE_FORMAT = "dd.MM.YYYY";
 
@@ -79,11 +63,13 @@ public class MittagstischUtil {
      * Determine the information of the week.
      *
      * @param selector The selector to the inforamtion of week
-     * @param page     The page to be parsed
+     * @param url      The url of the page to be parsed
      * @return String The content including week information
+     * @throws IOException
      */
-    protected static String getWeek(final String selector, final HtmlPage page) {
-        return page.querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty()).findFirst()
+    protected static String getWeek(final String selector, final String url) throws IOException {
+        HtmlPage htmlPage = MittagstischUtil.getHtmlPage(url);
+        return htmlPage.querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty()).findFirst()
                 .map(node -> node.getTextContent()).get();
     }
 
@@ -125,32 +111,6 @@ public class MittagstischUtil {
         log.debug("is in week: '{}'", isInweek);
 
         return isInweek;
-    }
-
-    /**
-     * Prepares a lunch with some predefined content if needed.
-     *
-     * @param page         The page to be parsed
-     * @param name         The page name
-     * @param selectorWeek The css selector for the week of the page
-     * @param url          The url of the page
-     * @param daily        True if the lunch is per day otherwise false
-     * @param days         Days added to this day.
-     * @return String
-     */
-    protected static Lunch prepareLunch(final HtmlPage page, final String name, final String selectorWeek,
-            final String url, final boolean daily, final int days) {
-        final Lunch lunch = new Lunch(name);
-        final String weekText = MittagstischUtil.getWeek(selectorWeek, page);
-        log.debug("prepare lunch for '{}' with weektext '{}'", name, weekText);
-        if (!MittagstischUtil.isInWeek(weekText, days) && !MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK)) {
-            lunch.setFood(String.format(OUTDATED, url, url));
-            lunch.setStatus(STATUS_ERROR);
-        } else if (MittagstischUtil.isInWeek(weekText, IN_NEXT_WEEK) && daily && days == 0) {
-            lunch.setFood(NEXT_WEEK);
-            lunch.setStatus(STATUS_WARNING);
-        }
-        return lunch;
     }
 
     /**

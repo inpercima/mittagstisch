@@ -7,49 +7,32 @@ import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.model.State;
 
-public class MittagstischLebensmittelImbissSeidel {
+public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
 
-    protected static final String LUNCH = "body div div div div div.xr_s19 span";
-
-    protected static final String URL = "https://lebensmittel-imbiss-seidel.de/imbiss.htm";
-
-    protected static final String WEEK = "body div div div div div.xr_s19 span:nth-of-type(1)";
-
-    private MittagstischLebensmittelImbissSeidel() {
-        // not used
+    public MittagstischLebensmittelImbissSeidel(final int days) {
+        this.setLunchSelector("body div div div div div.xr_s19 span");
+        this.setUrl("https://lebensmittel-imbiss-seidel.de/imbiss.htm");
+        this.setWeekSelector("body div div div div div.xr_s19 span:nth-of-type(1)");
+        this.setName("Lebensmittel Imbiss Seidel");
+        this.setDaily(true);
+        this.setDays(days);
     }
 
     /**
-     * Returns the output for the lunch in "Lebensmittel Imbiss Seidel".
+     * Parses and returns the output for the lunch in "Lebensmittel Imbiss Seidel".
      *
-     * @param days The number of days added to the current day
-     * @return Lunch Information about the lunch
+     * @param state
      * @throws IOException
      */
-    public static Lunch prepare(final int days) throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(URL);
-        final Lunch lunch = MittagstischUtil.prepareLunch(page, "Lebensmittel Imbiss Seidel", WEEK, URL, true, days);
-        if (lunch.getFood() == null) {
-            parse(page, lunch, days);
-            lunch.setStatus(MittagstischUtil.STATUS_SUCCESS);
-        }
-        return lunch;
-    }
-
-    /**
-     * Parses the given page to get information about the lunch.
-     *
-     * @param page The page which should be parsed
-     * @param lunch The lunch which should be used
-     * @param days The number of days added to the current day
-     */
-    private static void parse(final HtmlPage page, final Lunch lunch, final int days) {
+    public Lunch parse(final State state) throws IOException {
         // details are in spans per day after span with dayname
-        String food = page.querySelectorAll(LUNCH).stream()
-                .filter(span -> MittagstischUtil.filterNodes(span, days, "Änderungen", false))
+        final HtmlPage htmlPage = MittagstischUtil.getHtmlPage(getUrl());
+        final String food = htmlPage.querySelectorAll(getLunchSelector()).stream()
+                .filter(span -> MittagstischUtil.filterNodes(span, getDays(), "Änderungen", false))
                 .map(DomNode::getTextContent).collect(Collectors.joining(" "));
-        lunch.setFood(food);
+        return buildLunch(state, food);
     }
 
 }
