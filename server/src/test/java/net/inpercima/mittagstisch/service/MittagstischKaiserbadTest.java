@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -24,9 +22,9 @@ public class MittagstischKaiserbadTest {
     @Test
     @Disabled("Wochenkarte doesn't exist anymore")
     public void kaiserbad() throws IOException {
-        final HtmlPage htmlPage = MittagstischKaiserbad.getHtmlPage(mk.getUrl());
-        assertThat(htmlPage.getTitleText()).isEqualTo("Home - kaiserbad-leipzig.de");
-        assertThat(MittagstischKaiserbad.getWeek(mk.getWeekSelector(), mk.getUrl())).contains("Wochenkarte");
+        mk.getHtmlPage(mk.getUrl());
+        assertThat(mk.getHtmlPage().getTitleText()).isEqualTo("Home - kaiserbad-leipzig.de");
+        assertThat(mk.getWeek(mk.getWeekSelector(), mk.getUrl())).contains("Wochenkarte");
     }
 
     @Test

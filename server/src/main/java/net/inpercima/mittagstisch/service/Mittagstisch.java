@@ -59,6 +59,8 @@ abstract class Mittagstisch {
 
     private boolean dissabled;
 
+    private HtmlPage htmlPage;
+
     /**
      * Prepares a Lunch with some predefined content if needed.
      *
@@ -86,9 +88,15 @@ abstract class Mittagstisch {
         return parse(state);
     }
 
-    public Stream<DomNode> filter(final String filter) throws IOException {
-        final HtmlPage htmlPage = getHtmlPage(getUrl());
-        return htmlPage.querySelectorAll(getLunchSelector()).stream()
+    /**
+     * Filter a page
+     *
+     * @return Stream<DomNode>
+     * @throws IOException
+     */
+    protected Stream<DomNode> filter(final String filter) throws IOException {
+        getHtmlPage(getUrl());
+        return getHtmlPage().querySelectorAll(getLunchSelector()).stream()
                 .filter(span -> filterNodes(span, getDays(), filter, false));
 
     }
@@ -117,10 +125,10 @@ abstract class Mittagstisch {
      * @param url The URL of the page which should be parsed
      * @return HtmlPage The page which should be parsed
      */
-    protected static HtmlPage getHtmlPage(final String url) throws IOException {
+    protected void getHtmlPage(final String url) throws IOException {
         final WebRequest request = new WebRequest(new URL(url));
         request.setCharset(StandardCharsets.UTF_8);
-        return initWebClient().getPage(request);
+        setHtmlPage(initWebClient().getPage(request));
     }
 
     /**
@@ -146,10 +154,10 @@ abstract class Mittagstisch {
      * @return String The content including week information
      * @throws IOException
      */
-    protected static String getWeek(final String selector, final String url) throws IOException {
-        HtmlPage htmlPage = getHtmlPage(url);
-        return htmlPage.querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty()).findFirst()
-                .map(node -> node.getTextContent()).get();
+    protected String getWeek(final String selector, final String url) throws IOException {
+        getHtmlPage(url);
+        return getHtmlPage().querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty())
+                .findFirst().map(node -> node.getTextContent()).get();
     }
 
     /**

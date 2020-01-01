@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,9 +20,9 @@ public class MittagstischWullewuppTest {
 
     @Test
     public void wullewupp() throws IOException {
-        final HtmlPage page = MittagstischWullewupp.getHtmlPage(mw.getUrl());
-        assertThat(page.getTitleText()).isEqualTo("Speiseplan | suppenbar");
-        assertThat(MittagstischWullewupp.getWeek(mw.getWeekSelector(), mw.getUrl())).contains("Wochenplan");
+        mw.getHtmlPage(mw.getUrl());
+        assertThat(mw.getHtmlPage().getTitleText()).isEqualTo("Speiseplan | suppenbar");
+        assertThat(mw.getWeek(mw.getWeekSelector(), mw.getUrl())).contains("Wochenplan");
     }
 
     @Test
