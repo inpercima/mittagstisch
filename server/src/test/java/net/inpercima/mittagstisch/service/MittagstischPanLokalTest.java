@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import net.inpercima.mittagstisch.model.State;
+import net.inpercima.mittagstisch.model.Lunch;
 
 public class MittagstischPanLokalTest {
 
@@ -26,9 +26,9 @@ public class MittagstischPanLokalTest {
     @Test
     @Disabled("page does not exist")
     public void panLokal() throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(mpl.getUrl());
+        final HtmlPage page = MittagstischPanLokal.getHtmlPage(mpl.getUrl());
         assertThat(page.getTitleText()).isEqualTo("Mittagessen Archives - Pan");
-        final String week = MittagstischUtil.getWeek(mpl.getWeekSelector(), mpl.getUrl());
+        final String week = MittagstischPanLokal.getWeek(mpl.getWeekSelector(), mpl.getUrl());
         assertThat(week).is(
                 anyOf(new Condition<>(week::contains, "Wochenkarte"), new Condition<>(week::contains, "Mittagskarte")));
     }
@@ -36,8 +36,8 @@ public class MittagstischPanLokalTest {
     @Test
     @Disabled("page does not exist")
     public void shouldPrepare() throws IOException {
-        final State state = mpl.prepare();
-        assertThat(state).isNotNull();
+        final Lunch lunch = mpl.prepare();
+        assertThat(lunch).isNotNull();
     }
 
 }

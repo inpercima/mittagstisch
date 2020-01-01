@@ -11,12 +11,12 @@ import net.inpercima.mittagstisch.model.State;
 public class MittagstischKantine3 extends Mittagstisch {
 
     public MittagstischKantine3(final int days) {
-        this.setLunchSelector("main section div div p");
-        this.setUrl("http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
-        this.setWeekSelector("main section div div h1");
-        this.setName("Kantine 3 (im Tapetenwerk)");
         this.setDaily(true);
         this.setDays(days);
+        this.setLunchSelector("main section div div p");
+        this.setName("Kantine 3 (im Tapetenwerk)");
+        this.setUrl("http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
+        this.setWeekSelector("main section div div h1");
     }
 
     /**
@@ -29,7 +29,7 @@ public class MittagstischKantine3 extends Mittagstisch {
         // details are in spans per day after span with dayname
         String food = filter("TÄGLICH").map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
         // Replacement necessary because name of day can be in the paragraph
-        return buildLunch(state, food.replace(MittagstischUtil.getDay(true, getDays()), ""));
+        return buildLunch(state, food.replace(getDay(true, getDays()), ""));
     }
 
     /**

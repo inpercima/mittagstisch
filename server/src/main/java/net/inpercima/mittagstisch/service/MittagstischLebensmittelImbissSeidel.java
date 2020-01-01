@@ -11,12 +11,12 @@ import net.inpercima.mittagstisch.model.State;
 public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
 
     public MittagstischLebensmittelImbissSeidel(final int days) {
-        this.setLunchSelector("body div div div div div.xr_s19 span");
-        this.setUrl("https://lebensmittel-imbiss-seidel.de/imbiss.htm");
-        this.setWeekSelector("body div div div div div.xr_s19 span:nth-of-type(1)");
-        this.setName("Lebensmittel Imbiss Seidel");
         this.setDaily(true);
         this.setDays(days);
+        this.setLunchSelector("body div div div div div.xr_s19 span");
+        this.setName("Lebensmittel Imbiss Seidel");
+        this.setUrl("https://lebensmittel-imbiss-seidel.de/imbiss.htm");
+        this.setWeekSelector("body div div div div div.xr_s19 span:nth-of-type(1)");
     }
 
     /**

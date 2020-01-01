@@ -21,19 +21,16 @@ public class MittagstischController {
     public List<Lunch> listToday() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
         MittagstischLebensmittelImbissSeidel mlis = new MittagstischLebensmittelImbissSeidel(0);
-        lunch.add(mlis.parse(mlis.prepare()));
-
         MittagstischKantine3 mk3 = new MittagstischKantine3(0);
-        lunch.add(mk3.parse(mk3.prepare()));
-
         MittagstischWullewupp mw = new MittagstischWullewupp(0);
-        lunch.add(mw.parse(mw.prepare()));
-
         MittagstischKaiserbad mk = new MittagstischKaiserbad(0);
-        lunch.add(mk.parse(mk.prepare()));
-
         MittagstischPanLokal mpl = new MittagstischPanLokal(0);
-        lunch.add(mpl.parse(mpl.prepare()));
+
+        lunch.add(mlis.prepare());
+        lunch.add(mk3.prepare());
+        lunch.add(mw.prepare());
+        lunch.add(mk.prepare());
+        lunch.add(mpl.prepare());
         return lunch;
     }
 
@@ -41,19 +38,16 @@ public class MittagstischController {
     public List<Lunch> listTomorrow() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
         MittagstischLebensmittelImbissSeidel mlis = new MittagstischLebensmittelImbissSeidel(1);
-        lunch.add(mlis.parse(mlis.prepare()));
-
         MittagstischKantine3 mk3 = new MittagstischKantine3(1);
-        lunch.add(mk3.parse(mk3.prepare()));
-
         MittagstischWullewupp mw = new MittagstischWullewupp(1);
-        lunch.add(mw.parse(mw.prepare()));
-
         MittagstischKaiserbad mk = new MittagstischKaiserbad(1);
-        lunch.add(mk.parse(mk.prepare()));
-
         MittagstischPanLokal mpl = new MittagstischPanLokal(1);
-        lunch.add(mpl.parse(mpl.prepare()));
+
+        lunch.add(mlis.prepare());
+        lunch.add(mk3.prepare());
+        lunch.add(mw.prepare());
+        lunch.add(mk.prepare());
+        lunch.add(mpl.prepare());
         return lunch;
     }
 

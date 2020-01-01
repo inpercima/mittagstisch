@@ -9,7 +9,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import net.inpercima.mittagstisch.model.State;
+import net.inpercima.mittagstisch.model.Lunch;
 
 public class MittagstischLebensmittelImbissSeidelTest {
 
@@ -22,16 +22,16 @@ public class MittagstischLebensmittelImbissSeidelTest {
 
     @Test
     public void lebensmittelSeidel() throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(mlis.getUrl());
+        final HtmlPage page = MittagstischLebensmittelImbissSeidel.getHtmlPage(mlis.getUrl());
         assertThat(page.getTitleText()).isEqualTo("Lebensmittel & Imbiss Seidel");
-        assertThat(MittagstischUtil.getWeek(mlis.getWeekSelector(), mlis.getUrl()).contains("Woche"));
+        assertThat(MittagstischLebensmittelImbissSeidel.getWeek(mlis.getWeekSelector(), mlis.getUrl()).contains("Woche"));
     }
 
     @Test
     public void shouldPrepare() throws IOException {
-        final State state = mlis.prepare();
-        assertThat(state).isNotNull();
-        assertThat(state.getStatus()).isNotEmpty();
+        final Lunch lunch = mlis.prepare();
+        assertThat(lunch).isNotNull();
+        assertThat(lunch.getFood()).isNotEmpty();
     }
 
 }

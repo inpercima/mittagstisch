@@ -9,7 +9,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import net.inpercima.mittagstisch.model.State;
+import net.inpercima.mittagstisch.model.Lunch;
 
 public class MittagstischWullewuppTest {
 
@@ -22,16 +22,16 @@ public class MittagstischWullewuppTest {
 
     @Test
     public void wullewupp() throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(mw.getUrl());
+        final HtmlPage page = MittagstischWullewupp.getHtmlPage(mw.getUrl());
         assertThat(page.getTitleText()).isEqualTo("Speiseplan | suppenbar");
-        assertThat(MittagstischUtil.getWeek(mw.getWeekSelector(), mw.getUrl())).contains("Wochenplan");
+        assertThat(MittagstischWullewupp.getWeek(mw.getWeekSelector(), mw.getUrl())).contains("Wochenplan");
     }
 
     @Test
     public void shouldPrepare() throws IOException {
-        final State state = mw.prepare();
-        assertThat(state).isNotNull();
-        assertThat(state.getStatusText()).isNotEmpty();
+        final Lunch lunch = mw.prepare();
+        assertThat(lunch).isNotNull();
+        assertThat(lunch.getFood()).isNotEmpty();
     }
 
 }
