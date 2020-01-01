@@ -22,7 +22,7 @@ public class MittagstischWullewuppTest {
     public void wullewupp() throws IOException {
         mw.getHtmlPage(mw.getUrl());
         assertThat(mw.getHtmlPage().getTitleText()).isEqualTo("Speiseplan | suppenbar");
-        assertThat(mw.getWeek(mw.getWeekSelector(), mw.getUrl())).contains("Wochenplan");
+        assertThat(mw.getWeek(mw.getWeekSelector())).contains("Wochenplan");
     }
 
     @Test

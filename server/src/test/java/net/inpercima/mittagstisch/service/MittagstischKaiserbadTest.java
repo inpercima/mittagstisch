@@ -24,7 +24,7 @@ public class MittagstischKaiserbadTest {
     public void kaiserbad() throws IOException {
         mk.getHtmlPage(mk.getUrl());
         assertThat(mk.getHtmlPage().getTitleText()).isEqualTo("Home - kaiserbad-leipzig.de");
-        assertThat(mk.getWeek(mk.getWeekSelector(), mk.getUrl())).contains("Wochenkarte");
+        assertThat(mk.getWeek(mk.getWeekSelector())).contains("Wochenkarte");
     }
 
     @Test

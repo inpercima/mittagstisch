@@ -74,7 +74,8 @@ abstract class Mittagstisch {
             state.setStatusText(String.format(STATUS_ERROR, getUrl(), getUrl()));
             state.setStatus("status-error");
         } else {
-            final String weekText = getWeek(getWeekSelector(), getUrl());
+            getHtmlPage(getUrl());
+            final String weekText = getWeek(getWeekSelector());
             log.debug("prepare lunch for '{}' with weektext '{}'", getName(), weekText);
             state.setStatus("status-success");
             if (!isInWeek(weekText, getDays()) && !isInWeek(weekText, IN_NEXT_WEEK)) {
@@ -150,12 +151,10 @@ abstract class Mittagstisch {
      * Determine the information of the week.
      *
      * @param selector The selector to the inforamtion of week
-     * @param url      The url of the page to be parsed
      * @return String The content including week information
      * @throws IOException
      */
-    protected String getWeek(final String selector, final String url) throws IOException {
-        getHtmlPage(url);
+    protected String getWeek(final String selector) throws IOException {
         return getHtmlPage().querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty())
                 .findFirst().map(node -> node.getTextContent()).get();
     }
