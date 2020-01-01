@@ -5,57 +5,36 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.model.State;
 
-public class MittagstischKantine3 {
+public class MittagstischKantine3 extends Mittagstisch {
 
-    protected static final String LUNCH = "main section div div p";
-
-    protected static final String URL = "http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/";
-
-    protected static final String WEEK = "main section div div h1";
-
-    private MittagstischKantine3() {
-        // not used
+    public MittagstischKantine3(final int days) {
+        this.setDaily(true);
+        this.setDays(days);
+        this.setLunchSelector("main section div div p");
+        this.setName("Kantine 3 (im Tapetenwerk)");
+        this.setUrl("http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
+        this.setWeekSelector("main section div div h1");
     }
 
     /**
-     * Returns the output for the lunch in "Kantine 3 (im Tapetenwerk)".
+     * Parses and returns the output for the lunch in "Kantine 3 (im Tapetenwerk)".
      *
-     * @param days The number of days added to the current day
-     * @return Lunch Information about the lunch
+     * @param state
      * @throws IOException
      */
-    public static Lunch prepare(final int days) throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(URL);
-        final Lunch lunch = MittagstischUtil.prepareLunch(page, "Kantine 3 (im Tapetenwerk)", WEEK, URL, true, days);
-        if (lunch.getFood() == null) {
-            parse(page, lunch, days);
-            lunch.setStatus(MittagstischUtil.STATUS_SUCCESS);
-        }
-        return lunch;
-    }
-
-    /**
-     * Parses the given page to get information about the lunch.
-     *
-     * @param page The page which should be parsed
-     * @param lunch The lunch which should be used
-     * @param days The number of days added to the current day
-     */
-    private static void parse(final HtmlPage page, final Lunch lunch, final int days) {
-        String food = page.querySelectorAll(LUNCH).stream()
-                .filter(p -> MittagstischUtil.filterNodes(p, days, "TÄGLICH", true))
-                .map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
+    public Lunch parse(final State state) throws IOException {
+        // details are in spans per day after span with dayname
+        String food = filter("TÄGLICH").map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
         // Replacement necessary because name of day can be in the paragraph
-        lunch.setFood(food.replace(MittagstischUtil.getDay(true, days), ""));
+        return buildLunch(state, food.replace(getDay(true, getDays()), ""));
     }
 
     /**
      * Updates the content if there is no space between food and price.
-     * 
+     *
      * @param content The text in paragraph.
      * @return
      */

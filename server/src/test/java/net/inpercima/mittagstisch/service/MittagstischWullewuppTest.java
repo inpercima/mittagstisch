@@ -1,27 +1,35 @@
 package net.inpercima.mittagstisch.service;
 
-import org.junit.jupiter.api.Test;
-
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import net.inpercima.mittagstisch.model.Lunch;
 
 public class MittagstischWullewuppTest {
 
-    @Test
-    public void wullewupp() throws IOException {
-        final HtmlPage page = MittagstischUtil.getHtmlPage(MittagstischWullewupp.URL);
-        assertThat(page.getTitleText()).isEqualTo("Speiseplan | suppenbar");
-        assertThat(MittagstischUtil.getWeek(MittagstischWullewupp.WEEK, page)).contains("Wochenplan");
+    private MittagstischWullewupp mw;
+
+    @BeforeEach
+    public void create() {
+        mw = new MittagstischWullewupp(0);
     }
 
     @Test
-    public void shouldPrepare() {
-        final Lunch lunch = MittagstischWullewupp.prepare();
+    public void wullewupp() throws IOException {
+        mw.getHtmlPage(mw.getUrl());
+        assertThat(mw.getHtmlPage().getTitleText()).isEqualTo("Speiseplan | suppenbar");
+        assertThat(mw.getWeek(mw.getWeekSelector(), mw.getUrl())).contains("Wochenplan");
+    }
+
+    @Test
+    public void shouldPrepare() throws IOException {
+        final Lunch lunch = mw.prepare();
         assertThat(lunch).isNotNull();
+        assertThat(lunch.getFood()).isNotEmpty();
     }
 
 }

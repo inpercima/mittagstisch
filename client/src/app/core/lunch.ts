@@ -1,13 +1,9 @@
-export class Lunch {
+export interface Lunch {
 
-  page: string;
+  name: string;
 
   food: string;
 
   price: string;
-
-  status: string;
-
-  constructor() { }
 
 }
