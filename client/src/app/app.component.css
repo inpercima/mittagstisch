@@ -20,6 +20,10 @@ body {
   background-color: #daf9dc !important;
 }
 
-.status-warning {
+.status-outdated {
   background-color: #ffffd1 !important;
+}
+
+.status-next-week {
+  background-color: #6dafc9 !important;
 }

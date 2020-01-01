@@ -30,17 +30,11 @@ abstract class Mittagstisch {
 
     private static final int IN_NEXT_WEEK = 7;
 
-    private static final String NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
+    private static final String STATUS_ERROR = "Derzeit kann aufgrund einer technischen Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
-    private static final String OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
+    private static final String STATUS_NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte unter 'nächste Woche' schauen.";
 
-    private static final String TECHNICAL = "Derzeit kann aufgrund einer technischen Besonderheit keine Information zur Karte eingeholt werden. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
-
-    private static final String STATUS_ERROR = "status-error";
-
-    private static final String STATUS_SUCCESS = "status-success";
-
-    private static final String STATUS_WARNING = "status-warning";
+    private static final String STATUS_OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     private static final String DATE_FORMAT = "dd.MM.YYYY";
 
@@ -66,7 +60,7 @@ abstract class Mittagstisch {
     private boolean dissabled;
 
     /**
-     * Prepares a State with some predefined content if needed.
+     * Prepares a Lunch with some predefined content if needed.
      *
      * @return State
      * @throws IOException
@@ -75,18 +69,18 @@ abstract class Mittagstisch {
         final State state = new State();
         if (isDissabled()) {
             log.debug("prepare lunch for '{}' is dissabeld", getName());
-            state.setStatusText(String.format(TECHNICAL, getUrl(), getUrl()));
-            state.setStatus(STATUS_ERROR);
+            state.setStatusText(String.format(STATUS_ERROR, getUrl(), getUrl()));
+            state.setStatus("status-error");
         } else {
             final String weekText = getWeek(getWeekSelector(), getUrl());
             log.debug("prepare lunch for '{}' with weektext '{}'", getName(), weekText);
-            state.setStatus(STATUS_SUCCESS);
+            state.setStatus("status-success");
             if (!isInWeek(weekText, getDays()) && !isInWeek(weekText, IN_NEXT_WEEK)) {
-                state.setStatusText(String.format(OUTDATED, getUrl(), getUrl()));
-                state.setStatus(STATUS_ERROR);
+                state.setStatusText(String.format(STATUS_OUTDATED, getUrl(), getUrl()));
+                state.setStatus("status-outdated");
             } else if (isInWeek(weekText, IN_NEXT_WEEK) && isDaily() && getDays() == 0) {
-                state.setStatusText(NEXT_WEEK);
-                state.setStatus(STATUS_WARNING);
+                state.setStatusText(STATUS_NEXT_WEEK);
+                state.setStatus("status-next-week");
             }
         }
         return parse(state);
@@ -165,7 +159,7 @@ abstract class Mittagstisch {
      * @param days     Days added to this day.
      * @return boolean True if up-to-date otherwise false
      */
-    protected static boolean isInWeek(final String weekText, final int days) {
+    private static boolean isInWeek(final String weekText, final int days) {
         final LocalDate now = getLocalizedDate(days);
         final LocalDate firstDay = now.with(dayOfWeek(), 1);
         final LocalDate lastDay = now.with(dayOfWeek(), 5);
@@ -203,7 +197,7 @@ abstract class Mittagstisch {
      *
      * @return TemporalField
      */
-    protected static TemporalField dayOfWeek() {
+    private static TemporalField dayOfWeek() {
         return WeekFields.of(Locale.GERMANY).dayOfWeek();
     }
 
@@ -213,7 +207,7 @@ abstract class Mittagstisch {
      * @param days Days added to this day.
      * @return LocalDate
      */
-    protected static LocalDate getLocalizedDate(final int days) {
+    private static LocalDate getLocalizedDate(final int days) {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
         String format = now.format(LOGGER_FORMAT);
         log.debug("current date: '{}'", format);
@@ -235,7 +229,7 @@ abstract class Mittagstisch {
         return toUppercase ? day.toUpperCase() : day;
     }
 
-    protected static boolean filterNodes(final DomNode node, final int days, final String endText,
+    private static boolean filterNodes(final DomNode node, final int days, final String endText,
             final boolean uppercase) {
 
         // use regex '\u00A0' to match No-Break space (&nbsp;)
