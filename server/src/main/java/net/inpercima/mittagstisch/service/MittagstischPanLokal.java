@@ -24,4 +24,8 @@ public class MittagstischPanLokal extends Mittagstisch {
         return buildLunch(state, "");
     }
 
+    public boolean isInWeek(final String weekText, final int days) {
+        return false;
+    }
+
 }

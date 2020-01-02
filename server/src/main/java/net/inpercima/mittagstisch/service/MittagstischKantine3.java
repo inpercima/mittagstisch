@@ -5,9 +5,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Lunch;
 import net.inpercima.mittagstisch.model.State;
 
+@Slf4j
 public class MittagstischKantine3 extends Mittagstisch {
 
     public MittagstischKantine3(final int days) {
@@ -26,8 +30,11 @@ public class MittagstischKantine3 extends Mittagstisch {
      * @throws IOException
      */
     public Lunch parse(final State state) throws IOException {
-        // details are in spans per day after span with dayname
-        String food = filter("TÄGLICH").map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
+        String food = StringUtils.EMPTY;
+        if (StringUtils.isBlank(state.getStatusText())) {
+            // details are in spans per day after span with dayname
+            filter("TÄGLICH").map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
+        }
         // Replacement necessary because name of day can be in the paragraph
         return buildLunch(state, food.replace(getDay(true, getDays()), ""));
     }
@@ -50,6 +57,18 @@ public class MittagstischKantine3 extends Mittagstisch {
             }
         }
         return result;
+    }
+
+    public boolean isInWeek(final String weekText, final int days) {
+        final boolean isInweek = lastDay(days).isAfter(getLocalizedDate(days))
+                && ((weekText.contains(firstDay(days).format(dMMMM).toUpperCase())
+                        && weekText.contains(lastDay(days).format(dMMMM).toUpperCase()))
+                        || (weekText.contains(firstDay(days).format(d).toUpperCase())
+                                && weekText.contains(lastDay(days).format(dMMMM).toUpperCase()))
+
+                );
+        log.debug("is in week: '{}'", isInweek);
+        return isInweek;
     }
 
 }

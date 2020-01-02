@@ -19,6 +19,8 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Lunch;
@@ -36,9 +38,19 @@ abstract class Mittagstisch {
 
     private static final String STATUS_OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
-    private static final String DATE_FORMAT = "dd.MM.YYYY";
+    protected static final String DATE_FORMAT = "dd.MM.yyyy";
 
-    private static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    protected static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+    protected static final DateTimeFormatter d = DateTimeFormatter.ofPattern("dd.", Locale.GERMANY);
+
+    protected static final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
+
+    protected static final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
+
+    protected static final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
+
+    protected static final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("dd. MMMM yyyy", Locale.GERMANY);
 
     // global b/c of itteration for valid sections
     private static boolean found = false;
@@ -90,15 +102,14 @@ abstract class Mittagstisch {
     }
 
     /**
-     * Filter a page
+     * Filter a page.
      *
      * @return Stream<DomNode>
      * @throws IOException
      */
     protected Stream<DomNode> filter(final String filter) throws IOException {
-        getHtmlPage(getUrl());
         return getHtmlPage().querySelectorAll(getLunchSelector()).stream()
-                .filter(span -> filterNodes(span, getDays(), filter, false));
+                .filter(node -> filterNodes(node, getDays(), filter, false));
 
     }
 
@@ -113,7 +124,7 @@ abstract class Mittagstisch {
     public Lunch buildLunch(final State state, final String food) {
         final Lunch lunch = new Lunch();
         lunch.setName(getName());
-        lunch.setFood(!state.getStatusText().isBlank() ? state.getStatusText() : food);
+        lunch.setFood(StringUtils.isNotBlank(state.getStatusText()) ? state.getStatusText() : food);
         lunch.setStatus(state.getStatus());
         return lunch;
     }
@@ -150,7 +161,7 @@ abstract class Mittagstisch {
     /**
      * Determine the information of the week.
      *
-     * @param selector The selector to the inforamtion of week
+     * @param selector The selector to the information of week
      * @return String The content including week information
      * @throws IOException
      */
@@ -166,38 +177,7 @@ abstract class Mittagstisch {
      * @param days     Days added to this day.
      * @return boolean True if up-to-date otherwise false
      */
-    private static boolean isInWeek(final String weekText, final int days) {
-        final LocalDate now = getLocalizedDate(days);
-        final LocalDate firstDay = now.with(dayOfWeek(), 1);
-        final LocalDate lastDay = now.with(dayOfWeek(), 5);
-
-        final DateTimeFormatter d = DateTimeFormatter.ofPattern("dd.", Locale.GERMANY);
-        final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
-        final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
-        final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
-        final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("dd. MMMM YYYY", Locale.GERMANY);
-
-        final int weekNumber = now.get(WeekFields.of(Locale.GERMANY).weekOfYear());
-
-        final String formatFirsDay = firstDay.format(LOGGER_FORMAT);
-        log.debug("first day in week '{}'", formatFirsDay);
-        final String formatLastDay = lastDay.format(LOGGER_FORMAT);
-        log.debug("last day in week '{}'", formatLastDay);
-
-        final boolean kaiserbad = weekText.contains(firstDay.format(d)) && weekText.contains(lastDay.format(dMMMMYYYY));
-        final boolean kantine3 = weekText.contains(firstDay.format(dMMMM).toUpperCase())
-                && weekText.contains(lastDay.format(dMMMM).toUpperCase());
-        final boolean lebensmittelSeidel = weekText.contains(firstDay.format(ddMMYYYY))
-                && weekText.contains(lastDay.format(ddMMYYYY));
-        final boolean pan = weekText.contains(String.valueOf(weekNumber))
-                && (weekText.contains("KW") || weekText.contains("KARTE"));
-        final boolean wullewupp = weekText.contains(firstDay.format(dMM)) && weekText.contains(lastDay.format(dMM));
-        final boolean isInweek = lastDay.isAfter(now)
-                && (kaiserbad || kantine3 || lebensmittelSeidel || pan || wullewupp);
-        log.debug("is in week: '{}'", isInweek);
-
-        return isInweek;
-    }
+    abstract boolean isInWeek(final String weekText, final int days);
 
     /**
      * Gets the TemporalField for day of the week.
@@ -214,14 +194,24 @@ abstract class Mittagstisch {
      * @param days Days added to this day.
      * @return LocalDate
      */
-    private static LocalDate getLocalizedDate(final int days) {
+    protected static LocalDate getLocalizedDate(final int days) {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
-        String format = now.format(LOGGER_FORMAT);
-        log.debug("current date: '{}'", format);
         final LocalDate date = now.plusDays(days);
-        format = date.format(LOGGER_FORMAT);
-        log.debug("used date for weekcheck: '{}'", format);
         return date;
+    }
+
+    protected static LocalDate firstDay(final int days) {
+        final LocalDate now = getLocalizedDate(days);
+        final LocalDate firstDay = now.with(dayOfWeek(), 1);
+        log.debug("first day in week '{}'", firstDay.format(LOGGER_FORMAT));
+        return firstDay;
+    }
+
+    protected static LocalDate lastDay(final int days) {
+        final LocalDate now = getLocalizedDate(days);
+        final LocalDate lastDay = now.with(dayOfWeek(), 5);
+        log.debug("last day in week '{}'", lastDay.format(LOGGER_FORMAT));
+        return lastDay;
     }
 
     /**
@@ -236,20 +226,30 @@ abstract class Mittagstisch {
         return toUppercase ? day.toUpperCase() : day;
     }
 
+    /**
+     * Determine the day name for checks.
+     *
+     * @param node      The element to filter
+     * @param days      The number of days added to the current day
+     * @param endText   The text at the end of the lunch section
+     * @param uppercase True for uppercase otherwise false
+     * @return boolean
+     */
     private static boolean filterNodes(final DomNode node, final int days, final String endText,
             final boolean uppercase) {
 
         // use regex '\u00A0' to match No-Break space (&nbsp;)
         final String content = node.getTextContent().replace('\u00A0', ' ').trim();
-        if (startsWith(content, uppercase, days)) {
+        if (startsWithDayname(content, uppercase, days)) {
             found = true;
-        } else if (startsWith(content, uppercase, days + 1) || content.startsWith(endText)) {
+        } else if (startsWithDayname(content, uppercase, days + 1) || content.startsWith(endText)) {
             found = false;
         }
+        // just return true if content not dayname
         return found && !content.trim().equals(getDay(uppercase, days));
     }
 
-    private static boolean startsWith(final String content, final boolean uppercase, final int days) {
+    private static boolean startsWithDayname(final String content, final boolean uppercase, final int days) {
         return content.startsWith(getDay(uppercase, days));
     }
 

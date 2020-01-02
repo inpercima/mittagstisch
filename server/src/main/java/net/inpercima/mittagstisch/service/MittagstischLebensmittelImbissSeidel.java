@@ -5,18 +5,22 @@ import java.util.stream.Collectors;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
 
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Lunch;
 import net.inpercima.mittagstisch.model.State;
 
+@Slf4j
 public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
 
     public MittagstischLebensmittelImbissSeidel(final int days) {
         this.setDaily(true);
         this.setDays(days);
-        this.setLunchSelector("body div div div div div.xr_s19 span");
+        this.setLunchSelector("body div div div div div.xr_s20 span");
         this.setName("Lebensmittel Imbiss Seidel");
         this.setUrl("https://lebensmittel-imbiss-seidel.de/imbiss.htm");
-        this.setWeekSelector("body div div div div div.xr_s19 span:nth-of-type(1)");
+        this.setWeekSelector("body div div div div div.xr_s20 span:nth-of-type(1)");
     }
 
     /**
@@ -26,9 +30,20 @@ public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
      * @throws IOException
      */
     public Lunch parse(final State state) throws IOException {
-        // details are in spans per day after span with dayname
-        final String food = filter("Änderungen").map(DomNode::getTextContent).collect(Collectors.joining(" "));
+        String food = StringUtils.EMPTY;
+        if (StringUtils.isBlank(state.getStatusText())) {
+            // details are in spans per day after span with dayname
+            food = filter("Änderungen").map(DomNode::getTextContent).collect(Collectors.joining(" "));
+        }
         return buildLunch(state, food);
+    }
+
+    public boolean isInWeek(final String weekText, final int days) {
+        final boolean isInweek = lastDay(days).isAfter(getLocalizedDate(days))
+                && weekText.contains(firstDay(days).format(ddMMYYYY))
+                && weekText.contains(lastDay(days).format(ddMMYYYY));
+        log.debug("is in week: '{}'", isInweek);
+        return isInweek;
     }
 
 }
