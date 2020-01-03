@@ -250,10 +250,10 @@ abstract class Mittagstisch {
         return content.startsWith(getDay(uppercase, days));
     }
 
-    protected boolean isWithinRange() {
-        final LocalDate now = getLocalizedDate(getDays());
-        final LocalDate firstDay = firstDay(getDays());
-        final LocalDate lastDay = lastDay(getDays());
+    protected boolean isWithinRange(final int days) {
+        final LocalDate now = getLocalizedDate(days);
+        final LocalDate firstDay = firstDay(days);
+        final LocalDate lastDay = lastDay(days);
         return now.isEqual(firstDay) || now.isEqual(lastDay) || (now.isAfter(firstDay) && now.isBefore(lastDay));
     }
 

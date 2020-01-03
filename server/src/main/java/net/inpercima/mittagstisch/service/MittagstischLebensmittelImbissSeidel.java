@@ -39,7 +39,7 @@ public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
     }
 
     public boolean isInWeek(final int days) {
-        final boolean isInweek = isWithinRange() && weekContains(days, ddMMYYYY);
+        final boolean isInweek = isWithinRange(days) && weekContains(days, ddMMYYYY);
         log.debug("is in week: '{}'", isInweek);
         return isInweek;
     }

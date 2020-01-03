@@ -41,7 +41,7 @@ public class MittagstischPanLokal extends Mittagstisch {
 
     public boolean isInWeek(final int days) {
         final int weekNumber = getLocalizedDate(days).get(WeekFields.of(Locale.GERMANY).weekOfYear());
-        final boolean isInweek = isWithinRange() && ((weekTextContains("KW", String.valueOf(weekNumber))
+        final boolean isInweek = isWithinRange(days) && ((weekTextContains("KW", String.valueOf(weekNumber))
                 || (weekTextContains("AB", firstDay(days).format(dMM)))));
         log.debug("is in week: '{}'", isInweek);
         return isInweek;
