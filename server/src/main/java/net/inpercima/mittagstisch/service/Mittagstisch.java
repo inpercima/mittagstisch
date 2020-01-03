@@ -50,8 +50,6 @@ abstract class Mittagstisch {
 
     protected static final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
 
-    protected static final DateTimeFormatter dMMMMYYYY = DateTimeFormatter.ofPattern("dd. MMMM yyyy", Locale.GERMANY);
-
     // global b/c of itteration for valid sections
     private static boolean found = false;
 
@@ -66,8 +64,6 @@ abstract class Mittagstisch {
     private boolean daily;
 
     private int days;
-
-    private String detailSelector;
 
     private boolean dissabled;
 
@@ -184,7 +180,7 @@ abstract class Mittagstisch {
      *
      * @return TemporalField
      */
-    private static TemporalField dayOfWeek() {
+    protected static TemporalField dayOfWeek() {
         return WeekFields.of(Locale.GERMANY).dayOfWeek();
     }
 
@@ -253,4 +249,27 @@ abstract class Mittagstisch {
         return content.startsWith(getDay(uppercase, days));
     }
 
+    protected boolean isWithinRange() {
+        final LocalDate now = getLocalizedDate(getDays());
+        final LocalDate firstDay = firstDay(getDays());
+        final LocalDate lastDay = lastDay(getDays());
+        return now.isEqual(firstDay) || now.isEqual(lastDay) || (now.isAfter(firstDay) && now.isBefore(lastDay));
+    }
+
+    protected boolean weekContains(final int days, final String weekText, final DateTimeFormatter formatter) {
+        return weekContains(weekText, firstDay(days), formatter) && weekContains(weekText, lastDay(days), formatter);
+    }
+
+    protected boolean weekContains(final int days, final String weekText, final DateTimeFormatter formatterA,
+            final DateTimeFormatter formatterB) {
+        return weekContains(weekText, firstDay(days), formatterA) && weekContains(weekText, lastDay(days), formatterB);
+    }
+
+    protected boolean weekContains(final String weekText, final String sequenceA, final String sequenceB) {
+        return weekText.contains(sequenceA) && weekText.contains(sequenceB);
+    }
+
+    private boolean weekContains(final String weekText, final LocalDate date, final DateTimeFormatter formatter) {
+        return weekText.contains(date.format(formatter));
+    }
 }
