@@ -46,20 +46,9 @@ abstract class Mittagstisch {
 
     protected static final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
 
-    protected static final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
-
     protected static final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
 
-    // global b/c of itteration for valid sections
-    private static boolean found = false;
-
-    private String lunchSelector;
-
-    private String url;
-
-    private String weekSelector;
-
-    private String name;
+    protected static final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
 
     private boolean daily;
 
@@ -67,7 +56,20 @@ abstract class Mittagstisch {
 
     private boolean dissabled;
 
+    // global b/c of itteration for valid sections
+    private static boolean found = false;
+
     private HtmlPage htmlPage;
+
+    private String lunchSelector;
+
+    private String name;
+
+    private String url;
+
+    private String weekSelector;
+
+    private String weekText;
 
     /**
      * Prepares a Lunch with some predefined content if needed.
@@ -83,13 +85,13 @@ abstract class Mittagstisch {
             state.setStatus("status-error");
         } else {
             getHtmlPage(getUrl());
-            final String weekText = getWeek(getWeekSelector());
+            determineWeekText(getWeekSelector());
             log.debug("prepare lunch for '{}' with weektext '{}'", getName(), weekText);
             state.setStatus("status-success");
-            if (!isInWeek(weekText, getDays()) && !isInWeek(weekText, IN_NEXT_WEEK)) {
+            if (!isInWeek(getDays()) && !isInWeek(IN_NEXT_WEEK)) {
                 state.setStatusText(String.format(STATUS_OUTDATED, getUrl(), getUrl()));
                 state.setStatus("status-outdated");
-            } else if (isInWeek(weekText, IN_NEXT_WEEK) && isDaily() && getDays() == 0) {
+            } else if (isInWeek(IN_NEXT_WEEK) && isDaily() && getDays() == 0) {
                 state.setStatusText(STATUS_NEXT_WEEK);
                 state.setStatus("status-next-week");
             }
@@ -161,19 +163,18 @@ abstract class Mittagstisch {
      * @return String The content including week information
      * @throws IOException
      */
-    protected String getWeek(final String selector) throws IOException {
-        return getHtmlPage().querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty())
-                .findFirst().map(node -> node.getTextContent()).get();
+    protected void determineWeekText(final String selector) throws IOException {
+        setWeekText(getHtmlPage().querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty())
+                .findFirst().map(node -> node.getTextContent()).get());
     }
 
     /**
      * Checks if the dates in the determined week are up-to-date.
      *
-     * @param weekText The determined information of week.
-     * @param days     Days added to this day.
+     * @param days Days added to this day.
      * @return boolean True if up-to-date otherwise false
      */
-    abstract boolean isInWeek(final String weekText, final int days);
+    abstract boolean isInWeek(final int days);
 
     /**
      * Gets the TemporalField for day of the week.
@@ -256,20 +257,21 @@ abstract class Mittagstisch {
         return now.isEqual(firstDay) || now.isEqual(lastDay) || (now.isAfter(firstDay) && now.isBefore(lastDay));
     }
 
-    protected boolean weekContains(final int days, final String weekText, final DateTimeFormatter formatter) {
-        return weekContains(weekText, firstDay(days), formatter) && weekContains(weekText, lastDay(days), formatter);
+    protected boolean weekContains(final int days, final DateTimeFormatter formatter) {
+        return weekTextContains(firstDay(days).format(formatter)) && weekTextContains(lastDay(days).format(formatter));
     }
 
-    protected boolean weekContains(final int days, final String weekText, final DateTimeFormatter formatterA,
+    protected boolean weekTextContains(final int days, final DateTimeFormatter formatterA,
             final DateTimeFormatter formatterB) {
-        return weekContains(weekText, firstDay(days), formatterA) && weekContains(weekText, lastDay(days), formatterB);
+        return weekTextContains(firstDay(days).format(formatterA))
+                && weekTextContains(lastDay(days).format(formatterB));
     }
 
-    protected boolean weekContains(final String weekText, final String sequenceA, final String sequenceB) {
-        return weekText.contains(sequenceA) && weekText.contains(sequenceB);
+    protected boolean weekTextContains(final String sequenceA, final String sequenceB) {
+        return weekTextContains(sequenceA) && weekTextContains(sequenceB);
     }
 
-    private boolean weekContains(final String weekText, final LocalDate date, final DateTimeFormatter formatter) {
-        return weekText.contains(date.format(formatter));
+    private boolean weekTextContains(final String seqeunce) {
+        return getWeekText().contains(seqeunce);
     }
 }

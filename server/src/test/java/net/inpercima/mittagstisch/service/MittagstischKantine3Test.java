@@ -22,7 +22,7 @@ public class MittagstischKantine3Test {
     public void kantine3() throws IOException {
         mk3.getHtmlPage(mk3.getUrl());
         assertThat(mk3.getHtmlPage().getTitleText()).isEqualTo("Speiseplan Kantine / Tapetenwerk");
-        assertThat(mk3.getWeek(mk3.getWeekSelector())).contains("WOCHENKARTE");
+        assertThat(mk3.getWeekText()).contains("WOCHENKARTE");
     }
 
     @Test

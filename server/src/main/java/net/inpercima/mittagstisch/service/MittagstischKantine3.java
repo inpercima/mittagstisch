@@ -59,9 +59,9 @@ public class MittagstischKantine3 extends Mittagstisch {
         return result;
     }
 
-    public boolean isInWeek(final String weekText, final int days) {
-        final boolean isInweek = isWithinRange() && ((weekContains(days, weekText, dMMMM)))
-                || (weekContains(days, weekText, d, dMMMM));
+    public boolean isInWeek(final int days) {
+        final boolean isInweek = isWithinRange() && ((weekContains(days, dMMMM)))
+                || (weekTextContains(days, d, dMMMM));
         log.debug("is in week: '{}'", isInweek);
         return isInweek;
     }
