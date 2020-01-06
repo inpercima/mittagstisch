@@ -42,9 +42,13 @@ abstract class Mittagstisch {
 
     protected static final DateTimeFormatter LOGGER_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
-    protected static final DateTimeFormatter d = DateTimeFormatter.ofPattern("dd.", Locale.GERMANY);
+    protected static final DateTimeFormatter d = DateTimeFormatter.ofPattern("d.", Locale.GERMANY);
+
+    protected static final DateTimeFormatter dM = DateTimeFormatter.ofPattern("d.M", Locale.GERMANY);
 
     protected static final DateTimeFormatter dMM = DateTimeFormatter.ofPattern("d.MM", Locale.GERMANY);
+
+    protected static final DateTimeFormatter ddMM = DateTimeFormatter.ofPattern("dd.MM", Locale.GERMANY);
 
     protected static final DateTimeFormatter dMMMM = DateTimeFormatter.ofPattern("d.MMMM", Locale.GERMANY);
 
@@ -69,6 +73,8 @@ abstract class Mittagstisch {
 
     private String weekSelector;
 
+    private String originalWeekText;
+
     private String weekText;
 
     /**
@@ -86,12 +92,13 @@ abstract class Mittagstisch {
         } else {
             getHtmlPage(getUrl());
             determineWeekText(getWeekSelector());
-            log.debug("prepare lunch for '{}' with weektext '{}'", getName(), weekText);
+            log.debug("prepare lunch for '{}' with original weektext '{}' and modified weektext '{}'", getName(),
+                    getOriginalWeekText(), getWeekText());
             state.setStatus("status-success");
-            if (!isInWeek(getDays()) && !isInWeek(IN_NEXT_WEEK)) {
+            if (!isWithinWeek(getDays()) && !isWithinWeek(IN_NEXT_WEEK)) {
                 state.setStatusText(String.format(STATUS_OUTDATED, getUrl(), getUrl()));
                 state.setStatus("status-outdated");
-            } else if (isInWeek(IN_NEXT_WEEK) && isDaily() && getDays() == 0) {
+            } else if (isWithinWeek(IN_NEXT_WEEK) && isDaily() && getDays() == 0) {
                 state.setStatusText(STATUS_NEXT_WEEK);
                 state.setStatus("status-next-week");
             }
@@ -107,7 +114,7 @@ abstract class Mittagstisch {
      */
     protected Stream<DomNode> filter(final String filter) throws IOException {
         return getHtmlPage().querySelectorAll(getLunchSelector()).stream()
-                .filter(node -> filterNodes(node, getDays(), filter, false));
+                .filter(node -> filterNodes(node, getDays(), filter));
 
     }
 
@@ -164,8 +171,10 @@ abstract class Mittagstisch {
      * @throws IOException
      */
     protected void determineWeekText(final String selector) throws IOException {
-        setWeekText(getHtmlPage().querySelectorAll(selector).stream().filter(node -> !node.getTextContent().isEmpty())
-                .findFirst().map(node -> node.getTextContent()).get());
+        final String weekText = getHtmlPage().querySelectorAll(selector).stream()
+                .filter(node -> !node.getTextContent().isEmpty()).findFirst().map(node -> node.getTextContent()).get();
+        setOriginalWeekText(weekText);
+        setWeekText(weekText.replace(" ", StringUtils.EMPTY).toUpperCase());
     }
 
     /**
@@ -174,7 +183,7 @@ abstract class Mittagstisch {
      * @param days Days added to this day.
      * @return boolean True if up-to-date otherwise false
      */
-    abstract boolean isInWeek(final int days);
+    abstract boolean isWithinWeek(final int days);
 
     /**
      * Gets the TemporalField for day of the week.
@@ -214,13 +223,12 @@ abstract class Mittagstisch {
     /**
      * Determine the day name for checks.
      *
-     * @param toUppercase True if the result should be in uppercase otherwise false
      * @param days        The number of days added to the current day
      * @return String
      */
-    protected static String getDay(final boolean toUppercase, final int days) {
+    protected static String getDay(final int days) {
         String day = getLocalizedDate(days).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY);
-        return toUppercase ? day.toUpperCase() : day;
+        return day.toUpperCase();
     }
 
     /**
@@ -229,25 +237,22 @@ abstract class Mittagstisch {
      * @param node      The element to filter
      * @param days      The number of days added to the current day
      * @param endText   The text at the end of the lunch section
-     * @param uppercase True for uppercase otherwise false
      * @return boolean
      */
-    private static boolean filterNodes(final DomNode node, final int days, final String endText,
-            final boolean uppercase) {
-
+    private static boolean filterNodes(final DomNode node, final int days, final String endText) {
         // use regex '\u00A0' to match No-Break space (&nbsp;)
-        final String content = node.getTextContent().replace('\u00A0', ' ').trim();
-        if (startsWithDayname(content, uppercase, days)) {
+        final String content = node.getTextContent().replace("\u00A0", " ").trim().toUpperCase();
+        if (startsWithDayname(content, days)) {
             found = true;
-        } else if (startsWithDayname(content, uppercase, days + 1) || content.startsWith(endText)) {
+        } else if (startsWithDayname(content, days + 1) || content.startsWith(endText)) {
             found = false;
         }
         // just return true if content not dayname
-        return found && !content.trim().equals(getDay(uppercase, days));
+        return found && !content.equals(getDay(days));
     }
 
-    private static boolean startsWithDayname(final String content, final boolean uppercase, final int days) {
-        return content.startsWith(getDay(uppercase, days));
+    private static boolean startsWithDayname(final String content, final int days) {
+        return content.startsWith(getDay(days));
     }
 
     protected boolean isWithinRange(final int days) {
@@ -257,7 +262,7 @@ abstract class Mittagstisch {
         return now.isEqual(firstDay) || now.isEqual(lastDay) || (now.isAfter(firstDay) && now.isBefore(lastDay));
     }
 
-    protected boolean weekContains(final int days, final DateTimeFormatter formatter) {
+    protected boolean weekTextContains(final int days, final DateTimeFormatter formatter) {
         return weekTextContains(firstDay(days).format(formatter)) && weekTextContains(lastDay(days).format(formatter));
     }
 
@@ -272,6 +277,6 @@ abstract class Mittagstisch {
     }
 
     private boolean weekTextContains(final String seqeunce) {
-        return getWeekText().contains(seqeunce);
+        return getWeekText().contains(seqeunce.toUpperCase());
     }
 }

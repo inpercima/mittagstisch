@@ -33,10 +33,10 @@ public class MittagstischKantine3 extends Mittagstisch {
         String food = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
             // details are in spans per day after span with dayname
-            filter("TÄGLICH").map(p -> update(p.getTextContent())).collect(Collectors.joining("<br>"));
+            food = filter("TÄGLICH").map(p -> update(p.asText())).collect(Collectors.joining("<br>"));
         }
         // Replacement necessary because name of day can be in the paragraph
-        return buildLunch(state, food.replace(getDay(true, getDays()), ""));
+        return buildLunch(state, food.replace(getDay(getDays()), ""));
     }
 
     /**
@@ -59,11 +59,11 @@ public class MittagstischKantine3 extends Mittagstisch {
         return result;
     }
 
-    public boolean isInWeek(final int days) {
-        final boolean isInweek = isWithinRange(days) && ((weekContains(days, dMMMM)))
-                || (weekTextContains(days, d, dMMMM));
-        log.debug("is in week: '{}'", isInweek);
-        return isInweek;
+    public boolean isWithinWeek(final int days) {
+        final boolean isWithinWeek = isWithinRange(days)
+                && (weekTextContains(days, dMMMM) || weekTextContains(days, d, dMMMM));
+        log.debug("is in week: '{}'", isWithinWeek);
+        return isWithinWeek;
     }
 
 }

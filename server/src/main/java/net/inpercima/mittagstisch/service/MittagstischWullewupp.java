@@ -1,6 +1,10 @@
 package net.inpercima.mittagstisch.service;
 
+import java.util.List;
+
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
+import com.gargoylesoftware.htmlunit.html.HtmlStyle;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,15 +33,15 @@ public class MittagstischWullewupp extends Mittagstisch {
         String food = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
             HtmlDivision div = getHtmlPage().querySelector(getLunchSelector());
-            food = div.getTextContent();
+            food = div.asText();
         }
         return buildLunch(state, food);
     }
 
-    public boolean isInWeek(final int days) {
-        final boolean isInweek = isWithinRange(days) && weekContains(days, ddMMYYYY);
-        log.debug("is in week: '{}'", isInweek);
-        return isInweek;
+    public boolean isWithinWeek(final int days) {
+        final boolean isWithinWeek = isWithinRange(days) && weekTextContains(days, dM);
+        log.debug("is in week: '{}'", isWithinWeek);
+        return isWithinWeek;
     }
 
 }

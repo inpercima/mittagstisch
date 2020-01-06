@@ -33,15 +33,16 @@ public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
         String food = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
             // details are in spans per day after span with dayname
-            food = filter("Änderungen").map(DomNode::getTextContent).collect(Collectors.joining(" "));
+            food = filter("Änderungen").map(DomNode::asText).collect(Collectors.joining(" "));
         }
         return buildLunch(state, food);
     }
 
-    public boolean isInWeek(final int days) {
-        final boolean isInweek = isWithinRange(days) && weekContains(days, ddMMYYYY);
-        log.debug("is in week: '{}'", isInweek);
-        return isInweek;
+    public boolean isWithinWeek(final int days) {
+        final boolean isWithinWeek = isWithinRange(days)
+                && (weekTextContains(days, ddMMYYYY) || weekTextContains(days, ddMM, ddMMYYYY));
+        log.debug("is in week: '{}'", isWithinWeek);
+        return isWithinWeek;
     }
 
 }

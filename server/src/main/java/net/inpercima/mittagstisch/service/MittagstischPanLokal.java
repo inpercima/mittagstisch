@@ -39,12 +39,12 @@ public class MittagstischPanLokal extends Mittagstisch {
         return buildLunch(state, food);
     }
 
-    public boolean isInWeek(final int days) {
+    public boolean isWithinWeek(final int days) {
         final int weekNumber = getLocalizedDate(days).get(WeekFields.of(Locale.GERMANY).weekOfYear());
-        final boolean isInweek = isWithinRange(days) && ((weekTextContains("KW", String.valueOf(weekNumber))
+        final boolean isWithinWeek = isWithinRange(days) && ((weekTextContains("KW", String.valueOf(weekNumber))
                 || (weekTextContains("AB", firstDay(days).format(dMM)))));
-        log.debug("is in week: '{}'", isInweek);
-        return isInweek;
+        log.debug("is in week: '{}'", isWithinWeek);
+        return isWithinWeek;
     }
 
 }

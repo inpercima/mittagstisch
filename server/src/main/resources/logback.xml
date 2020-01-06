@@ -11,6 +11,5 @@
         <appender-ref ref="con" />
     </root>
 
-    <logger name="net.inpercima.mittagstisch" level="debug" />
     <logger name="com.gargoylesoftware.htmlunit" level="error" />
 </configuration>
