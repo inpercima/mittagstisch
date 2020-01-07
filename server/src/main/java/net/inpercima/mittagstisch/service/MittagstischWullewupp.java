@@ -1,10 +1,8 @@
 package net.inpercima.mittagstisch.service;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
-import com.gargoylesoftware.htmlunit.html.HtmlStyle;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,10 +16,10 @@ public class MittagstischWullewupp extends Mittagstisch {
     public MittagstischWullewupp(final int days) {
         this.setDaily(false);
         this.setDays(days);
-        this.setLunchSelector("div[id='PAGES_CONTAINERinlineContent'] div div div div div div div div div");
+        this.setLunchSelector("div[id='comp-j41q3qb7inlineContent-gridContainer'] > div");
         this.setName("Wullewupp");
         this.setUrl("https://www.wullewupp.de/bar");
-        this.setWeekSelector("div[id='PAGES_CONTAINERinlineContent'] div div div div div div div div div div h2");
+        this.setWeekSelector("div[id='comp-j41q3qb7inlineContent-gridContainer'] > div > h2");
     }
 
     /**
@@ -32,8 +30,10 @@ public class MittagstischWullewupp extends Mittagstisch {
     public Lunch parse(final State state) {
         String food = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
-            HtmlDivision div = getHtmlPage().querySelector(getLunchSelector());
-            food = div.asText();
+            // details are in divs per lunch after div with weekname
+            food = getHtmlPage().querySelectorAll(getLunchSelector()).stream()
+                    .filter(node -> !node.asText().contains(getOriginalWeekText())).map(DomNode::asText)
+                    .collect(Collectors.joining("<br><br>"));
         }
         return buildLunch(state, food);
     }

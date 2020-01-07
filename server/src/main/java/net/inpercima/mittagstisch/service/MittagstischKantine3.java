@@ -36,7 +36,7 @@ public class MittagstischKantine3 extends Mittagstisch {
             food = filter("TÄGLICH").map(p -> update(p.asText())).collect(Collectors.joining("<br>"));
         }
         // Replacement necessary because name of day can be in the paragraph
-        return buildLunch(state, food.replace(getDay(getDays()), ""));
+        return buildLunch(state, food.replace(getDay(getDays()), "").replaceFirst("<br>", StringUtils.EMPTY));
     }
 
     /**
