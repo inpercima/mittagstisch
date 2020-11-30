@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.service.MittagstischBistroBic;
 import net.inpercima.mittagstisch.service.MittagstischKaiserbad;
 import net.inpercima.mittagstisch.service.MittagstischKantine3;
 import net.inpercima.mittagstisch.service.MittagstischLebensmittelImbissSeidel;
@@ -25,12 +26,14 @@ public class MittagstischController {
         MittagstischWullewupp mw = new MittagstischWullewupp(0);
         MittagstischKaiserbad mk = new MittagstischKaiserbad(0);
         MittagstischPanLokal mpl = new MittagstischPanLokal(0);
+        MittagstischBistroBic mbb = new MittagstischBistroBic(0);
 
         lunch.add(mlis.prepare());
         lunch.add(mk3.prepare());
         lunch.add(mw.prepare());
         lunch.add(mk.prepare());
         lunch.add(mpl.prepare());
+        lunch.add(mbb.prepare());
         return lunch;
     }
 
@@ -42,12 +45,14 @@ public class MittagstischController {
         MittagstischWullewupp mw = new MittagstischWullewupp(1);
         MittagstischKaiserbad mk = new MittagstischKaiserbad(1);
         MittagstischPanLokal mpl = new MittagstischPanLokal(1);
+        MittagstischBistroBic mbb = new MittagstischBistroBic(1);
 
         lunch.add(mlis.prepare());
         lunch.add(mk3.prepare());
         lunch.add(mw.prepare());
         lunch.add(mk.prepare());
         lunch.add(mpl.prepare());
+        lunch.add(mbb.prepare());
         return lunch;
     }
 
