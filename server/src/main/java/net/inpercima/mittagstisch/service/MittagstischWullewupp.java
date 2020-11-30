@@ -16,6 +16,7 @@ public class MittagstischWullewupp extends Mittagstisch {
     public MittagstischWullewupp(final int days) {
         this.setDaily(false);
         this.setDays(days);
+        this.setDissabled(true);
         this.setLunchSelector("div[id='comp-j41q3qb7inlineContent-gridContainer'] > div");
         this.setName("Wullewupp");
         this.setUrl("https://www.wullewupp.de/bar");
