@@ -1,4 +1,4 @@
-# mittagstisch - server
+# Mittagstisch - server
 
 ## Getting started
 
@@ -7,14 +7,14 @@
 cd server
 ```
 
-Create property files for `devMode` and `prodMode`.
+Create environment files for `devMode` and `prodMode`.
 
 ```bash
 cp src/main/resources/application.yml src/main/resources/application-dev.yml
 cp src/main/resources/application.yml src/main/resources/application-prod.yml
 ```
 
-**Note**: These files will not be under version control and listed in .gitignore.
+**Note**: These files will not be under version control but listed in .gitignore.
 
 ## Usage
 

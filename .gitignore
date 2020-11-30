@@ -1,7 +1,6 @@
 # begin project specific
 
 environment.dev.ts
-environment.mock.ts
 environment.prod.ts
 application-dev.yml
 application-prod.yml
@@ -9,10 +8,12 @@ application-prod.yml
 # ignore all in '.vscode' b/c some vsc config files contain user specific content
 .vscode/*
 
+.classpath
+
 # end project specific
 
-# Created by https://www.gitignore.io/api/node,angular,eclipse,intellij+all,java,maven
-# Edit at https://www.gitignore.io/?templates=node,angular,eclipse,intellij+all,java,maven
+# Created by https://www.toptal.com/developers/gitignore/api/node,angular,eclipse,intellij+all,java,maven
+# Edit at https://www.toptal.com/developers/gitignore?templates=node,angular,eclipse,intellij+all,java,maven
 
 ### Angular ###
 ## Angular ##
@@ -39,10 +40,9 @@ testem.log
 typings/
 
 # e2e
-e2e/*.js
 e2e/*.map
 
-#System Files
+# System Files
 .DS_Store/
 
 ### Eclipse ###
@@ -95,26 +95,23 @@ local.properties
 
 # Annotation Processing
 .apt_generated/
+.apt_generated_test/
 
 # Scala IDE specific (Scala & Java development for Eclipse)
 .cache-main
 .scala_dependencies
 .worksheet
 
-### Eclipse Patch ###
-# Eclipse Core
+# Uncomment this line if you wish to ignore the project description file.
+# Typically, this file would be tracked if it contains build/dependency configurations:
 .project
 
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
-
-# Annotation Processing
-.apt_generated
-
+### Eclipse Patch ###
+# Spring Boot Tooling
 .sts4-cache/
 
 ### Intellij+all ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
@@ -144,6 +141,9 @@ local.properties
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
+# .idea/artifacts
+# .idea/compiler.xml
+# .idea/jarRepositories.xml
 # .idea/modules.xml
 # .idea/*.iml
 # .idea/modules
@@ -233,8 +233,8 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
-.flattened-pom.xml
 
 ### Node ###
 # Logs
@@ -289,6 +289,12 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
 # Optional REPL history
 .node_repl_history
 
@@ -301,18 +307,24 @@ jspm_packages/
 # dotenv environment variables file
 .env
 .env.test
+.env*.local
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
+.parcel-cache
 
-# next.js build output
+# Next.js build output
 .next
 
-# nuxt.js build output
+# Nuxt.js build / generate output
 .nuxt
+dist
 
-# react / gatsby 
-public/
+# Gatsby files
+.cache/
+# Comment in the public line in if your project uses Gatsby and not Next.js
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# public
 
 # vuepress build output
 .vuepress/dist
@@ -326,4 +338,10 @@ public/
 # DynamoDB Local files
 .dynamodb/
 
-# End of https://www.gitignore.io/api/node,angular,eclipse,intellij+all,java,maven
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# End of https://www.toptal.com/developers/gitignore/api/node,angular,eclipse,intellij+all,java,maven

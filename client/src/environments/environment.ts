@@ -3,15 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  activateLogin: false,
   api: 'http://localhost:8080/',
   apiSuffix: '',
   appname: 'Mittagstisch',
   defaultRoute: 'dashboard',
   production: false,
-  redirectNotFound: false,
-  showFeatures: true,
-  showLogin: false,
   theme: 'indigo-pink',
 };
 

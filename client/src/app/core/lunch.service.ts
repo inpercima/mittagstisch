@@ -4,23 +4,23 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Lunch } from './lunch';
-import { RequestService } from './request.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class LunchService {
 
-  constructor(private http: HttpClient, private requestService: RequestService) { }
+  constructor(private http: HttpClient) { }
 
   public get(): Observable<Array<Lunch>> {
-    return this.http.get<Array<Lunch>>(this.requestService.url('/today'));
+    return this.http.get<Array<Lunch>>(environment.api + '/today');
   }
 
   public getTomorrow(): Observable<Array<Lunch>> {
-    return this.http.get<Array<Lunch>>(this.requestService.url('/tomorrow'));
+    return this.http.get<Array<Lunch>>(environment.api + '/tomorrow');
   }
 
   public getNextWeek(): Observable<Array<Lunch>> {
-    return this.http.get<Array<Lunch>>(this.requestService.url('/next-week'));
+    return this.http.get<Array<Lunch>>(environment.api + '/next-week');
   }
 
 }

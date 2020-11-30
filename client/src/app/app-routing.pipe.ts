@@ -9,5 +9,4 @@ export class AppRoutingPipe implements PipeTransform {
   transform(items: Routes): Routes {
     return items.filter(item => item.path !== '' && item.path !== '**');
   }
-
 }

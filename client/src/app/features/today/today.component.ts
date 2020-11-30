@@ -9,14 +9,12 @@ import { Lunch } from 'src/app/core/lunch';
 })
 export class TodayComponent implements OnInit {
 
-  private panelOpenState: boolean;
+  lunch: Lunch[];
 
-  private lunch: Array<Lunch>;
-
-  private loaded: boolean;
+  loaded = false;
 
   constructor(private lunchService: LunchService) {
-    this.lunch = new Array<Lunch>();
+    this.lunch = [];
   }
 
   ngOnInit(): void {

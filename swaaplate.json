@@ -1,50 +1,54 @@
 {
-  "general": {
-    "author": "Marcel Jänicke",
-    "description": "The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).",
-    "github": {
-      "use": true,
-      "username": "inpercima"
-    },
-    "name": "mittagstisch",
-    "title": "Mittagstisch",
-    "useDocker": false
-  },
   "client": {
     "buildDir": "dist",
+    "ghUser": "inpercima",
     "installDependencies": true,
+    "language": "en",
+    "modules": {
+      "enabled": true,
+      "features": {
+        "defaultRoute": "dashboard",
+        "name": "features"
+      },
+      "notFound": {
+        "enabled": false,
+        "name": ""
+      },
+      "routing": true
+    },
     "packageJson": {
       "contributors": [{
         "name": "Marcel Jänicke",
         "email": "inpercima@gmail.com"
       }],
-      "homepage": "https://github.com/inpercima/mittagstisch",
-      "repository": "https://github.com/inpercima/mittagstisch"
+      "homepage": "https://github.com/inpercima/mittagstisch/",
+      "repository": "https://github.com/inpercima/mittagstisch/"
     },
-    "route": {
-      "features": {
-        "default": "dashboard",
-        "show": true
-      },
-      "login": {
-        "activate": false,
-        "name": "login",
-        "show": false
-      },
-      "notFound": {
-        "name": "not-found",
-        "redirect": false
-      }
-    },
-    "selectorPrefix": "mt",
+    "prefix": "mt",
     "theme": "indigo-pink",
+    "useGoogleFonts": true,
     "useYarn": true
+  },
+  "general": {
+    "author": "Marcel Jänicke",
+    "description": "The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).",
+    "modRewriteIndex": false,
+    "name": "mittagstisch",
+    "title": "Mittagstisch",
+    "useDocker": false,
+    "useMITLicense": true,
+    "useMock": false,
+    "useSecurity": false
   },
   "server": {
     "backend": "java",
-    "htaccess": false,
-    "management": "maven",
-    "packagePath": "net.inpercima.mittagstisch",
-    "serverAsApi": false
+    "javaKt": {
+      "management": "maven",
+      "packagePath": "net.inpercima.mittagstisch"
+    },
+    "php": {
+      "modRewritePhpExtension": false,
+      "serverAsApi": false
+    }
   }
 }

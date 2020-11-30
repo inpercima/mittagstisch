@@ -1,11 +1,18 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
+  "cli": {
+    "packageManager": "yarn"
+  },
   "newProjectRoot": "projects",
   "projects": {
     "mittagstisch": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:application": {
+          "strict": true
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "mt",
@@ -18,7 +25,7 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -30,22 +37,6 @@
             "scripts": []
           },
           "configurations": {
-            "dev": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev.ts"
-                }
-              ]
-            },
-            "mock": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.mock.ts"
-                }
-              ]
-            },
             "production": {
               "fileReplacements": [
                 {
@@ -56,22 +47,40 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": true,
-              "aot": true,
-              "extractLicenses": false,
+              "extractLicenses": true,
               "vendorChunk": true,
               "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ]
+            },
+            "dev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
                 }
               ]
             }
@@ -83,14 +92,11 @@
             "browserTarget": "mittagstisch:build"
           },
           "configurations": {
-            "dev": {
-              "browserTarget": "mittagstisch:build:dev"
-            },
-            "mock": {
-              "browserTarget": "mittagstisch:build:mock"
-            },
             "production": {
               "browserTarget": "mittagstisch:build:production"
+            },
+            "dev": {
+              "browserTarget": "mittagstisch:build:dev"
             }
           }
         },
@@ -145,8 +151,5 @@
       }
     }
   },
-  "defaultProject": "mittagstisch",
-  "cli": {
-    "packageManager": "yarn"
-  }
+  "defaultProject": "mittagstisch"
 }
