@@ -6,7 +6,9 @@ import { Observable } from 'rxjs';
 import { Lunch } from './lunch';
 import { environment } from 'src/environments/environment';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LunchService {
 
   constructor(private http: HttpClient) { }
