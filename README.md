@@ -28,7 +28,7 @@ Some libraries could not be updated b/c of peer dependencies or knowing issues.
 
 | library    | current version | last version | reason |
 | ---------- | --------------- | ------------ | ------ |
-| rxjs       | 6.6.0           | 7.2.0        | "@angular/common@12.1.1" has incorrect peer dependency "rxjs@^6.5.3" |
+| rxjs       | 6.6.0           | 7.3.0        | "@angular/common@12.1.4" has incorrect peer dependency "rxjs@^6.5.3" |
 
 ## Getting started
 
