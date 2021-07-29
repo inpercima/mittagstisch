@@ -1,8 +1,6 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -25,9 +23,7 @@ import { MaterialModule } from './shared/lunch-entry/material/material.module';
     BrowserAnimationsModule,
     BrowserModule,
     FeaturesModule,
-    HttpClientModule,
-    MatTabsModule,
-    MatToolbarModule,
+    FlexLayoutModule,
     OverlayModule,
     MaterialModule,
   ],

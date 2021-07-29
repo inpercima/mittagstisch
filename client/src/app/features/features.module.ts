@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { MaterialModule } from '../shared/lunch-entry/material/material.module';
@@ -23,6 +21,7 @@ import { TomorrowComponent } from './tomorrow/tomorrow.component';
     CommonModule,
     FeaturesRoutingModule,
     FlexLayoutModule,
+    HttpClientModule,
     MaterialModule,
   ],
 })
