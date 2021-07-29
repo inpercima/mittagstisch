@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppRoutingPipe } from './app-routing.pipe';
 import { FeaturesModule } from './features/features.module';
+import { MaterialModule } from './shared/lunch-entry/material/material.module';
 
 @NgModule({
   bootstrap: [
@@ -28,6 +29,7 @@ import { FeaturesModule } from './features/features.module';
     MatTabsModule,
     MatToolbarModule,
     OverlayModule,
+    MaterialModule,
   ],
 })
 export class AppModule { }
