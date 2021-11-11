@@ -8,7 +8,7 @@
     [routerLink]="routeLink.path"
     routerLinkActive #rla="routerLinkActive"
     [active]="rla.isActive">
-    {{ routeLink.data?.title }}
+    {{ routeLink.data!['title'] }}
   </a>
 </nav>
 <ng-template #dialog>

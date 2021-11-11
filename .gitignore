@@ -8,7 +8,7 @@ application-prod.yml
 # ignore all in '.vscode' b/c some vsc config files contain user specific content
 .vscode/*
 
-.classpath
+.angular
 
 # end project specific
 
@@ -105,7 +105,7 @@ local.properties
 
 # Uncomment this line if you wish to ignore the project description file.
 # Typically, this file would be tracked if it contains build/dependency configurations:
-.project
+#.project
 
 ### Eclipse Patch ###
 # Spring Boot Tooling
@@ -240,6 +240,13 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
+### Maven Patch ###
+# Eclipse m2e generated files
+# Eclipse Core
+.project
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
 ### Node ###
 # Logs
 logs
@@ -357,5 +364,15 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+### Node Patch ###
+# Serverless Webpack directories
+.webpack/
+
+# Optional stylelint cache
+.stylelintcache
+
+# SvelteKit build / generate output
+.svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node,angular,eclipse,intellij+all,java,maven
