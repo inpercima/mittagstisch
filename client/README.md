@@ -1,8 +1,5 @@
 # Mittagstisch - client
 
-[![dependencies Status](https://status.david-dm.org/gh/inpercima/mittagstisch.svg?path=client)](https://david-dm.org/inpercima/mittagstisch?path=client)
-[![devDependencies Status](https://status.david-dm.org/gh/inpercima/mittagstisch.svg?path=client&type=dev)](https://david-dm.org/inpercima/mittagstisch?path=client&type=dev)
-
 ## Getting started
 
 ```bash
