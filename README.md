@@ -12,7 +12,12 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 * `angular-cli 14.2.1` or higher
 
-### Java
+### Docker (when running backend in docker)
+
+* `docker 20.10.17` or higher
+* `docker-compose 2.10.0` or higher
+
+### Java (when running backend local)
 
 * `jdk 17` or higher
 
@@ -37,3 +42,5 @@ cd mittagstisch
 For the frontend check [mittagstisch - web](./web).
 
 For the backend check [mittagstisch - server](./server).
+
+For docker check [mittagstisch - docker](./README_docker.md).
