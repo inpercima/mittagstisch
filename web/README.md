@@ -1,10 +1,10 @@
-# Mittagstisch - client
+# Mittagstisch - web
 
 ## Getting started
 
 ```bash
-# all commands used in ./client
-cd client
+# all commands used in ./web
+cd web
 
 # install tools and frontend dependencies
 yarn

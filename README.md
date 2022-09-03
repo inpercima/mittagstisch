@@ -34,6 +34,6 @@ cd mittagstisch
 
 ### Modules
 
-For the client check [mittagstisch - client](./client).
+For the frontend check [mittagstisch - web](./web).
 
-For the server check [mittagstisch - server](./server).
+For the backend check [mittagstisch - server](./server).
