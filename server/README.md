@@ -7,7 +7,7 @@
 cd server
 ```
 
-Create environment files for `devMode` and `prodMode`.
+Create environment files for `development mode` and `production mode`.
 
 ```bash
 cp src/main/resources/application.yml src/main/resources/application-dev.yml
@@ -18,7 +18,7 @@ cp src/main/resources/application.yml src/main/resources/application-prod.yml
 
 ## Usage
 
-### Run in devMode
+### Run in development mode
 
 ```bash
 # short
@@ -28,7 +28,7 @@ cp src/main/resources/application.yml src/main/resources/application-prod.yml
 ./mvnw spring-boot:run -Pdev
 ```
 
-### Run in prodMode
+### Run in production mode
 
 ```bash
 # short
@@ -38,7 +38,7 @@ cp src/main/resources/application.yml src/main/resources/application-prod.yml
 ./mvnw spring-boot:run -Pprod
 ```
 
-### Package and run in prodMode
+### Package and run in production mode
 
 ```bash
 # package
