@@ -19,7 +19,7 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 ### Node, npm or yarn
 
 * `node 16.16.0` or higher in combination with
-  * `npm 8.12.2` or higher or
+  * `npm 8.18.0` or higher or
   * `yarn 1.22.19` or higher, used in this repository
 
 ## Getting started
