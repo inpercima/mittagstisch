@@ -19,10 +19,11 @@ services:
     image: mysql:${MYSQL_VERSION}
     mem_limit: 1g
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT}:3306"
     restart: unless-stopped
     volumes:
       - data-mysql:/var/lib/mysql
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
   phpmyadmin:
     container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
     depends_on:
