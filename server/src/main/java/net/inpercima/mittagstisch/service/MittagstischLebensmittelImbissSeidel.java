@@ -33,7 +33,7 @@ public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
         String food = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
             // details are in spans per day after span with dayname
-            food = filter("Änderungen").map(DomNode::asText).collect(Collectors.joining(" "));
+            food = filter("Änderungen").map(DomNode::asNormalizedText).collect(Collectors.joining(" "));
         }
         return buildLunch(state, food);
     }

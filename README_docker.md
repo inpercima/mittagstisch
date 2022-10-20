@@ -100,7 +100,7 @@ docker compose --project-name "mittagstisch" down
 
 ### Mysql out of this project
 
-If you manage your data out of this project, you can use the dump file (`dump.sql`) and connect to your database
+If you manage your data out of this project, you can use the dump file (`dump.sql`) and connect to your database.
 Then run following commands:
 
 ```bash

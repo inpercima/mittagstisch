@@ -33,7 +33,7 @@ public class MittagstischKantine3 extends Mittagstisch {
         String food = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
             // details are in spans per day after span with dayname
-            food = filter("TÄGLICH").map(p -> update(p.asText())).collect(Collectors.joining("<br>"));
+            food = filter("TÄGLICH").map(p -> update(p.asNormalizedText())).collect(Collectors.joining("<br>"));
         }
         // Replacement necessary because name of day can be in the paragraph
         return buildLunch(state, food.replace(getDay(getDays()), "").replaceFirst("<br>", StringUtils.EMPTY));

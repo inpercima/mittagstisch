@@ -33,7 +33,7 @@ public class MittagstischWullewupp extends Mittagstisch {
         if (StringUtils.isBlank(state.getStatusText())) {
             // details are in divs per lunch after div with weekname
             food = getHtmlPage().querySelectorAll(getLunchSelector()).stream()
-                    .filter(node -> !node.asText().contains(getOriginalWeekText())).map(DomNode::asText)
+                    .filter(node -> !node.asNormalizedText().contains(getOriginalWeekText())).map(DomNode::asNormalizedText)
                     .collect(Collectors.joining("<br><br>"));
         }
         return buildLunch(state, food);

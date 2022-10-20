@@ -154,7 +154,7 @@ abstract class Mittagstisch {
      * @return WebClient The initialized client
      */
     private static WebClient initWebClient() {
-        final WebClient webClient = new WebClient(BrowserVersion.FIREFOX_78);
+        final WebClient webClient = new WebClient(BrowserVersion.FIREFOX);
         final WebClientOptions options = webClient.getOptions();
         options.setJavaScriptEnabled(false);
         options.setUseInsecureSSL(true);
