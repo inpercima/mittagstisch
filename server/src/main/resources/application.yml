@@ -6,7 +6,18 @@ logging:
   file:
      name: logs/application.log
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
 # enable gz compression
 server:
   compression:
     enabled: true
+
+spring:
+  jpa:
+    open-in-view: false
+    show-sql: false
