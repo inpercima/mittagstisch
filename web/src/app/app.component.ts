@@ -15,10 +15,9 @@ import { FeaturesRoutingModule } from './features/features-routing.module';
 })
 export class AppComponent {
 
-  public routes: Routes;
-
   public appname: string;
 
+  public routes: Routes;
   /**
    * Adds the custom theme to the app root.
    * For overlays the OverlayContainer like in the constructor is used.

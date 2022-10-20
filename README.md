@@ -4,18 +4,18 @@
 
 The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).
 
-This project was generated with [swaaplate](https://github.com/inpercima/swaaplate) version 2.3.7.
+This project was generated with [swaaplate](https://github.com/inpercima/swaaplate) version 2.3.8.
 
 ## Prerequisites
 
 ### Angular CLI
 
-* `angular-cli 14.2.1` or higher
+* `angular-cli 14.2.6` or higher
 
-### Docker (when running backend in docker)
+### Docker
 
-* `docker 20.10.17` or higher
-* `docker-compose 2.10.0` or higher
+* `docker 20.10.18` or higher
+* `docker compose 2.11.0` or higher
 
 ### Java (when running backend local)
 
@@ -23,8 +23,8 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 ### Node, npm or yarn
 
-* `node 16.16.0` or higher in combination with
-  * `npm 8.18.0` or higher or
+* `node 16.17.0` or higher in combination with
+  * `npm 8.19.2` or higher or
   * `yarn 1.22.19` or higher, used in this repository
 
 ## Getting started
@@ -43,4 +43,4 @@ For the frontend check [mittagstisch - web](./web).
 
 For the backend check [mittagstisch - server](./server).
 
-For docker check [mittagstisch - docker](./README_docker.md).
+For the docker check [mittagstisch - docker](./README_docker.md).

@@ -68,7 +68,7 @@ Change for `production mode` the option `production` to `true`.
 
 * [api](#api)
 * [appname](#appname)
-* [defaultRoute](#defaultRoute)
+* [defaultRoute](#defaultroute)
 * [production](#production)
 * [theme](#theme)
 

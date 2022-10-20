@@ -35,7 +35,7 @@
     "modRewriteIndex": false,
     "name": "mittagstisch",
     "title": "Mittagstisch",
-    "useDocker": false,
+    "useDocker": true,
     "useMITLicense": true,
     "useMock": false,
     "useSecurity": false
