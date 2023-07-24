@@ -12,6 +12,10 @@ cp default.env .env
 
 **Note**: This file will not be under version control but listed in .gitignore.
 
+Check for the existence of `environment.prod.ts` as described in [Mittagstisch - frontend](./frontend).
+
+Check for the existence of `application-prod.yml` as described in [Mittagstisch - backend](./backend).
+
 ## Configuration
 
 ### Table of contents

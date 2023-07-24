@@ -1,6 +1,5 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { NgModule } from '@angular/core';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -23,7 +22,6 @@ import { MaterialModule } from './shared/lunch-entry/material/material.module';
     BrowserAnimationsModule,
     BrowserModule,
     FeaturesModule,
-    FlexLayoutModule,
     OverlayModule,
     MaterialModule,
   ],
