@@ -20,7 +20,7 @@ public class MittagstischLebensmittelImbissSeidelTest {
 
     @Test
     public void lebensmittelSeidel() throws IOException {
-        mlis.getHtmlPage(mlis.getUrl());
+        mlis.determineHtmlPage();
         assertThat(mlis.getHtmlPage().getTitleText()).isEqualTo("Lebensmittel & Imbiss Seidel");
         assertThat(mlis.getWeekText().contains("Woche"));
     }

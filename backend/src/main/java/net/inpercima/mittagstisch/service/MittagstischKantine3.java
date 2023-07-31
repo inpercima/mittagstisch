@@ -59,11 +59,12 @@ public class MittagstischKantine3 extends Mittagstisch {
         return result;
     }
 
-    public boolean isWithinWeek(final int days) {
-        final boolean isWithinWeek = isWithinRange(days)
-                && (weekTextContains(days, dMMMM) || weekTextContains(days, d, dMMMM));
-        log.debug("is in week: '{}'", isWithinWeek);
-        return isWithinWeek;
+    public boolean isWithinWeek(final boolean checkForNextWeek) {
+        // final boolean isWithinWeek = isWithinRange(days)
+        //         && (weekTextContains(days, dMMMM) || weekTextContains(days, d, dMMMM));
+        // log.debug("is in week: '{}'", isWithinWeek);
+        // return isWithinWeek;
+        return false;
     }
 
 }

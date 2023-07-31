@@ -10,5 +10,4 @@ public class State {
     private String status;
 
     private String statusText;
-
 }

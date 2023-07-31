@@ -14,6 +14,4 @@ public class Lunch {
     private String price;
 
     private String status;
-
-
 }

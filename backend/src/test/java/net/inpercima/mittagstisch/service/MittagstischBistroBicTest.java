@@ -20,7 +20,7 @@ public class MittagstischBistroBicTest {
 
     @Test
     public void bistroBic() throws IOException {
-        mbb.getHtmlPage(mbb.getUrl());
+        mbb.determineHtmlPage();
         assertThat(mbb.getHtmlPage().getTitleText()).isEqualTo("Bistro im Bussines & Innovation Centre Leipzig - Speiseplan");
         // Condition<String> wochenkarte = new Condition<>(s -> s.contains("Wochenkarte"), "type Wochenkarte");
         // Condition<String> mittagskarte = new Condition<>(s -> s.contains("Mittagskarte"), "type Mittagskarte");

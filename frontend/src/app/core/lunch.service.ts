@@ -14,15 +14,15 @@ export class LunchService {
   constructor(private http: HttpClient) { }
 
   public get(): Observable<Array<Lunch>> {
-    return this.http.get<Array<Lunch>>(environment.api + '/today');
+    return this.http.get<Array<Lunch>>(environment.api + 'today');
   }
 
   public getTomorrow(): Observable<Array<Lunch>> {
-    return this.http.get<Array<Lunch>>(environment.api + '/tomorrow');
+    return this.http.get<Array<Lunch>>(environment.api + 'tomorrow');
   }
 
   public getNextWeek(): Observable<Array<Lunch>> {
-    return this.http.get<Array<Lunch>>(environment.api + '/next-week');
+    return this.http.get<Array<Lunch>>(environment.api + 'next-week');
   }
 
 }

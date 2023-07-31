@@ -22,7 +22,7 @@ public class MittagstischPanLokalTest {
 
     @Test
     public void panLokal() throws IOException {
-        mpl.getHtmlPage(mpl.getUrl());
+        mpl.determineHtmlPage();
         assertThat(mpl.getHtmlPage().getTitleText()).isEqualTo("Mittagessen Archives - Pan Lokal");
         Condition<String> wochenkarte = new Condition<>(s -> s.contains("Wochenkarte"), "type Wochenkarte");
         Condition<String> mittagskarte = new Condition<>(s -> s.contains("Mittagskarte"), "type Mittagskarte");

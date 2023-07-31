@@ -38,11 +38,12 @@ public class MittagstischLebensmittelImbissSeidel extends Mittagstisch {
         return buildLunch(state, food);
     }
 
-    public boolean isWithinWeek(final int days) {
-        final boolean isWithinWeek = isWithinRange(days)
-                && (weekTextContains(days, ddMMYYYY) || weekTextContains(days, ddMM, ddMMYYYY));
-        log.debug("is in week: '{}'", isWithinWeek);
-        return isWithinWeek;
+    public boolean isWithinWeek(final boolean checkForNextWeek) {
+        // final boolean isWithinWeek = isWithinRange(days)
+        //         && (weekTextContains(days, ddMMYYYY) || weekTextContains(days, ddMM, ddMMYYYY));
+        // log.debug("is in week: '{}'", isWithinWeek);
+        // return isWithinWeek;
+        return false;
     }
 
 }

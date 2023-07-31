@@ -22,7 +22,7 @@ public class MittagstischKaiserbadTest {
     @Test
     @Disabled("Wochenkarte doesn't exist anymore")
     public void kaiserbad() throws IOException {
-        mk.getHtmlPage(mk.getUrl());
+        mk.determineHtmlPage();
         assertThat(mk.getHtmlPage().getTitleText()).isEqualTo("Home - kaiserbad-leipzig.de");
         assertThat(mk.getWeekText()).contains("Wochenkarte");
     }

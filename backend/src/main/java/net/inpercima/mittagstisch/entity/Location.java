@@ -1,23 +1,23 @@
-package net.inpercima.mittagstisch.entity;
+// package net.inpercima.mittagstisch.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+// import jakarta.persistence.Column;
+// import jakarta.persistence.Entity;
+// import jakarta.persistence.GeneratedValue;
+// import jakarta.persistence.GenerationType;
+// import jakarta.persistence.Id;
 
-import lombok.Getter;
-import lombok.Setter;
+// import lombok.Getter;
+// import lombok.Setter;
 
-@Entity
-@Getter
-@Setter
-public class Location {
+// @Entity
+// @Getter
+// @Setter
+// public class Location {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Integer id;
+//     @Id
+//     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+//     private Integer id;
 
-    @Column
-    private String name;
-}
+//     @Column
+//     private String name;
+// }

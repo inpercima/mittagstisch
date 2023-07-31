@@ -33,16 +33,17 @@ public class MittagstischWullewupp extends Mittagstisch {
         if (StringUtils.isBlank(state.getStatusText())) {
             // details are in divs per lunch after div with weekname
             food = getHtmlPage().querySelectorAll(getLunchSelector()).stream()
-                    .filter(node -> !node.asNormalizedText().contains(getOriginalWeekText())).map(DomNode::asNormalizedText)
+                    .filter(node -> !node.asNormalizedText().contains(getWeekText())).map(DomNode::asNormalizedText)
                     .collect(Collectors.joining("<br><br>"));
         }
         return buildLunch(state, food);
     }
 
-    public boolean isWithinWeek(final int days) {
-        final boolean isWithinWeek = isWithinRange(days) && weekTextContains(days, dM);
-        log.debug("is in week: '{}'", isWithinWeek);
-        return isWithinWeek;
+    public boolean isWithinWeek(final boolean checkForNextWeek) {
+        // final boolean isWithinWeek = isWithinRange(days) && weekTextContains(days, dM);
+        // log.debug("is in week: '{}'", isWithinWeek);
+        // return isWithinWeek;
+        return false;
     }
 
 }

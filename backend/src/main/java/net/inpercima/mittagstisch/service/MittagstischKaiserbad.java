@@ -24,7 +24,7 @@ public class MittagstischKaiserbad extends Mittagstisch {
         return buildLunch(state, "");
     }
 
-    public boolean isWithinWeek(final int days) {
+    public boolean isWithinWeek(final boolean checkForNextWeek) {
         return false;
     }
 
