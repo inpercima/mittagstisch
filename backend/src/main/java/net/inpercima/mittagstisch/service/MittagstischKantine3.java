@@ -36,7 +36,7 @@ public class MittagstischKantine3 extends Mittagstisch {
             food = filter("TÄGLICH").map(p -> update(p.asNormalizedText())).collect(Collectors.joining("<br>"));
         }
         // Replacement necessary because name of day can be in the paragraph
-        return buildLunch(state, food.replace(getDay(getDays()), "").replaceFirst("<br>", StringUtils.EMPTY));
+        return buildLunch(state, food.replace(getDay(), "").replaceFirst("<br>", StringUtils.EMPTY));
     }
 
     /**
@@ -61,7 +61,7 @@ public class MittagstischKantine3 extends Mittagstisch {
 
     public boolean isWithinWeek(final boolean checkForNextWeek) {
         // final boolean isWithinWeek = isWithinRange(days)
-        //         && (weekTextContains(days, dMMMM) || weekTextContains(days, d, dMMMM));
+        // && (weekTextContains(days, dMMMM) || weekTextContains(days, d, dMMMM));
         // log.debug("is in week: '{}'", isWithinWeek);
         // return isWithinWeek;
         return false;

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
 import net.inpercima.mittagstisch.service.MittagstischBistroBic;
 import net.inpercima.mittagstisch.service.MittagstischPanLokal;
 
@@ -18,10 +19,12 @@ public class MittagstischController {
     public List<Lunch> listToday() throws IOException {
         final List<Lunch> lunch = new ArrayList<>();
         //MittagstischPanLokal mpl = new MittagstischPanLokal(0);
+        GeschmackssacheLeipzig gl = new GeschmackssacheLeipzig(0);
         MittagstischBistroBic mbb = new MittagstischBistroBic(0);
 
         //lunch.add(mpl.prepare());
         lunch.add(mbb.prepare());
+        lunch.add(gl.prepare());
         return lunch;
     }
 

@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -13,7 +13,7 @@ import { LunchService } from './lunch.service';
   templateUrl: './lunch.component.html',
   imports: [MatCardModule, MatDividerModule, MatProgressBarModule, NgFor, NgIf],
 })
-export class LunchComponent {
+export class LunchComponent implements OnInit {
   lunch: Lunch[];
   path: string;
 

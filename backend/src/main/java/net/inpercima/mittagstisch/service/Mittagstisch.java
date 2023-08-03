@@ -169,7 +169,7 @@ abstract class Mittagstisch {
     /**
      * Checks if the dates in the determined week are up-to-date.
      *
-     * @param checkForNextWeek
+     * @param checkForNextWeek[contains(text(),'Speiseplan'
      * @return boolean True if up-to-date otherwise false
      */
     abstract boolean isWithinWeek(final boolean checkForNextWeek);
@@ -196,6 +196,26 @@ abstract class Mittagstisch {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
         final LocalDate date = now.plusDays(checkForNextWeek ? IN_NEXT_WEEK : getDays());
         return date;
+    }
+
+    /**
+     * Determine the day name for checks.
+     *
+     * @param days The number of days added to the current day
+     * @return String
+     */
+    protected String getDay() {
+        return getLocalizedDate(false).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY);
+    }
+
+    /**
+     * Determine the day name for checks in lower case.
+     *
+     * @param days The number of days added to the current day
+     * @return String
+     */
+    protected String getDayLowerCase() {
+        return getDay().toLowerCase();
     }
 
     /**
@@ -265,17 +285,6 @@ abstract class Mittagstisch {
     /**
      * Determine the day name for checks.
      *
-     * @param days The number of days added to the current day
-     * @return String
-     */
-    protected String getDay(final int days) {
-        String day = getLocalizedDate(false).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY);
-        return day.toUpperCase();
-    }
-
-    /**
-     * Determine the day name for checks.
-     *
      * @param node    The element to filter
      * @param days    The number of days added to the current day
      * @param endText The text at the end of the lunch section
@@ -290,11 +299,11 @@ abstract class Mittagstisch {
             found = false;
         }
         // just return true if content not dayname
-        return found && !content.equals(getDay(days));
+        return found && !content.equals(getDay());
     }
 
     private boolean startsWithDayname(final String content, final int days) {
-        return content.startsWith(getDay(days));
+        return content.startsWith(getDay());
     }
 
     // protected boolean weekTextContains(final int days, final DateTimeFormatter

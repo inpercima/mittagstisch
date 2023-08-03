@@ -104,7 +104,7 @@
               <outputDirectory>${basedir}/target/classes/public</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../web/dist</directory>
+                  <directory>../frontend/dist</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>

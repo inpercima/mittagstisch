@@ -11,32 +11,34 @@ import net.inpercima.mittagstisch.model.Lunch;
 import net.inpercima.mittagstisch.model.State;
 
 @Slf4j
-public class MittagstischBistroBic extends Mittagstisch {
+public class GeschmackssacheLeipzig extends Mittagstisch {
 
-    public MittagstischBistroBic(final int days) {
+    public GeschmackssacheLeipzig(final int days) {
         this.setDaily(true);
         this.setDays(days);
-        this.setLunchSelector("div.content_main_dho p");
-        this.setName("Bistro BIC");
-        this.setUrl("http://www.bistro-bic.de/Speiseplan");
-        this.setWeekSelector("div.content_main_dho p");
-        this.setWeekSelectorXPath("/html/body/div[4]/div[3]/div/div[1]//*[contains(text(),'Speiseplan')]");
+        this.setLunchSelector("table:first-of-type tr");
+        this.setName("Geschmackssache Leipzig");
+        this.setUrl("https://geschmackssache-leipzig.de");
+        this.setWeekSelector("div[id='main'] div h2");
+        this.setWeekSelectorXPath("/html/body/div/div/div/div[1]/h2//*[contains(text(),'Wochenkarte')]");
     }
 
     /**
-     * Parses and returns the output for the lunch in "Bistro BIC".
+     * Parses and returns the output for the lunch in "Geschmackssache Leipzig".
      *
      * @param state
      */
     public Lunch parse(final State state) {
         String mealWithDayAndPrice = StringUtils.EMPTY;
         if (StringUtils.isBlank(state.getStatusText())) {
-            // details are in paragraphs per day
+            // details are in rows per day
+            final String dayAbbr = getDay().substring(0, 2);
+            final String dayLowerCaseAbbr = dayAbbr.toLowerCase();
+
             mealWithDayAndPrice = getHtmlPage().querySelectorAll(getLunchSelector()).stream()
-                    .filter(node -> node.asNormalizedText().toLowerCase().contains(getDayLowerCase())).findFirst().get()
+                    .filter(node -> node.asNormalizedText().toLowerCase().startsWith(dayLowerCaseAbbr)).findFirst().get()
                     .asNormalizedText();
-            mealWithDayAndPrice = mealWithDayAndPrice.replaceFirst(getDay(), "").trim();
-            mealWithDayAndPrice = mealWithDayAndPrice.replace("\n", "<br><br>");
+            mealWithDayAndPrice = mealWithDayAndPrice.replaceFirst(dayAbbr, "").trim();
         }
         return buildLunch(state, mealWithDayAndPrice);
     }
