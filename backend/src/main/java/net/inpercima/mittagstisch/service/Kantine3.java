@@ -1,42 +1,33 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
-import net.inpercima.mittagstisch.model.State;
 
-@Slf4j
-public class MittagstischKantine3 extends Mittagstisch {
+public class Kantine3 extends Mittagstisch {
 
-    public MittagstischKantine3(final int days) {
-        this.setDaily(true);
-        this.setDays(days);
-        this.setLunchSelector("main section div div p");
-        this.setName("Kantine 3 (im Tapetenwerk)");
-        this.setUrl("http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
-        this.setWeekSelector("main section div div h1");
+    public Kantine3(final int days) {
+        Bistro bistro = new Bistro();
+        bistro.setDaily(true);
+        bistro.setDays(days);
+        bistro.setLunchSelector("main section div div p");
+        bistro.setName("Kantine 3 (im Tapetenwerk)");
+        bistro.setUrl("http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
+        bistro.setWeekSelector("main section div div h1");
+        bistro.setWeekSelectorXPath("");
+        this.setBistro(bistro);
     }
 
     /**
-     * Parses and returns the output for the lunch in "Kantine 3 (im Tapetenwerk)".
-     *
-     * @param state
-     * @throws IOException
+     * Parses and returns the output for the lunch in "Geschmackssache Leipzig".
      */
-    public Lunch parse(final State state) throws IOException {
-        String food = StringUtils.EMPTY;
-        if (StringUtils.isBlank(state.getStatusText())) {
-            // details are in spans per day after span with dayname
-            food = filter("TÄGLICH").map(p -> update(p.asNormalizedText())).collect(Collectors.joining("<br>"));
-        }
-        // Replacement necessary because name of day can be in the paragraph
-        return buildLunch(state, food.replace(getDay(), "").replaceFirst("<br>", StringUtils.EMPTY));
+    public Lunch parse() {
+        String mealWithDayAndPrice = StringUtils.EMPTY;
+        return buildLunch(mealWithDayAndPrice);
     }
 
     /**

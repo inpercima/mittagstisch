@@ -11,29 +11,29 @@ import org.junit.jupiter.api.Test;
 
 import net.inpercima.mittagstisch.model.Lunch;
 
-public class MittagstischPanLokalTest {
+public class PanLokalTest {
 
-    private MittagstischPanLokal mpl;
+    private PanLokal panLokal;
 
     @BeforeEach
-    public void create() {
-        mpl = new MittagstischPanLokal(0);
+    public void create() throws IOException {
+        panLokal = new PanLokal(0);
+        panLokal.prepare();
     }
 
     @Test
     public void panLokal() throws IOException {
-        mpl.determineHtmlPage();
-        assertThat(mpl.getHtmlPage().getTitleText()).isEqualTo("Mittagessen Archives - Pan Lokal");
+        assertThat(panLokal.getHtmlPage().getTitleText()).isEqualTo("PAN Lokal - Mittag");
         Condition<String> wochenkarte = new Condition<>(s -> s.contains("Wochenkarte"), "type Wochenkarte");
-        Condition<String> mittagskarte = new Condition<>(s -> s.contains("Mittagskarte"), "type Mittagskarte");
-        assertThat(mpl.getWeekText()).is(anyOf(wochenkarte, mittagskarte));
+        Condition<String> mittagskarte = new Condition<>(s -> s.contains("MITTAGSKARTE"), "type Mittagskarte");
+        assertThat(panLokal.getWeekText()).is(anyOf(wochenkarte, mittagskarte));
     }
 
     @Test
     public void shouldPrepare() throws IOException {
-        final Lunch lunch = mpl.prepare();
+        final Lunch lunch = panLokal.parse();
         assertThat(lunch).isNotNull();
-        assertThat(lunch.getFood()).isNotEmpty();
+        assertThat(lunch.getMeal()).isNotEmpty();
     }
 
 }
