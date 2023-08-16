@@ -1,7 +1,7 @@
 export interface Lunch {
-  name: string;
+  bistroName: string;
 
-  food: string;
+  meal: string;
 
   price: string;
 

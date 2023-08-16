@@ -10,6 +10,7 @@ public class PanLokal extends Mittagstisch {
     public PanLokal(final int days) {
         final Bistro bistro = new Bistro();
         bistro.setDaily(true);
+        bistro.setDisabled(true);
         bistro.setDays(days);
         bistro.setLunchSelector("div[id='widgetbar_page_1'] div[class='wdn-pricelist-priceList']");
         bistro.setName("PAN Lokal");
@@ -24,12 +25,12 @@ public class PanLokal extends Mittagstisch {
      * Parses and returns the output for the lunch in "PAN Lokal".
      */
     public Lunch parse() {
-        String food = StringUtils.EMPTY;
-        return buildLunch(food);
+        String mealWithDayAndPrice = StringUtils.EMPTY;
+        return buildLunch(mealWithDayAndPrice);
     }
 
     public boolean isWithinWeek(final boolean checkForNextWeek) {
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
-                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{2})", ddMMYY);
+                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{2})", MittagstischUtils.ddMMYY, "", "");
     }
 }

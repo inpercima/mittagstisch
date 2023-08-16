@@ -1,20 +1,17 @@
 <mat-card class="w-4/5 mx-auto" *ngIf="!loaded">
+  <mat-card-content>
+    <mat-progress-bar color="primary" mode="indeterminate" value="50"></mat-progress-bar>
+  </mat-card-content>
+</mat-card>
+
+<ng-container *ngIf="loaded">
+  <mat-card class="w-4/5 mx-auto" *ngFor="let item of lunch">
+    <mat-card-header [class]="item.status">
+      <mat-card-title>{{ item.bistroName }}</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
     <mat-card-content>
-      <mat-progress-bar color="primary" mode="indeterminate" value="50"></mat-progress-bar>
+      <p [innerHTML]="item.meal"></p>
     </mat-card-content>
   </mat-card>
-  
-  <ng-container *ngIf="loaded">
-    <mat-card class="w-4/5 mx-auto" *ngFor="let item of lunch">
-      <mat-card-header>
-        <mat-card-title>{{item.name}}</mat-card-title>
-        <mat-card-subtitle>{{item.status}}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-divider></mat-divider>
-      <mat-card-content>
-        <p [innerHTML]="item.food">
-        </p>
-      </mat-card-content>
-    </mat-card>
-  </ng-container>
-  
+</ng-container>

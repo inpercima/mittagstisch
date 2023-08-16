@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import net.inpercima.mittagstisch.model.Lunch;
 import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
+import net.inpercima.mittagstisch.service.Kantine3;
+import net.inpercima.mittagstisch.service.LebensmittelimbissSeidel;
 import net.inpercima.mittagstisch.service.PanLokal;
 
 @RestController
@@ -26,6 +28,14 @@ public class TodayController {
         BistroImBic bistroImBic = new BistroImBic(0);
         bistroImBic.prepare();
         lunch.add(bistroImBic.parse());
+
+        LebensmittelimbissSeidel lebensmittelimbissSeidel = new LebensmittelimbissSeidel(0);
+        lebensmittelimbissSeidel.prepare();
+        lunch.add(lebensmittelimbissSeidel.parse());
+
+        Kantine3 kantine3 = new Kantine3(0);
+        kantine3.prepare();
+        lunch.add(kantine3.parse());
 
         PanLokal panLokal = new PanLokal(0);
         panLokal.prepare();

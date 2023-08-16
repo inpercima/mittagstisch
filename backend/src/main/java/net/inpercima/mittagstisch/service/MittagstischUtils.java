@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -29,7 +30,21 @@ import net.inpercima.mittagstisch.model.Bistro;
 public class MittagstischUtils {
 
     // monday - friday used so just 5 days
-    private static final int IN_NEXT_WEEK = 5;
+    private static final int IN_NEXT_WEEK = 7;
+
+    private static final String DATE_FORMAT = "dd.MM.yyyy";
+
+    protected static final DateTimeFormatter ddMMYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
+            .appendPattern("dd.MM.yy")
+            .toFormatter(Locale.GERMANY);
+
+    protected static final DateTimeFormatter ddMMMMYYYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
+            .appendPattern("dd.MMMMyyyy")
+            .toFormatter(Locale.GERMANY);
+
+    protected static final DateTimeFormatter ddMMYYYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
+            .appendPattern(DATE_FORMAT)
+            .toFormatter(Locale.GERMANY);
 
     /**
      * Init webclient with firefox browser and some options.
@@ -75,7 +90,7 @@ public class MittagstischUtils {
                     .getFirstByXPath(bistro.getWeekSelectorXPath()))
                     .asNormalizedText();
         }
-        final String weekText = originalWeekText.replace(" ", StringUtils.EMPTY).trim().toUpperCase();
+        final String weekText = originalWeekText.replace(" ", StringUtils.EMPTY).trim();
         log.debug("prepare lunch for: '{}' with weektext: '{}'", bistro.getName(), weekText);
         return weekText;
     }
@@ -114,21 +129,21 @@ public class MittagstischUtils {
     }
 
     public boolean isWithinWeek(final boolean checkForNextWeek, final String weekText, final int days,
-            final String regex, final DateTimeFormatter dateFormat) {
+            final String regex, final DateTimeFormatter dateFormat, final String suffix1, final String suffix2) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(weekText);
         LocalDate firstDate = null;
         LocalDate lastDate = null;
         while (matcher.find()) {
             if (firstDate == null) {
-                firstDate = LocalDate.parse(matcher.group(1), dateFormat);
+                firstDate = LocalDate.parse(matcher.group(1) + suffix1, dateFormat);
                 log.debug("extracted firstDate: '{}'", firstDate);
             } else {
-                lastDate = LocalDate.parse(matcher.group(1), dateFormat);
+                lastDate = LocalDate.parse(matcher.group(1) + suffix2, dateFormat);
                 log.debug("extracted lastDate: '{}'", lastDate);
             }
         }
-        final boolean isWithinWeek = MittagstischUtils.isWithinRange(firstDate, lastDate, checkForNextWeek,
+        final boolean isWithinWeek = isWithinRange(firstDate, lastDate, checkForNextWeek,
                 days);
         log.debug("is in week: '{}'", isWithinWeek);
         return isWithinWeek;

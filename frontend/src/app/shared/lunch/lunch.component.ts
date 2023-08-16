@@ -11,16 +11,16 @@ import { LunchService } from './lunch.service';
   selector: 'mt-lunch',
   standalone: true,
   templateUrl: './lunch.component.html',
+  styleUrls: ['./lunch.component.css'],
   imports: [MatCardModule, MatDividerModule, MatProgressBarModule, NgFor, NgIf],
 })
 export class LunchComponent implements OnInit {
-  lunch: Lunch[];
+  lunch: Lunch[] = [];
   path: string;
 
   loaded = false;
 
   constructor(public route: ActivatedRoute, private lunchService: LunchService) {
-    this.lunch = [];
     this.path = route.snapshot.routeConfig!.path!;
   }
 

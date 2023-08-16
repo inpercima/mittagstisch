@@ -25,7 +25,7 @@ public class GeschmackssacheLeipzig extends Mittagstisch {
     public Lunch parse() {
         String mealWithDayAndPrice = StringUtils.EMPTY;
         if (StringUtils.isBlank(getState().getStatusText())) {
-            // details are in rows per day
+            // details are in table rows per day
             final String dayAbbr = MittagstischUtils.getDay(getBistro().getDays()).substring(0, 2);
             final String dayLowerCaseAbbr = dayAbbr.toLowerCase();
 
@@ -33,13 +33,14 @@ public class GeschmackssacheLeipzig extends Mittagstisch {
                     .filter(node -> node.asNormalizedText().toLowerCase().startsWith(dayLowerCaseAbbr)).findFirst()
                     .get()
                     .asNormalizedText();
-            mealWithDayAndPrice = mealWithDayAndPrice.replaceFirst(dayAbbr, "").trim();
+            // remove day b/c the selected day is clear, and replace tab by single html whitespace
+            mealWithDayAndPrice = mealWithDayAndPrice.replaceFirst(dayAbbr, "").trim().replace("\t", "&nbsp;");
         }
         return buildLunch(mealWithDayAndPrice);
     }
 
     public boolean isWithinWeek(final boolean checkForNextWeek) {
-        return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), 0,
-                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})", ddMMYYYY);
+        return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
+                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})", MittagstischUtils.ddMMYYYY, "", "");
     }
 }

@@ -33,15 +33,16 @@ public class BistroImBic extends Mittagstisch {
                             .contains(MittagstischUtils.getDay(getBistro().getDays()).toLowerCase()))
                     .findFirst().get()
                     .asNormalizedText();
+            // remove day b/c the selected day is clear, and replace line break by html line
+            // breaks
             mealWithDayAndPrice = mealWithDayAndPrice
-                    .replaceFirst(MittagstischUtils.getDay(getBistro().getDays()), "").trim();
-            mealWithDayAndPrice = mealWithDayAndPrice.replace("\n", "<br><br>");
+                    .replaceFirst(MittagstischUtils.getDay(getBistro().getDays()), "").trim().replace("\n", "<br><br>");
         }
         return buildLunch(mealWithDayAndPrice);
     }
 
     public boolean isWithinWeek(final boolean checkForNextWeek) {
-        return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), 0,
-                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})", ddMMYYYY);
+        return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
+                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})", MittagstischUtils.ddMMYYYY, "", "");
     }
 }

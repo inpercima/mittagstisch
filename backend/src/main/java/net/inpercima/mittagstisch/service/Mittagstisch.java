@@ -1,8 +1,6 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,12 +21,6 @@ abstract class Mittagstisch {
     private static final String STATUS_NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Schau bitte unter 'nächste Woche'";
 
     private static final String STATUS_OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
-
-    protected static final String DATE_FORMAT = "dd.MM.yyyy";
-
-    protected static final DateTimeFormatter ddMMYY = DateTimeFormatter.ofPattern("dd.MM.yy", Locale.GERMANY);
-
-    protected static final DateTimeFormatter ddMMYYYY = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.GERMANY);
 
     private Bistro bistro;
 
