@@ -44,7 +44,7 @@ public class Kantine3 extends Mittagstisch {
         final LocalDate now = MittagstischUtils.getLocalizedDate(false, this.getBistro().getDays());
         final String suffix = String.valueOf(now.getYear());
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
-                "((?:[0-2][0-9]|3[01]).(?:(?:JAN)(?:UAR)?|FEB(?:RUAR)?|MÄR(?:Z)?|APR(?:IL)?|MAI|JUN(?:I)?|JUL(?:I)?|AUG(?:UST)?|SEP(?:TEMBER)?|OKT(?:OBER)?|NOV(?:EMBER)?|DEZ(?:EMBER)?))",
-                MittagstischUtils.ddMMMMYYYY, suffix, suffix);
+                "((?:[0-2][0-9]|3[01]|[1-9]).(?:(?:JAN)(?:UAR)?|FEB(?:RUAR)?|MÄR(?:Z)?|APR(?:IL)?|MAI|JUN(?:I)?|JUL(?:I)?|AUG(?:UST)?|SEP(?:TEMBER)?|OKT(?:OBER)?|NOV(?:EMBER)?|DEZ(?:EMBER)?))",
+                MittagstischUtils.dMMMMYYYY, suffix, suffix);
     }
 }

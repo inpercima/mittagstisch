@@ -30,7 +30,7 @@ import net.inpercima.mittagstisch.model.Bistro;
 public class MittagstischUtils {
 
     // monday - friday used so just 5 days
-    private static final int IN_NEXT_WEEK = 7;
+    private static final int IN_NEXT_WEEK = 5;
 
     private static final String DATE_FORMAT = "dd.MM.yyyy";
 
@@ -38,8 +38,8 @@ public class MittagstischUtils {
             .appendPattern("dd.MM.yy")
             .toFormatter(Locale.GERMANY);
 
-    protected static final DateTimeFormatter ddMMMMYYYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
-            .appendPattern("dd.MMMMyyyy")
+    protected static final DateTimeFormatter dMMMMYYYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
+            .appendPattern("d.MMMMyyyy")
             .toFormatter(Locale.GERMANY);
 
     protected static final DateTimeFormatter ddMMYYYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
@@ -108,7 +108,7 @@ public class MittagstischUtils {
 
     /**
      * Gets the current date with specified days added to simulate today (0 days),
-     * tomorrow (1 day) and next week (7 days).
+     * tomorrow (1 day) and next week (5 days - mo-fr).
      *
      * @return LocalDate
      */
