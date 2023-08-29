@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.service.BistroAmKanal;
 import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
 import net.inpercima.mittagstisch.service.Kantine3;
@@ -28,6 +29,10 @@ public class TomorrowController {
         BistroImBic bistroImBic = new BistroImBic(1);
         bistroImBic.prepare();
         lunch.add(bistroImBic.parse());
+
+        BistroAmKanal bistroAmKanal = new BistroAmKanal(1);
+        bistroAmKanal.prepare();
+        lunch.add(bistroAmKanal.parse());
 
         LebensmittelimbissSeidel lebensmittelimbissSeidel = new LebensmittelimbissSeidel(1);
         lebensmittelimbissSeidel.prepare();

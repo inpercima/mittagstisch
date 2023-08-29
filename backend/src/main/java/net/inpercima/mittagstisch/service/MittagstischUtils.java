@@ -82,16 +82,22 @@ public class MittagstischUtils {
      * @throws IOException
      */
     public String determineWeekText(final HtmlPage htmlPage, final Bistro bistro) throws IOException {
-        String originalWeekText = htmlPage.querySelectorAll(bistro.getWeekSelector()).stream()
-                .filter(node -> StringUtils.isNotBlank(MittagstischUtils.filterSpecialChars(node))).findFirst()
-                .map(node -> node.getTextContent()).get();
-        if (StringUtils.isBlank(originalWeekText)) {
-            originalWeekText = ((DomNode) htmlPage
-                    .getFirstByXPath(bistro.getWeekSelectorXPath()))
-                    .asNormalizedText();
+        String weekText = StringUtils.EMPTY;
+        if (bistro.isPdf()) {
+            weekText = htmlPage.querySelector(bistro.getWeekSelector()).getAttributes().getNamedItem("href").getNodeValue();
+            log.debug("prepare lunch for: '{}' with pdf link: '{}'", bistro.getName(), weekText);
+        } else {
+            String originalWeekText = htmlPage.querySelectorAll(bistro.getWeekSelector()).stream()
+                    .filter(node -> StringUtils.isNotBlank(MittagstischUtils.filterSpecialChars(node))).findFirst()
+                    .map(node -> node.getTextContent()).get();
+            if (StringUtils.isBlank(originalWeekText)) {
+                originalWeekText = ((DomNode) htmlPage
+                        .getFirstByXPath(bistro.getWeekSelectorXPath()))
+                        .asNormalizedText();
+            }
+            weekText = originalWeekText.replace(" ", StringUtils.EMPTY).trim();
+            log.debug("prepare lunch for: '{}' with weektext: '{}'", bistro.getName(), weekText);
         }
-        final String weekText = originalWeekText.replace(" ", StringUtils.EMPTY).trim();
-        log.debug("prepare lunch for: '{}' with weektext: '{}'", bistro.getName(), weekText);
         return weekText;
     }
 

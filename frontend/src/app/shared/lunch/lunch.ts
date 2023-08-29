@@ -6,4 +6,6 @@ export interface Lunch {
   price: string;
 
   status: string;
+
+  pdfLink: string;
 }

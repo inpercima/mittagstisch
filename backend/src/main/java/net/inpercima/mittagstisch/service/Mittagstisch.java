@@ -18,7 +18,7 @@ abstract class Mittagstisch {
 
     private static final String STATUS_ERROR = "Oops, wir können leider keine Informationen zu '%s' einholen. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
-    private static final String STATUS_NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Schau bitte unter 'nächste Woche'";
+    private static final String STATUS_NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     private static final String STATUS_OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
@@ -56,17 +56,15 @@ abstract class Mittagstisch {
             setWeekText(MittagstischUtils.determineWeekText(getHtmlPage(), this.getBistro()));
             final int days = this.getBistro().getDays();
 
-            state.setStatusText(String.format(STATUS_OUTDATED, url, url));
-            state.setStatus("status-outdated");
             if ((days == 0 || days == 1) && isWithinWeek(false)) {
                 state.setStatusText("");
                 state.setStatus("status-success");
-            } else if (days == 7 && isWithinWeek(false)) {
-                state.setStatusText("");
-                state.setStatus("status-success");
             } else if ((days == 0 || days == 1) && !isWithinWeek(false) && isWithinWeek(true)) {
-                state.setStatusText(STATUS_NEXT_WEEK);
+                state.setStatusText(String.format(STATUS_NEXT_WEEK, url, url));
                 state.setStatus("status-next-week");
+            } else {
+                state.setStatusText(String.format(STATUS_OUTDATED, url, url));
+                state.setStatus("status-outdated");
             }
         }
         this.setState(state);
@@ -83,6 +81,9 @@ abstract class Mittagstisch {
         lunch.setBistroName(this.getBistro().getName());
         lunch.setMeal(StringUtils.isNotBlank(state.getStatusText()) ? state.getStatusText() : meal);
         lunch.setStatus(this.getState().getStatus());
+        if (getBistro().isPdf()) {
+            lunch.setPdfLink(getWeekText());
+        }
         return lunch;
     }
 }

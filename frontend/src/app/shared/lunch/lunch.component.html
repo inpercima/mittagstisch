@@ -11,7 +11,14 @@
     </mat-card-header>
     <mat-divider></mat-divider>
     <mat-card-content>
-      <p [innerHTML]="item.meal"></p>
+      <ng-template [ngIf]="item.pdfLink" [ngIfElse]="noPdf">
+        <p>
+          <a target="_blank" [href]="item.pdfLink">Wockenkarte als PDF</a>
+        </p>
+      </ng-template>
+      <ng-template #noPdf>
+        <p [innerHTML]="item.meal"></p>
+      </ng-template>
     </mat-card-content>
   </mat-card>
 </ng-container>

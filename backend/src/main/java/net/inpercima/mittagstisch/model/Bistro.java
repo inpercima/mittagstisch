@@ -24,4 +24,6 @@ public class Bistro {
     private boolean disabled;
 
     private int days;
+
+    private boolean pdf;
 }

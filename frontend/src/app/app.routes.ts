@@ -18,8 +18,4 @@ export const ROUTES: Routes = [
     path: 'tomorrow',
     loadComponent: () => import('./shared/lunch/lunch.component').then((c) => c.LunchComponent),
   },
-  {
-    path: 'next-week',
-    loadComponent: () => import('./shared/lunch/lunch.component').then((c) => c.LunchComponent),
-  },
 ];
