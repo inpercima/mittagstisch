@@ -26,4 +26,6 @@ public class Bistro {
     private int days;
 
     private boolean pdf;
+
+    private boolean pdfFullPath = true;
 }

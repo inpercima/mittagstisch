@@ -1,6 +1,7 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -85,6 +86,15 @@ public class MittagstischUtils {
         String weekText = StringUtils.EMPTY;
         if (bistro.isPdf()) {
             weekText = htmlPage.querySelector(bistro.getWeekSelector()).getAttributes().getNamedItem("href").getNodeValue();
+            if (!bistro.isPdfFullPath()) {
+                try {
+                    final URL url = new URL(bistro.getUrl());
+                    final String host = url.getProtocol() + "://" + url.getHost();
+                    weekText = host + weekText;
+                } catch (MalformedURLException e) {
+                    log.error("URL could not be parsed.", e);
+                }
+            }
             log.debug("prepare lunch for: '{}' with pdf link: '{}'", bistro.getName(), weekText);
         } else {
             String originalWeekText = htmlPage.querySelectorAll(bistro.getWeekSelector()).stream()
