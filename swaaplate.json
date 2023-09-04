@@ -1,5 +1,16 @@
 {
-  "client": {
+  "backend": {
+    "javaKt": {
+      "management": "maven",
+      "packagePath": "net.inpercima.mittagstisch"
+    },
+    "language": "java",
+    "php": {
+      "modRewritePhpExtension": false,
+      "serverAsApi": false
+    }
+  },
+  "frontend": {
     "buildDir": "dist",
     "ghUser": "inpercima",
     "installDependencies": true,
@@ -39,16 +50,5 @@
     "useMITLicense": true,
     "useMock": false,
     "useSecurity": false
-  },
-  "server": {
-    "backend": "java",
-    "javaKt": {
-      "management": "maven",
-      "packagePath": "net.inpercima.mittagstisch"
-    },
-    "php": {
-      "modRewritePhpExtension": false,
-      "serverAsApi": false
-    }
   }
 }

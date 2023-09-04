@@ -1,0 +1,24 @@
+<mat-card class="w-4/5 mx-auto" *ngIf="!loaded">
+  <mat-card-content>
+    <mat-progress-bar color="primary" mode="indeterminate" value="50"></mat-progress-bar>
+  </mat-card-content>
+</mat-card>
+
+<ng-container *ngIf="loaded">
+  <mat-card class="w-4/5 mx-auto" *ngFor="let item of lunch">
+    <mat-card-header [class]="item.status">
+      <mat-card-title>{{ item.bistroName }}</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+      <ng-template [ngIf]="item.pdfLink" [ngIfElse]="noPdf">
+        <p>
+          <a target="_blank" [href]="item.pdfLink">Wockenkarte als PDF</a>
+        </p>
+      </ng-template>
+      <ng-template #noPdf>
+        <p [innerHTML]="item.meal"></p>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</ng-container>

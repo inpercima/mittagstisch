@@ -1,43 +1,54 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, HostBinding, TemplateRef } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Routes } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+import { RouterLink, RouterLinkActive, RouterOutlet, Routes } from '@angular/router';
 
 import { environment } from '../environments/environment';
-import { AppRoutingModule } from './app-routing.module';
-import { FeaturesRoutingModule } from './features/features-routing.module';
+import { AppRoutingPipe } from './app-routing.pipe';
+
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Title } from '@angular/platform-browser';
+
+import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { ROUTES } from './app.routes';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'mt-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [
+    NgFor,
+    MatButtonModule,
+    MatDialogModule,
+    MatTabsModule,
+    MatToolbarModule,
+    RouterLinkActive,
+    RouterLink,
+    RouterOutlet,
+    AppRoutingPipe,
+  ],
 })
 export class AppComponent {
-
   public appname: string;
 
   public routes: Routes;
-  /**
-   * Adds the custom theme to the app root.
-   * For overlays the OverlayContainer like in the constructor is used.
-   * For dialogs the panelClass of the configuration must added manually like
-   *
-   * const dialogConfig = new MatDialogConfig();
-   * dialogConfig.panelClass = `${environment.theme}-theme`;
-   */
+  // Adds the custom theme to the app root.
   @HostBinding('class') class = `${environment.theme}-theme`;
 
   public constructor(private dialog: MatDialog, private titleService: Title, public overlayContainer: OverlayContainer) {
     this.appname = environment.appname;
-    this.routes = AppRoutingModule.ROUTES.concat(FeaturesRoutingModule.ROUTES);
+    this.routes = ROUTES;
     this.titleService.setTitle(this.appname);
+    // Adds the custom theme to dialogs.
     this.overlayContainer.getContainerElement().classList.add(`${environment.theme}-theme`);
   }
 
-  openDialog(ref: TemplateRef<any>): void {
+  openDialog(ref: TemplateRef<Element>): void {
     this.dialog.open(ref, {
-      maxWidth: "800px",
+      maxWidth: '800px',
     });
   }
 }

@@ -2,10 +2,6 @@
 # APPLICATION CONFIG
 #
 
-logging:
-  file:
-     name: logs/application.log
-
 management:
   endpoints:
     web:
@@ -18,6 +14,6 @@ server:
     enabled: true
 
 spring:
-  jpa:
-    open-in-view: false
-    show-sql: false
+  # jpa:
+  #   open-in-view: false
+  #   show-sql: false

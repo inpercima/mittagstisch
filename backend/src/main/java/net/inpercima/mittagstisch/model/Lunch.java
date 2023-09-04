@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Lunch {
 
-    private String name;
+    private String bistroName;
 
-    private String food;
+    private String meal;
 
     private String price;
 
     private String status;
 
-
+    private String pdfLink;
 }

@@ -12,16 +12,14 @@ describe('AppComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        AppComponent,
-        AppRoutingPipe,
-      ],
-      imports: [
+    imports: [
         MatTabsModule,
         MatToolbarModule,
         RouterTestingModule,
-      ],
-    }).compileComponents();
+        AppRoutingPipe,
+        AppComponent,
+    ],
+}).compileComponents();
   });
 
   beforeEach(() => {

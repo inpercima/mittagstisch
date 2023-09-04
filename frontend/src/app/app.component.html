@@ -1,27 +1,30 @@
-<mat-toolbar fxLayoutAlign="space-between center" color="primary" class="mat-elevation-z4">
+<mat-toolbar color="primary" class="mat-elevation-z4 justify-between">
   {{ appname }}
-  <button mat-button (click)="openDialog(dialog)">APP INFO</button>
+  <div>
+    <button mat-button (click)="openDialog(dialog)">APP INFO</button>
+    |
+    <a mat-button href="https://github.com/inpercima/mittagstisch" target="_blank">
+      <img class="github-link" alt="GitHub Repository" src="../assets/github-mark-white.svg" />
+      GitHub
+    </a>
+  </div>
 </mat-toolbar>
-<nav mat-tab-nav-bar>
-  <a mat-tab-link
-    *ngFor="let routeLink of routes | appRouting"
-    [routerLink]="routeLink.path"
-    routerLinkActive #rla="routerLinkActive"
-    [active]="rla.isActive">
-    {{ routeLink.data!['title'] }}
-  </a>
+<nav mat-tab-nav-bar [tabPanel]="tabPanel">
+  <a mat-tab-link *ngFor="let route of routes | appRouting" [routerLink]="route.path" routerLinkActive
+    #rla="routerLinkActive" [active]="rla.isActive">{{ route.path }}</a>
 </nav>
+<mat-tab-nav-panel #tabPanel>
+  <router-outlet></router-outlet>
+</mat-tab-nav-panel>
 <ng-template #dialog>
+  <h2 mat-dialog-title>Overview</h2>
   <mat-dialog-content>
-    <p>
-      The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).
-    </p>
-    <p>
-      With this app you can check the lunch in bisto or restuarants in Leipzig (Plagwitz, Lindenau) of this day, tomorrow or next week.
-    </p>
+    The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).
+    <br />
+    With this app you can check the lunch in bistros or restuarants in Leipzig (Plagwitz, Lindenau) of this day,
+    tomorrow or next week.
   </mat-dialog-content>
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close cdkFocusInitial>Close</button>
   </mat-dialog-actions>
 </ng-template>
-<router-outlet></router-outlet>
