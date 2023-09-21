@@ -11,7 +11,7 @@ import net.inpercima.mittagstisch.model.Lunch;
 @RestController
 public class TodayController extends BaseController {
 
-    @GetMapping(value = "/today")
+    @GetMapping(value = "/api/today")
     public List<Lunch> listToday() throws IOException {
         return list(0);
     }
