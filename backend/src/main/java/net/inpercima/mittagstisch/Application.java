@@ -1,11 +1,16 @@
 package net.inpercima.mittagstisch;
 
+import java.util.Collections;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @author Marcel Jänicke
@@ -27,5 +32,12 @@ public class Application {
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+    @Bean
+    ErrorViewResolver redirectToFrontEndOn404() {
+        return (request, status, model) -> status == HttpStatus.NOT_FOUND
+                ? new ModelAndView("forward:/index.html", Collections.<String, Object>emptyMap(), HttpStatus.OK)
+                : null;
     }
 }
