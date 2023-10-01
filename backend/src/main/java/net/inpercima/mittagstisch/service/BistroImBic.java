@@ -2,9 +2,11 @@ package net.inpercima.mittagstisch.service;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 
+@Slf4j
 public class BistroImBic extends Mittagstisch {
 
     public BistroImBic(final int days) {
@@ -27,16 +29,22 @@ public class BistroImBic extends Mittagstisch {
     public Lunch parse() {
         String mealWithDayAndPrice = StringUtils.EMPTY;
         if (StringUtils.isBlank(getState().getStatusText())) {
-            // details are in paragraphs per day
-            mealWithDayAndPrice = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
-                    .filter(node -> node.asNormalizedText().toLowerCase()
-                            .contains(MittagstischUtils.getDay(getBistro().getDays()).toLowerCase()))
-                    .findFirst().get()
-                    .asNormalizedText();
-            // remove day b/c the selected day is clear, and replace line break by html line
-            // breaks
-            mealWithDayAndPrice = mealWithDayAndPrice
-                    .replaceFirst(MittagstischUtils.getDay(getBistro().getDays()), "").trim().replace("\n", "<br><br>");
+            try {
+                // details are in paragraphs per day
+                mealWithDayAndPrice = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
+                        .filter(node -> node.asNormalizedText().toLowerCase()
+                                .contains(MittagstischUtils.getDay(getBistro().getDays()).toLowerCase()))
+                        .findFirst().get()
+                        .asNormalizedText();
+                // remove day b/c the selected day is clear, and replace line break by html line
+                // breaks
+                mealWithDayAndPrice = mealWithDayAndPrice
+                        .replaceFirst(MittagstischUtils.getDay(getBistro().getDays()), "").trim()
+                        .replace("\n", "<br><br>");
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                MittagstischUtils.setErrorState(getBistro().getName(), getState(), getBistro().getUrl());
+            }
         }
         return buildLunch(mealWithDayAndPrice);
     }

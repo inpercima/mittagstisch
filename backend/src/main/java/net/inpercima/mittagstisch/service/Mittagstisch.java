@@ -16,8 +16,6 @@ import net.inpercima.mittagstisch.model.State;
 @Slf4j
 abstract class Mittagstisch {
 
-    private static final String STATUS_ERROR = "Oops, wir können leider keine Informationen zu '%s' einholen. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
-
     private static final String STATUS_NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     private static final String STATUS_OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
@@ -40,31 +38,37 @@ abstract class Mittagstisch {
 
     /**
      * Prepares a lunch with some predefined content if needed.
-     *
-     * @throws IOException
      */
-    public void prepare() throws IOException {
+    public void prepare() {
         final String url = this.getBistro().getUrl();
+        final String bistro = this.getBistro().getName();
         final State state = new State();
         if (this.getBistro().isDisabled()) {
-            log.debug("prepare lunch for '{}' is dissabeld", this.getBistro().getName());
-            state.setStatusText(String.format(STATUS_ERROR, this.getBistro().getName(), url,
-                    url));
-            state.setStatus("status-error");
+            log.debug("prepare lunch for '{}' is dissabeld", bistro);
+            MittagstischUtils.setErrorState(bistro, state, url);
         } else {
-            setHtmlPage(MittagstischUtils.determineHtmlPage(url));
-            setWeekText(MittagstischUtils.determineWeekText(getHtmlPage(), this.getBistro()));
+            try {
+                setHtmlPage(MittagstischUtils.determineHtmlPage(url));
+                setWeekText(MittagstischUtils.determineWeekText(getHtmlPage(), this.getBistro()));
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                MittagstischUtils.setErrorState(bistro, state, url);
+            }
             final int days = this.getBistro().getDays();
 
-            if ((days == 0 || days == 1) && isWithinWeek(false)) {
-                state.setStatusText("");
-                state.setStatus("status-success");
-            } else if ((days == 0 || days == 1) && !isWithinWeek(false) && isWithinWeek(true)) {
-                state.setStatusText(String.format(STATUS_NEXT_WEEK, url, url));
-                state.setStatus("status-next-week");
-            } else {
-                state.setStatusText(String.format(STATUS_OUTDATED, url, url));
-                state.setStatus("status-outdated");
+            try {
+                if ((days == 0 || days == 1) && isWithinWeek(false)) {
+                    state.setStatusText("");
+                    state.setStatus("status-success");
+                } else if ((days == 0 || days == 1) && !isWithinWeek(false) && isWithinWeek(true)) {
+                    state.setStatusText(String.format(STATUS_NEXT_WEEK, url, url));
+                    state.setStatus("status-next-week");
+                } else {
+                    state.setStatusText(String.format(STATUS_OUTDATED, url, url));
+                    state.setStatus("status-outdated");
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         }
         this.setState(state);

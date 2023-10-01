@@ -25,6 +25,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
+import net.inpercima.mittagstisch.model.State;
 
 @UtilityClass
 @Slf4j
@@ -34,6 +35,8 @@ public class MittagstischUtils {
     private static final int IN_NEXT_WEEK = 5;
 
     private static final String DATE_FORMAT = "dd.MM.yyyy";
+
+    private static final String STATUS_ERROR = "Oops, wir können leider keine Informationen zu '%s' einholen. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
 
     protected static final DateTimeFormatter ddMMYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
             .appendPattern("dd.MM.yy")
@@ -85,7 +88,8 @@ public class MittagstischUtils {
     public String determineWeekText(final HtmlPage htmlPage, final Bistro bistro) throws IOException {
         String weekText = StringUtils.EMPTY;
         if (bistro.isPdf()) {
-            weekText = htmlPage.querySelector(bistro.getWeekSelector()).getAttributes().getNamedItem("href").getNodeValue();
+            weekText = htmlPage.querySelector(bistro.getWeekSelector()).getAttributes().getNamedItem("href")
+                    .getNodeValue();
             if (!bistro.isPdfFullPath()) {
                 try {
                     final URL url = new URL(bistro.getUrl());
@@ -175,5 +179,11 @@ public class MittagstischUtils {
         final LocalDate now = getLocalizedDate(checkForNextWeek, days);
         log.debug("used day: '{}'", now);
         return now.isEqual(firstDate) || now.isEqual(lastDate) || (now.isAfter(firstDate) && now.isBefore(lastDate));
+    }
+
+    public void setErrorState(final String bistro, final State state, final String url) {
+        state.setStatusText(String.format(STATUS_ERROR, bistro, url,
+                url));
+        state.setStatus("status-error");
     }
 }

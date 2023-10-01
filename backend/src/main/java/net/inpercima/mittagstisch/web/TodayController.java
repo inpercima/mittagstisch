@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.web;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +11,7 @@ import net.inpercima.mittagstisch.model.Lunch;
 public class TodayController extends BaseController {
 
     @GetMapping(value = "/api/today")
-    public List<Lunch> listToday() throws IOException {
+    public List<Lunch> listToday() {
         return list(0);
     }
 }

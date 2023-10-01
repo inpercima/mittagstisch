@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.web;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import net.inpercima.mittagstisch.service.PanLokal;
 
 public class BaseController {
 
-    public List<Lunch> list(final int days) throws IOException {
+    public List<Lunch> list(final int days) {
         final List<Lunch> lunch = new ArrayList<>();
 
         GeschmackssacheLeipzig geschmackssacheLeipizg = new GeschmackssacheLeipzig(days);
