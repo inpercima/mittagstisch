@@ -10,8 +10,10 @@
   </div>
 </mat-toolbar>
 <nav mat-tab-nav-bar [tabPanel]="tabPanel">
-  <a mat-tab-link *ngFor="let route of routes | appRouting" [routerLink]="route.path" routerLinkActive
+  @for (route of routes | appRouting; track route) {
+  <a mat-tab-link [routerLink]="route.path" routerLinkActive
     #rla="routerLinkActive" [active]="rla.isActive">{{ route.path }}</a>
+  }
 </nav>
 <mat-tab-nav-panel #tabPanel>
   <router-outlet></router-outlet>
