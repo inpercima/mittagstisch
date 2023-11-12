@@ -29,7 +29,7 @@
     },
     "packageJson": {
       "contributors": [{
-        "name": "Marcel Jänicke",
+        "name": "Marcel Hendrich",
         "email": "inpercima@gmail.com"
       }],
       "homepage": "https://github.com/inpercima/mittagstisch/",
@@ -41,7 +41,7 @@
     "useYarn": true
   },
   "general": {
-    "author": "Marcel Jänicke",
+    "author": "Marcel Hendrich",
     "description": "The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).",
     "modRewriteIndex": false,
     "name": "mittagstisch",

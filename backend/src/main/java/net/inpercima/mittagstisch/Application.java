@@ -13,7 +13,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * @author Marcel Jänicke
+ * @author Marcel Hendrich
  */
 @SpringBootApplication
 public class Application {
