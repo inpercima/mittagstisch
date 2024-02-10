@@ -1,7 +1,6 @@
 # begin project specific
 
 environment.dev.ts
-environment.prod.ts
 application-dev.yml
 application-prod.yml
 
