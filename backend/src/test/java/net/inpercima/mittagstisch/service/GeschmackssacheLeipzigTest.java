@@ -25,9 +25,9 @@ public class GeschmackssacheLeipzigTest {
     public void bistroBic() {
         assertThat(geschmackssacheLeipzig.getHtmlPage().getTitleText())
                 .isEqualTo("");
-        Condition<String> wochenkarte = new Condition<>(s -> s.contains("WOCHENKARTE"), "type Wochenkarte");
-        Condition<String> mittagskarte = new Condition<>(s -> s.contains("SPEISEPLAN"), "type Mittagskarte");
-        assertThat(geschmackssacheLeipzig.getWeekText()).is(anyOf(wochenkarte, mittagskarte));
+        Condition<String> wochenkarte = new Condition<>(s -> s.contains("Wochenkarte"), "type Wochenkarte");
+        Condition<String> kalenderwoche = new Condition<>(s -> s.contains("Kalenderwoche"), "type Kalenderwoche");
+        assertThat(geschmackssacheLeipzig.getWeekText()).is(anyOf(wochenkarte, kalenderwoche));
     }
 
     @Test

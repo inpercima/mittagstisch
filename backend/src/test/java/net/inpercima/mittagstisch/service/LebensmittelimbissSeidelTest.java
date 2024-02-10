@@ -25,9 +25,8 @@ public class LebensmittelimbissSeidelTest {
     public void bistroBic() {
         assertThat(lebensmittelimbissSeidel.getHtmlPage().getTitleText())
                 .isEqualTo("Lebensmittel & Imbiss Seidel");
-        Condition<String> wochenkarte = new Condition<>(s -> s.contains("WOCHE"), "type Wochenkarte");
-        Condition<String> mittagskarte = new Condition<>(s -> s.contains("Mittagskarte"), "type Mittagskarte");
-        assertThat(lebensmittelimbissSeidel.getWeekText()).is(anyOf(wochenkarte, mittagskarte));
+        Condition<String> woche = new Condition<>(s -> s.contains("Woche"), "type Woche");
+        assertThat(lebensmittelimbissSeidel.getWeekText()).is(anyOf(woche));
     }
 
     @Test

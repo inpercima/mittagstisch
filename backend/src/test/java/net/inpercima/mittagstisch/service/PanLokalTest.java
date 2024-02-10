@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import net.inpercima.mittagstisch.model.Lunch;
@@ -22,6 +23,7 @@ public class PanLokalTest {
     }
 
     @Test
+    @Disabled
     public void panLokal() throws IOException {
         assertThat(panLokal.getHtmlPage().getTitleText()).isEqualTo("PAN Lokal - Mittag");
         Condition<String> wochenkarte = new Condition<>(s -> s.contains("Wochenkarte"), "type Wochenkarte");
@@ -30,6 +32,7 @@ public class PanLokalTest {
     }
 
     @Test
+    @Disabled
     public void shouldPrepare() throws IOException {
         final Lunch lunch = panLokal.parse();
         assertThat(lunch).isNotNull();

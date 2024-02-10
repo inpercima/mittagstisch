@@ -26,8 +26,8 @@ public class BistroImBicTest {
         assertThat(bistroImBic.getHtmlPage().getTitleText())
                 .isEqualTo("Bistro im Bussines & Innovation Centre Leipzig - Speiseplan");
         Condition<String> wochenkarte = new Condition<>(s -> s.contains("Wochenkarte"), "type Wochenkarte");
-        Condition<String> mittagskarte = new Condition<>(s -> s.contains("SPEISEPLAN"), "type Mittagskarte");
-        assertThat(bistroImBic.getWeekText()).is(anyOf(wochenkarte, mittagskarte));
+        Condition<String> speiseplan = new Condition<>(s -> s.contains("Speiseplan"), "type Speiseplan");
+        assertThat(bistroImBic.getWeekText()).is(anyOf(wochenkarte, speiseplan));
     }
 
     @Test
