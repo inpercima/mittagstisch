@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -12,7 +11,7 @@ import { LunchService } from './lunch.service';
   standalone: true,
   templateUrl: './lunch.component.html',
   styleUrls: ['./lunch.component.css'],
-  imports: [MatCardModule, MatDividerModule, MatProgressBarModule, NgFor, NgIf],
+  imports: [MatCardModule, MatDividerModule, MatProgressBarModule],
 })
 export class LunchComponent implements OnInit {
   lunch: Lunch[] = [];
