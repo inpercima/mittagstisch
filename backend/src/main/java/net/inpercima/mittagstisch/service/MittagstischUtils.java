@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -156,8 +157,16 @@ public class MittagstischUtils {
         LocalDate lastDate = null;
         while (matcher.find()) {
             if (firstDate == null) {
-                firstDate = LocalDate.parse(matcher.group(1) + suffix1, dateFormat);
-                log.debug("extracted firstDate: '{}'", firstDate);
+                try {
+                    firstDate = LocalDate.parse(matcher.group(1) + suffix1, dateFormat);
+                    log.debug("extracted firstDate: '{}'", firstDate);
+                } catch (DateTimeParseException e) {
+                    if (matcher.group(1).length() == 5) {
+                        firstDate = LocalDate.parse(matcher.group(1) + "." + LocalDate.now().getYear() + suffix1,
+                                MittagstischUtils.ddMMYYYY);
+                        log.debug("second time extracted firstDate: '{}'", firstDate);
+                    }
+                }
             } else {
                 lastDate = LocalDate.parse(matcher.group(1) + suffix2, dateFormat);
                 log.debug("extracted lastDate: '{}'", lastDate);

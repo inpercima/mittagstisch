@@ -1,5 +1,7 @@
 package net.inpercima.mittagstisch.service;
 
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +33,18 @@ public class BistroImBic extends Mittagstisch {
         if (StringUtils.isBlank(getState().getStatusText())) {
             try {
                 // details are in paragraphs per day
-                mealWithDayAndPrice = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
-                        .filter(node -> node.asNormalizedText().toLowerCase()
-                                .contains(MittagstischUtils.getDay(getBistro().getDays()).toLowerCase()))
-                        .findFirst().get()
-                        .asNormalizedText();
-                // remove day b/c the selected day is clear, and replace line break by html line
-                // breaks
                 mealWithDayAndPrice = mealWithDayAndPrice
                         .replaceFirst(MittagstischUtils.getDay(getBistro().getDays()), "").trim()
                         .replace("\n", "<br><br>");
+
+                final String extractedText = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
+                        .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
+                final String currentDay = MittagstischUtils.getDay(this.getBistro().getDays());
+                final String lastString = currentDay.equals("FREITAG") ? "Bistro im BIC,"
+                        : MittagstischUtils.getDay(this.getBistro().getDays() + 1);
+                mealWithDayAndPrice = extractedText.substring(extractedText.indexOf(currentDay) +
+                        currentDay.length(),
+                        extractedText.indexOf(lastString)).trim().replace("\n", "<br><br>");
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 MittagstischUtils.setErrorState(getBistro().getName(), getState(), getBistro().getUrl());
@@ -51,6 +55,6 @@ public class BistroImBic extends Mittagstisch {
 
     public boolean isWithinWeek(final boolean checkForNextWeek) {
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
-                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})", MittagstischUtils.ddMMYYYY, "", "");
+                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2])\\.?(?:[0-9]{4})?)", MittagstischUtils.ddMMYYYY, "", "");
     }
 }
