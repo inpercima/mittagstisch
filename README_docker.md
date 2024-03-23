@@ -93,13 +93,13 @@ The password will not shown again.
 
 ```bash
 # run compose file
-docker compose --project-name "mittagstisch" -f docker-compose.yml -f docker-compose-mysql.yml up -d
+docker compose --project-name mittagstisch -f compose.yml -f compose-mysql.yml up -d
 
 # check the log file of the mysql service and search for "GENERATED ROOT PASSWORD" and note this
 docker logs mittagstisch_mysql
 
 # stop compose file
-docker compose --project-name "mittagstisch" down
+docker compose --project-name mittagstisch down
 ```
 
 ### Mysql out of this project
@@ -109,8 +109,8 @@ Then run following commands:
 
 ```bash
 # run compose file
-docker compose --project-name "mittagstisch" up -d
+docker compose --project-name mittagstisch up -d
 
 # stop compose file
-docker compose --project-name "mittagstisch" down
+docker compose --project-name mittagstisch down
 ```
