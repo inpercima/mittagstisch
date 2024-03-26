@@ -14,6 +14,7 @@ public class BistroImBic extends Mittagstisch {
     public BistroImBic(final int days) {
         Bistro bistro = new Bistro();
         bistro.setDaily(true);
+        bistro.setDisabled(true);
         bistro.setDays(days);
         bistro.setLunchSelector("div.content_main_dho p");
         bistro.setName("Bistro im BIC");
