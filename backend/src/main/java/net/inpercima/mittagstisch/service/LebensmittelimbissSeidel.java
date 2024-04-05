@@ -31,7 +31,7 @@ public class LebensmittelimbissSeidel extends Mittagstisch {
             final String extractedText = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
                     .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
             final String currentDay = MittagstischUtils.getDay(this.getBistro().getDays());
-            final String lastString = currentDay == "Freitag" ? "Wir liefern Ihnen"
+            final String lastString = "Freitag".equals(currentDay.trim()) ? "Wir liefern Ihnen"
                     : MittagstischUtils.getDay(this.getBistro().getDays() + 1);
 
             mealWithDayAndPrice = extractedText.substring(extractedText.indexOf(currentDay) + currentDay.length(),
