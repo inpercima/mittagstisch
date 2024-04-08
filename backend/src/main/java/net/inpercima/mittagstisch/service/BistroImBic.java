@@ -14,13 +14,12 @@ public class BistroImBic extends Mittagstisch {
     public BistroImBic(final int days) {
         Bistro bistro = new Bistro();
         bistro.setDaily(true);
-        bistro.setDisabled(true);
         bistro.setDays(days);
-        bistro.setLunchSelector("div.content_main_dho p");
+        bistro.setLunchSelector("div#content_main div div");
         bistro.setName("Bistro im BIC");
-        bistro.setUrl("http://www.bistro-bic.de/Speiseplan");
-        bistro.setWeekSelector("div.content_main_dho p");
-        bistro.setWeekSelectorXPath("/html/body/div[4]/div[3]/div/div[1]//*[contains(text(),'Speiseplan')]");
+        bistro.setUrl("http://www.bistro-bic.de/wochenkarte");
+        bistro.setWeekSelector("div#content_main div div h3");
+        bistro.setWeekSelectorXPath("/html/body/div[4]/div[4]/div[2]/div/div/div[1]/div[1]/h3");
         setBistro(bistro);
     }
 
@@ -41,7 +40,7 @@ public class BistroImBic extends Mittagstisch {
                 final String extractedText = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
                         .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
                 final String currentDay = MittagstischUtils.getDay(this.getBistro().getDays());
-                final String lastString = currentDay.equals("FREITAG") ? "Bistro im BIC,"
+                final String lastString = "Freitag".equals(currentDay) ? "Bei Fragen"
                         : MittagstischUtils.getDay(this.getBistro().getDays() + 1);
                 mealWithDayAndPrice = extractedText.substring(extractedText.indexOf(currentDay) +
                         currentDay.length(),
@@ -56,6 +55,6 @@ public class BistroImBic extends Mittagstisch {
 
     public boolean isWithinWeek(final boolean checkForNextWeek) {
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
-                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2])\\.?(?:[0-9]{4})?)", MittagstischUtils.ddMMYYYY, "", "");
+                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{0,4})", MittagstischUtils.ddMMYY, "", "");
     }
 }

@@ -168,8 +168,16 @@ public class MittagstischUtils {
                     }
                 }
             } else {
-                lastDate = LocalDate.parse(matcher.group(1) + suffix2, dateFormat);
-                log.debug("extracted lastDate: '{}'", lastDate);
+                try {
+                    lastDate = LocalDate.parse(matcher.group(1) + suffix2, dateFormat);
+                    log.debug("extracted lastDate: '{}'", lastDate);
+                } catch (DateTimeParseException e) {
+                    if (matcher.group(1).length() == 10) {
+                        lastDate = LocalDate.parse(matcher.group(1),
+                                MittagstischUtils.ddMMYYYY);
+                        log.debug("second time extracted lastDate: '{}'", lastDate);
+                    }
+                }
             }
         }
         final boolean isWithinWeek = isWithinRange(firstDate, lastDate, checkForNextWeek,
