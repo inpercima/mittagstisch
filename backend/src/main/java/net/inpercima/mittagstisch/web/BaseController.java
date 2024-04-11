@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.service.Biomare;
 import net.inpercima.mittagstisch.service.BistroAmKanal;
 import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.CafeteriaM9;
@@ -29,17 +30,21 @@ public class BaseController {
         bistroAmKanal.prepare();
         lunch.add(bistroAmKanal.parse());
 
+        Biomare biomare = new Biomare(days);
+        biomare.prepare();
+        lunch.add(biomare.parse());
+
         CafeteriaM9 cafeteriaM9 = new CafeteriaM9(days);
         cafeteriaM9.prepare();
         lunch.add(cafeteriaM9.parse());
 
-        LebensmittelimbissSeidel lebensmittelimbissSeidel = new LebensmittelimbissSeidel(days);
-        lebensmittelimbissSeidel.prepare();
-        lunch.add(lebensmittelimbissSeidel.parse());
-
         Kantine3 kantine3 = new Kantine3(days);
         kantine3.prepare();
         lunch.add(kantine3.parse());
+
+        LebensmittelimbissSeidel lebensmittelimbissSeidel = new LebensmittelimbissSeidel(days);
+        lebensmittelimbissSeidel.prepare();
+        lunch.add(lebensmittelimbissSeidel.parse());
 
         PanLokal panLokal = new PanLokal(days);
         panLokal.prepare();
