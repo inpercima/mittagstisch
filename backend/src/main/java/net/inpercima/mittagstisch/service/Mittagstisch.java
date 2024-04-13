@@ -49,7 +49,16 @@ abstract class Mittagstisch {
         } else {
             try {
                 setHtmlPage(MittagstischUtils.determineHtmlPage(url));
-                setWeekText(MittagstischUtils.determineWeekText(getHtmlPage(), this.getBistro()));
+                // special for biomare
+                if (this.getBistro().getWeekSelector().isBlank()) {
+                    weekText = htmlPage
+                            .querySelector(this.getBistro().getLunchSelector() + ":nth-child("
+                                    + (this.getBistro().getDays() + 1) + ") article h3")
+                            .asNormalizedText();
+                    setWeekText(weekText);
+                } else {
+                    setWeekText(MittagstischUtils.determineWeekText(getHtmlPage(), this.getBistro()));
+                }
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 MittagstischUtils.setErrorState(bistro, state, url);
