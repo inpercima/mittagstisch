@@ -7,7 +7,7 @@
 cd frontend
 
 # install tools and frontend dependencies
-yarn
+pnpm install
 ```
 
 Create environment files for `development mode` and `production mode`.
@@ -30,20 +30,17 @@ For the other options your app should run on a server which you like.
 
 ```bash
 # build, reachable on http://localhost/app/path/to/dist/
-yarn build:dev
+pnpm build:dev
 
 # build and starts a server, rebuild after changes, reachable on http://localhost:4200/
-yarn serve:dev
-
-# build, rebuild after changes, reachable on http://localhost/app/path/to/dist/
-yarn watch:dev
+pnpm start
 ```
 
 ### Package
 
 ```bash
 # build in production mode, compressed
-yarn build:prod
+pnpm build:prod
 ```
 
 ### Tests

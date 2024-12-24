@@ -20,7 +20,7 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 * `jdk 21` or higher
 
-### Node, npm or yarn
+### Node, npm or pnpm
 
 * `node 22.11.0` or higher in combination with
   * `npm 10.9.0` or higher or
