@@ -22,9 +22,9 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 ### Node, npm or yarn
 
-* `node 20.9.0` or higher in combination with
-  * `npm 10.1.0` or higher or
-  * `yarn 1.22.19` or higher, used in this repository
+* `node 22.11.0` or higher in combination with
+  * `npm 10.9.0` or higher or
+  * `pnpm 9.14.2` or higher, used in this repository
 
 ## Getting started
 

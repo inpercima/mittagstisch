@@ -50,7 +50,7 @@
     "typescript": "5.4.3"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=22.11.0"
   },
   "homepage": "https://github.com/inpercima/mittagstisch/",
   "license": "MIT",
