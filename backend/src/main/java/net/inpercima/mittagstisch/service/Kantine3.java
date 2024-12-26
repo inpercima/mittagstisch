@@ -15,8 +15,8 @@ public class Kantine3 extends Mittagstisch {
         bistro.setDaily(true);
         bistro.setDays(days);
         bistro.setLunchSelector("main section div div p");
-        bistro.setName("Kantine 3 (im Tapetenwerk)");
-        bistro.setUrl("http://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
+        bistro.setName("Rocky Maria - Kantine Tapetenwerk");
+        bistro.setUrl("https://www.tapetenwerk.de/aktuelles/speiseplan-kantine/");
         bistro.setWeekSelector("main section div div h1");
         bistro.setWeekSelectorXPath("");
         this.setBistro(bistro);
