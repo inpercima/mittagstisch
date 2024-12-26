@@ -10,7 +10,6 @@ import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.CafeteriaM9;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
 import net.inpercima.mittagstisch.service.Kantine3;
-import net.inpercima.mittagstisch.service.PanLokal;
 
 public class BaseController {
 
@@ -41,9 +40,6 @@ public class BaseController {
         kantine3.prepare();
         lunch.add(kantine3.parse());
 
-        PanLokal panLokal = new PanLokal(days);
-        panLokal.prepare();
-        lunch.add(panLokal.parse());
         return lunch;
     }
 }
