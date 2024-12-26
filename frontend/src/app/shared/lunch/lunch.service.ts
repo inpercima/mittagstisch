@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
@@ -10,8 +10,8 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class LunchService {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) { }
 
   public get(route: string): Observable<Array<Lunch>> {
     return this.http.get<Array<Lunch>>(environment.api + route);

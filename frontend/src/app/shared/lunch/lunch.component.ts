@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -13,12 +13,17 @@ import { LunchService } from './lunch.service';
   imports: [MatCardModule, MatDividerModule, MatProgressBarModule],
 })
 export class LunchComponent implements OnInit {
+  route = inject(ActivatedRoute);
+  private lunchService = inject(LunchService);
+
   lunch: Lunch[] = [];
   path: string;
 
   loaded = false;
 
-  constructor(public route: ActivatedRoute, private lunchService: LunchService) {
+  constructor() {
+    const route = this.route;
+
     this.path = route.snapshot.routeConfig!.path!;
   }
 

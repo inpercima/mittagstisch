@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, HostBinding, TemplateRef } from '@angular/core';
+import { Component, HostBinding, TemplateRef, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Routes } from '@angular/router';
 
 import { environment } from '../environments/environment';
@@ -31,13 +31,17 @@ import { NgFor } from '@angular/common';
   ],
 })
 export class AppComponent {
+  private dialog = inject(MatDialog);
+  private titleService = inject(Title);
+  overlayContainer = inject(OverlayContainer);
+
   public appname: string;
 
   public routes: Routes;
   // Adds the custom theme to the app root.
   @HostBinding('class') class = `${environment.theme}-theme`;
 
-  public constructor(private dialog: MatDialog, private titleService: Title, public overlayContainer: OverlayContainer) {
+  public constructor() {
     this.appname = environment.appname;
     this.routes = ROUTES;
     this.titleService.setTitle(this.appname);
