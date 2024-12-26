@@ -6,7 +6,6 @@ import { NgIf } from '@angular/common';
 @Component({
   selector: 'mt-dashboard',
   templateUrl: './dashboard.component.html',
-  standalone: true,
   imports: [NgIf, MatCardModule, MatProgressBarModule],
 })
 export class DashboardComponent implements OnInit {

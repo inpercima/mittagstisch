@@ -8,7 +8,6 @@ import { LunchService } from './lunch.service';
 
 @Component({
   selector: 'mt-lunch',
-  standalone: true,
   templateUrl: './lunch.component.html',
   styleUrls: ['./lunch.component.css'],
   imports: [MatCardModule, MatDividerModule, MatProgressBarModule],

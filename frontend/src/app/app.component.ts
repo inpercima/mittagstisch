@@ -18,7 +18,6 @@ import { NgFor } from '@angular/common';
   selector: 'mt-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  standalone: true,
   imports: [
     NgFor,
     MatButtonModule,
