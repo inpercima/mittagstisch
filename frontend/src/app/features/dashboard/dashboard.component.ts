@@ -1,17 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
-import { NgIf } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'mt-dashboard',
   templateUrl: './dashboard.component.html',
-  imports: [NgIf, MatCardModule, MatProgressBarModule],
+  imports: [MatCardModule, MatProgressBarModule],
 })
 export class DashboardComponent implements OnInit {
   loaded = false;
-
-  constructor() {}
 
   ngOnInit(): void {
     this.loaded = true;
