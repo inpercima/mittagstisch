@@ -10,7 +10,6 @@ import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.CafeteriaM9;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
 import net.inpercima.mittagstisch.service.Kantine3;
-import net.inpercima.mittagstisch.service.LebensmittelimbissSeidel;
 import net.inpercima.mittagstisch.service.PanLokal;
 
 public class BaseController {
@@ -41,10 +40,6 @@ public class BaseController {
         Kantine3 kantine3 = new Kantine3(days);
         kantine3.prepare();
         lunch.add(kantine3.parse());
-
-        LebensmittelimbissSeidel lebensmittelimbissSeidel = new LebensmittelimbissSeidel(days);
-        lebensmittelimbissSeidel.prepare();
-        lunch.add(lebensmittelimbissSeidel.parse());
 
         PanLokal panLokal = new PanLokal(days);
         panLokal.prepare();
