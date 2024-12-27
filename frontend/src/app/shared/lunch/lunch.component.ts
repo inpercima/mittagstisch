@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -16,6 +17,8 @@ export class LunchComponent implements OnInit {
   route = inject(ActivatedRoute);
   private lunchService = inject(LunchService);
 
+  private destroyRef = inject(DestroyRef);
+
   lunch: Lunch[] = [];
   path: string;
 
@@ -28,9 +31,12 @@ export class LunchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.lunchService.get(this.path).subscribe((lunch) => {
-      this.lunch = lunch;
-      this.loaded = true;
-    });
+    this.lunchService
+      .get(this.path)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((lunch) => {
+        this.lunch = lunch;
+        this.loaded = true;
+      });
   }
 }
