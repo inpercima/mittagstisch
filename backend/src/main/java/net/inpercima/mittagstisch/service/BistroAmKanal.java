@@ -40,7 +40,7 @@ public class BistroAmKanal extends Mittagstisch {
         return lunch;
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) {
+    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
         // b/c of pdf this is always true
         return true;
     }

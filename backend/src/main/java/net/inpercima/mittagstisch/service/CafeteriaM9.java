@@ -31,7 +31,7 @@ public class CafeteriaM9 extends Mittagstisch {
         return buildLunch(mealWithDayAndPrice);
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) {
+    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
         // b/c of pdf this is always true
         return true;
     }

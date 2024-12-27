@@ -2,6 +2,8 @@ package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebClientOptions;
 import com.gargoylesoftware.htmlunit.WebRequest;
@@ -71,9 +74,13 @@ public class MittagstischUtils {
      *
      * @param url
      * @return HtmlPage The page which should be parsed
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws FailingHttpStatusCodeException
      */
-    public HtmlPage determineHtmlPage(final String url) throws IOException {
-        final WebRequest request = new WebRequest(new URL(url));
+    public HtmlPage determineHtmlPage(final String url) throws URISyntaxException, FailingHttpStatusCodeException,
+            IOException {
+        final WebRequest request = new WebRequest(new URI(url).toURL());
         request.setCharset(StandardCharsets.UTF_8);
         return initWebClient().getPage(request);
     }
@@ -85,15 +92,17 @@ public class MittagstischUtils {
      * @param Bistro
      * @return String The content including week information
      * @throws IOException
+     * @throws URISyntaxException
      */
-    public String determineWeekText(final HtmlPage htmlPage, final Bistro bistro) throws IOException {
+    public String determineWeekText(final HtmlPage htmlPage, final Bistro bistro)
+            throws IOException, URISyntaxException {
         String weekText = StringUtils.EMPTY;
         if (bistro.isPdf()) {
             weekText = htmlPage.querySelector(bistro.getWeekSelector()).getAttributes().getNamedItem("href")
                     .getNodeValue();
             if (!bistro.isPdfFullPath()) {
                 try {
-                    final URL url = new URL(bistro.getUrl());
+                    final URL url = new URI(bistro.getUrl()).toURL();
                     final String host = url.getProtocol() + "://" + url.getHost();
                     weekText = host + weekText;
                 } catch (MalformedURLException e) {
@@ -150,7 +159,8 @@ public class MittagstischUtils {
     }
 
     public boolean isWithinWeek(final boolean checkForNextWeek, final String weekText, final int days,
-            final String regex, final DateTimeFormatter dateFormat, final String suffix1, final String suffix2) {
+            final String regex, final DateTimeFormatter dateFormat, final String suffix1, final String suffix2)
+            throws Exception {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(weekText);
         LocalDate firstDate = null;
@@ -192,7 +202,7 @@ public class MittagstischUtils {
      * @return boolean True if within week otherwise false
      */
     public boolean isWithinRange(final LocalDate firstDate, final LocalDate lastDate,
-            final boolean checkForNextWeek, final int days) {
+            final boolean checkForNextWeek, final int days) throws Exception {
         final LocalDate now = getLocalizedDate(checkForNextWeek, days);
         log.debug("used day: '{}'", now);
         return now.isEqual(firstDate) || now.isEqual(lastDate) || (now.isAfter(firstDate) && now.isBefore(lastDate));

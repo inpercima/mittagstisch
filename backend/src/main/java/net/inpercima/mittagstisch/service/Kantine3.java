@@ -5,9 +5,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
+import net.sourceforge.htmlunit.corejs.javascript.EcmaError;
 
+@Slf4j
 public class Kantine3 extends Mittagstisch {
 
     public Kantine3(final int days) {
@@ -28,19 +31,24 @@ public class Kantine3 extends Mittagstisch {
     public Lunch parse() {
         String mealWithDayAndPrice = StringUtils.EMPTY;
         if (StringUtils.isBlank(getState().getStatusText())) {
-            // details are in spans per day
-            final String extractedText = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
-                    .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
-            final String currentDay = MittagstischUtils.getDay(this.getBistro().getDays()).toUpperCase();
-            final String lastString = currentDay.equals("FREITAG") ? "PREISE"
-                    : MittagstischUtils.getDay(this.getBistro().getDays() + 1).toUpperCase();
-            mealWithDayAndPrice = extractedText.substring(extractedText.indexOf(currentDay) + currentDay.length(),
-                    extractedText.indexOf(lastString)).trim();
+            try {
+                // details are in spans per day
+                final String extractedText = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
+                        .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
+                final String currentDay = MittagstischUtils.getDay(this.getBistro().getDays()).toUpperCase();
+                final String lastString = currentDay.equals("FREITAG") ? "PREISE"
+                        : MittagstischUtils.getDay(this.getBistro().getDays() + 1).toUpperCase();
+                mealWithDayAndPrice = extractedText.substring(extractedText.indexOf(currentDay) + currentDay.length(),
+                        extractedText.indexOf(lastString)).trim();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                MittagstischUtils.setErrorState(getBistro().getName(), getState(), getBistro().getUrl());
+            }
         }
         return buildLunch(mealWithDayAndPrice);
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) {
+    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
         final LocalDate now = MittagstischUtils.getLocalizedDate(false, this.getBistro().getDays());
         final String suffix = String.valueOf(now.getYear());
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),

@@ -1,7 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -31,10 +29,11 @@ abstract class Mittagstisch {
     /**
      * Checks if the dates in the determined week are up-to-date.
      *
-     * @param checkForNextWeek[contains(text(),'Speiseplan'
+     * @param checkForNextWeek
      * @return boolean True if up-to-date otherwise false
+     * @throws Exception 
      */
-    abstract boolean isWithinWeek(final boolean checkForNextWeek);
+    abstract boolean isWithinWeek(final boolean checkForNextWeek) throws Exception;
 
     /**
      * Prepares a lunch with some predefined content if needed.
@@ -44,7 +43,7 @@ abstract class Mittagstisch {
         final String bistro = this.getBistro().getName();
         final State state = new State();
         if (this.getBistro().isDisabled()) {
-            log.debug("prepare lunch for '{}' is dissabeld", bistro);
+            log.debug("preparing lunch for '{}' is disabled", bistro);
             MittagstischUtils.setErrorState(bistro, state, url);
         } else {
             try {
@@ -59,7 +58,7 @@ abstract class Mittagstisch {
                 } else {
                     setWeekText(MittagstischUtils.determineWeekText(getHtmlPage(), this.getBistro()));
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 MittagstischUtils.setErrorState(bistro, state, url);
             }
@@ -78,6 +77,7 @@ abstract class Mittagstisch {
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
+                MittagstischUtils.setErrorState(bistro, state, url);
             }
         }
         this.setState(state);

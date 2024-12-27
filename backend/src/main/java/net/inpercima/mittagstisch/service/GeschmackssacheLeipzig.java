@@ -2,9 +2,11 @@ package net.inpercima.mittagstisch.service;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 
+@Slf4j
 public class GeschmackssacheLeipzig extends Mittagstisch {
 
     public GeschmackssacheLeipzig(final int days) {
@@ -25,21 +27,27 @@ public class GeschmackssacheLeipzig extends Mittagstisch {
     public Lunch parse() {
         String mealWithDayAndPrice = StringUtils.EMPTY;
         if (StringUtils.isBlank(getState().getStatusText())) {
-            // details are in table rows per day
-            final String dayAbbr = MittagstischUtils.getDay(getBistro().getDays()).substring(0, 2);
-            final String dayLowerCaseAbbr = dayAbbr.toLowerCase();
+            try {
+                // details are in table rows per day
+                final String dayAbbr = MittagstischUtils.getDay(getBistro().getDays()).substring(0, 2);
+                final String dayLowerCaseAbbr = dayAbbr.toLowerCase();
 
-            mealWithDayAndPrice = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
-                    .filter(node -> node.asNormalizedText().toLowerCase().startsWith(dayLowerCaseAbbr)).findFirst()
-                    .get()
-                    .asNormalizedText();
-            // remove day b/c the selected day is clear, and replace tab by single html whitespace
-            mealWithDayAndPrice = mealWithDayAndPrice.replaceFirst(dayAbbr, "").trim().replace("\t", "&nbsp;");
+                mealWithDayAndPrice = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
+                        .filter(node -> node.asNormalizedText().toLowerCase().startsWith(dayLowerCaseAbbr)).findFirst()
+                        .get()
+                        .asNormalizedText();
+                // remove day b/c the selected day is clear, and replace tab by single html
+                // whitespace
+                mealWithDayAndPrice = mealWithDayAndPrice.replaceFirst(dayAbbr, "").trim().replace("\t", "&nbsp;");
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                MittagstischUtils.setErrorState(getBistro().getName(), getState(), getBistro().getUrl());
+            }
         }
         return buildLunch(mealWithDayAndPrice);
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) {
+    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
                 "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})", MittagstischUtils.ddMMYYYY, "", "");
     }

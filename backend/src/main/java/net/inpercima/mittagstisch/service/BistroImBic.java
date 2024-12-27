@@ -53,7 +53,7 @@ public class BistroImBic extends Mittagstisch {
         return buildLunch(mealWithDayAndPrice);
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) {
+    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
         return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
                 "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{0,4})", MittagstischUtils.ddMMYY, "", "");
     }
