@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
-import net.sourceforge.htmlunit.corejs.javascript.EcmaError;
 
 @Slf4j
 public class Kantine3 extends Mittagstisch {
