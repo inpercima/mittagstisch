@@ -3,5 +3,5 @@ export const environment = {
   appname: 'Mittagstisch',
   defaultRoute: 'dashboard',
   production: false,
-  theme: 'indigo-pink',
+  theme: 'azure-blue',
 };

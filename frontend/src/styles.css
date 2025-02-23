@@ -1,16 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
-@import "fonts.css";
+@import url("app/app.component.css");
+@import url("fonts.css");
 
-@tailwind components;
-@tailwind utilities;
+/*
+  Avoid using base.
 
-body {
-  background-color: #fafafa;
-  font-family: Roboto, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  margin: 0;
-  overflow-y: scroll;
-}
+  Normally the import for tailwind looks like:
 
-mat-card {
-  margin-top: 20px;
-}
+  @import "tailwindcss";
+
+  but this breaks the resets that angular material does.
+  To avoid this, the individual layers are imported without the base layer.
+
+  See: https://tailwindcss.com/docs/preflight#disabling-preflight
+*/
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);

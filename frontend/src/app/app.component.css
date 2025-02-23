@@ -1,6 +1,16 @@
+body {
+  font-family: "Roboto", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  margin: 0;
+  overflow-y: scroll;
+}
+
+mat-card {
+  margin-top: 20px;
+}
+
 .github-link {
-  height: 20px;
-  top: 4px;
-  padding-right: 5px;
-  position: relative;
+  margin-right: 8px;
+  margin-top: 8px;
+  width: 24px;
+  height: 24px;
 }
