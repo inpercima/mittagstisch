@@ -7,7 +7,7 @@
 } @if (loaded) { @for (item of lunch; track item) {
 <mat-card class="w-4/5 mx-auto">
   <mat-card-header [class]="item.status">
-    <mat-card-title>{{ item.bistroName }}</mat-card-title>
+    <mat-card-title><a [href]="item.url" target="_blank">{{ item.bistroName }}</a></mat-card-title>
   </mat-card-header>
   <mat-divider></mat-divider>
   <mat-card-content>

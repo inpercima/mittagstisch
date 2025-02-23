@@ -8,4 +8,6 @@ export interface Lunch {
   status: string;
 
   pdfLink: string;
+
+  url: string;
 }

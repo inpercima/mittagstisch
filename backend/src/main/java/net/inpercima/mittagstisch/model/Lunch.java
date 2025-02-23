@@ -16,4 +16,6 @@ public class Lunch {
     private String status;
 
     private String pdfLink;
+
+    private String url;
 }

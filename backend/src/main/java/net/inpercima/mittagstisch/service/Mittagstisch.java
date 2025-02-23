@@ -91,6 +91,7 @@ abstract class Mittagstisch {
      */
     public Lunch buildLunch(final String meal) {
         final Lunch lunch = new Lunch();
+        lunch.setUrl(this.getBistro().getUrl());
         lunch.setBistroName(this.getBistro().getName());
         lunch.setMeal(StringUtils.isNotBlank(state.getStatusText()) ? state.getStatusText() : meal);
         lunch.setStatus(this.getState().getStatus());
