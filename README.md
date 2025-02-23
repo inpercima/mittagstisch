@@ -14,9 +14,11 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 ### Docker
 
-* `docker 25.0.4` or higher
+* `docker 27.5.1` or higher
 
-### Java (when running backend local)
+### Java
+
+Is required if started locally and not with Docker.
 
 * `jdk 21` or higher
 
