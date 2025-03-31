@@ -10,11 +10,12 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 ### Angular CLI
 
-* `@angular/cli 19.1.8` or higher
+* `@angular/cli 19.2.5` or higher
 
 ### Docker
 
-* `docker 27.5.1` or higher
+* `docker 28.0.2` or higher
+* `docker compose v2.34.0` or higher
 
 ### Java
 
@@ -26,7 +27,7 @@ Is required if started locally and not with Docker.
 
 * `node 22.14.0` or higher in combination with
   * `npm 10.9.2` or higher or
-  * `pnpm 10.4.1` or higher, used in this repository
+  * `pnpm 10.7.0` or higher, used in this repository
 
 ## Getting started
 
