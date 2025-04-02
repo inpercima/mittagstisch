@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.3</version>
+    <version>3.4.4</version>
   </parent>
 
   <artifactId>mittagstisch</artifactId>
@@ -47,9 +47,9 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sourceforge.htmlunit</groupId>
+      <groupId>org.htmlunit</groupId>
       <artifactId>htmlunit</artifactId>
-      <version>2.70.0</version>
+      <version>4.11.1</version>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
@@ -61,6 +61,11 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.36</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.18.3</version>
     </dependency>
   </dependencies>
 
@@ -122,6 +127,7 @@
           <include>**/*.yml</include>
           <include>**/*.xml</include>
           <include>**/*.sql</include>
+          <include>**/*.json</include>
         </includes>
       </resource>
     </resources>

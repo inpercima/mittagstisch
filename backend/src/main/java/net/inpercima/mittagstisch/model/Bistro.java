@@ -7,25 +7,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Bistro {
 
-    private Integer id;
-
     private String name;
-
-    private String lunchSelector;
 
     private String url;
 
-    private String weekSelector;
+    private String cssWeekSelector;
 
-    private String weekSelectorXPath;
+    private String xpathWeekSelector;
 
-    private boolean daily;
-
-    private boolean disabled;
+    private String cssLunchSelector;
 
     private int days;
 
-    private boolean pdf;
+    private boolean daily = true;
 
-    private boolean pdfFullPath = true;
+    private boolean pdf = false;
+
+    private boolean pdfFullPath = false;
+
+    private boolean disabled = false;
 }

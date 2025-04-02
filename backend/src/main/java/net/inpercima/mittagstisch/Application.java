@@ -1,11 +1,14 @@
 package net.inpercima.mittagstisch;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,5 +42,10 @@ public class Application {
         return (request, status, model) -> status == HttpStatus.NOT_FOUND
                 ? new ModelAndView("forward:/index.html", Collections.<String, Object>emptyMap(), HttpStatus.OK)
                 : null;
+    }
+
+    @Bean
+    public static File bistroConfigFile() throws IOException {
+        return new ClassPathResource("bistro.json").getFile();
     }
 }

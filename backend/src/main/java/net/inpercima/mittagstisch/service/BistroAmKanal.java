@@ -1,47 +1,45 @@
 package net.inpercima.mittagstisch.service;
 
-import org.apache.commons.lang3.StringUtils;
+import java.io.File;
+
+import org.htmlunit.html.HtmlPage;
+import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 
 @Slf4j
+@Service
 public class BistroAmKanal extends Mittagstisch {
 
-    public BistroAmKanal(final int days) {
-        Bistro bistro = new Bistro();
-        bistro.setPdf(true);
-        bistro.setDaily(true);
+    protected BistroAmKanal(File bistroConfigFile) {
+        super(bistroConfigFile);
+    }
+
+    public Lunch getLunch(final int days) {
+        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroConfigFile, "bistroAmKanal");
         bistro.setDays(days);
-        bistro.setLunchSelector("main wow-image img");
-        bistro.setName("Bistro am Kanal");
-        bistro.setUrl("https://buschmannle.wixsite.com/meinewebsite/wochenkarte");
-        bistro.setWeekSelector("main + div a[class~='wixui-button']");
-        bistro.setWeekSelectorXPath("/html/body/div/div/div[4]/div/div/div/div/section/div[2]/div/div[2]/div/div[4]/a");
-        setBistro(bistro);
+        return crawlLunch(bistro);
     }
 
     /**
-     * Parses and returns the output for the lunch in "Bistro am Kanal".
-     *
-     * @param state
+     * Gets specific data of the lunch for "Bistro am Kanal".
      */
-    public Lunch parse() {
-        String mealWithDayAndPrice = StringUtils.EMPTY;
-        Lunch lunch = buildLunch(mealWithDayAndPrice);
-        if (getBistro().isPdf() && !lunch.getPdfLink().endsWith("pdf")) {
-            final String linkedImage = getHtmlPage().querySelector(getBistro().getLunchSelector()).getAttributes()
+    protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
+        // sometimes the lunch report is not a pdf
+        String content = mainContent;
+        if (bistro.isPdf() && !mainContent.endsWith("pdf")) {
+            content = htmlPage.querySelector(bistro.getCssLunchSelector()).getAttributes()
                     .getNamedItem("src")
                     .getNodeValue();
-            log.debug("prepare lunch for: '{}' with alternative image link: '{}'", getBistro().getName(), linkedImage);
-            lunch.setPdfLink(linkedImage);
+            log.debug("prepare lunch for: '{}' with alternative image link: '{}'", bistro.getName(), content);
         }
-        return lunch;
+        return content;
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
-        // b/c of pdf this is always true
+    protected boolean isWithinRange(final Bistro bistro, final String weekText, final boolean checkForNextWeek) {
+        // always true b/c of pdf
         return true;
     }
 }

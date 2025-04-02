@@ -14,7 +14,7 @@
             <appender-ref ref="CONSOLE" />
         </root>
         <logger name="net.inpercima.mittagstisch" level="info" />
-        <logger name="com.gargoylesoftware.htmlunit" level="error" />
+        <logger name="org.htmlunit" level="error" />
     </springProfile>
 
     <springProfile name="dev">
@@ -22,6 +22,6 @@
             <appender-ref ref="CONSOLE" />
         </root>
         <logger name="net.inpercima.mittagstisch" level="debug" />
-        <logger name="com.gargoylesoftware.htmlunit" level="warn" />
+        <logger name="org.htmlunit" level="error" />
     </springProfile>
 </configuration>
