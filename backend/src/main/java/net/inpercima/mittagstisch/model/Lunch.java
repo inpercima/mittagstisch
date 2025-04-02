@@ -9,13 +9,9 @@ public class Lunch {
 
     private String bistroName;
 
-    private String meal;
+    private String url;
 
-    private String price;
+    private String content;
 
     private String status;
-
-    private String pdfLink;
-
-    private String url;
 }

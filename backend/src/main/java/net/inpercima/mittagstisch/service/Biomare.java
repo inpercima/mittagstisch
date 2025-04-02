@@ -1,51 +1,45 @@
 package net.inpercima.mittagstisch.service;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import org.htmlunit.html.HtmlPage;
+import org.springframework.stereotype.Service;
 
-import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 
-@Slf4j
+@Service
 public class Biomare extends Mittagstisch {
 
-    public Biomare(final int days) {
-        Bistro bistro = new Bistro();
-        bistro.setDaily(true);
+    protected Biomare(File bistroConfigFile) {
+        super(bistroConfigFile);
+    }
+
+    public Lunch getLunch(final int days) {
+        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroConfigFile, "biomare");
         bistro.setDays(days);
-        bistro.setLunchSelector("section#mittagstisch div.grid div");
-        bistro.setName("Biomare");
-        bistro.setUrl("https://www.bio-mare.com/");
-        bistro.setWeekSelector("");
-        bistro.setWeekSelectorXPath("");
-        this.setBistro(bistro);
+        return crawlLunch(bistro);
     }
 
     /**
-     * Parses and returns the output for the lunch in "Biomare".
+     * Gets specific data of the lunch for "Biomare".
      */
-    public Lunch parse() {
-        String mealWithDayAndPrice = StringUtils.EMPTY;
-        try {
-            mealWithDayAndPrice = getHtmlPage()
-                    .querySelector(this.getBistro().getLunchSelector() + ":nth-child("
-                            + (this.getBistro().getDays() + 1) + ") article div")
-                    .asNormalizedText().trim().replace("\n", "<br>");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            MittagstischUtils.setErrorState(this.getBistro().getName(), getState(), this.getBistro().getUrl());
-        }
-        return buildLunch(mealWithDayAndPrice);
+    protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
+        String content = htmlPage
+                .querySelector(bistro.getCssLunchSelector() + ":nth-child("
+                        + (bistro.getDays() + 1) + ") article div")
+                .asNormalizedText().trim().replace("\n", "<br>");
+        return content;
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
+    protected boolean isWithinRange(final Bistro bistro, final String weekText, final boolean checkForNextWeek)
+            throws Exception {
         Pattern pattern = Pattern.compile("((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{4})");
-        Matcher matcher = pattern.matcher(this.getWeekText());
+        Matcher matcher = pattern.matcher(weekText);
         LocalDate firstDate = null;
         while (matcher.find()) {
             if (firstDate == null) {
@@ -55,8 +49,7 @@ public class Biomare extends Mittagstisch {
                 }
             }
         }
-        final boolean isWithinWeek = MittagstischUtils.isWithinRange(firstDate, firstDate, checkForNextWeek,
-                this.getBistro().getDays());
-        return isWithinWeek;
+        return MittagstischUtils.isWithinRange(firstDate, firstDate, checkForNextWeek,
+                bistro.getDays());
     }
 }

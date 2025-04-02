@@ -1,13 +1,9 @@
 export interface Lunch {
   bistroName: string;
 
-  meal: string;
-
-  price: string;
+  content: string;
 
   status: string;
-
-  pdfLink: string;
 
   url: string;
 }

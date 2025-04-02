@@ -1,30 +1,18 @@
 package net.inpercima.mittagstisch.service;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import org.htmlunit.html.DomNode;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebClientOptions;
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +28,13 @@ public class MittagstischUtils {
 
     private static final String DATE_FORMAT = "dd.MM.yyyy";
 
-    private static final String STATUS_ERROR = "Oops, wir können leider keine Informationen zu '%s' einholen. Bitte prüfe manuell: <a href='%s' target='_blank'>%s</>";
+    private static final String STATUS_DISABLED = "Das Prüfen von '%s' ist deaktiviert.";
+
+    private static final String STATUS_ERROR = "Oops, wir können leider keine Informationen zu '%s' einholen. Bitte prüfe manuell.";
+
+    private static final String STATUS_NEXT_WEEK = "Der Speiseplan scheint schon für nächste Woche vorgegeben. Bitte prüfe manuell.";
+
+    private static final String STATUS_OUTDATED = "Der Speiseplan scheint nicht mehr aktuell zu sein. Bitte prüfe manuell.";
 
     protected static final DateTimeFormatter ddMMYY = new DateTimeFormatterBuilder().parseCaseInsensitive()
             .appendPattern("dd.MM.yy")
@@ -55,83 +49,12 @@ public class MittagstischUtils {
             .toFormatter(Locale.GERMANY);
 
     /**
-     * Init webclient with firefox browser and some options.
-     *
-     * @return WebClient The initialized client
-     */
-    public WebClient initWebClient() {
-        final WebClient webClient = new WebClient(BrowserVersion.FIREFOX);
-        final WebClientOptions options = webClient.getOptions();
-        options.setJavaScriptEnabled(false);
-        options.setUseInsecureSSL(true);
-        options.setThrowExceptionOnScriptError(true);
-        options.setThrowExceptionOnFailingStatusCode(true);
-        return webClient;
-    }
-
-    /**
-     * Determine the page to get information of the lunch.
-     *
-     * @param url
-     * @return HtmlPage The page which should be parsed
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws FailingHttpStatusCodeException
-     */
-    public HtmlPage determineHtmlPage(final String url) throws URISyntaxException, FailingHttpStatusCodeException,
-            IOException {
-        final WebRequest request = new WebRequest(new URI(url).toURL());
-        request.setCharset(StandardCharsets.UTF_8);
-        return initWebClient().getPage(request);
-    }
-
-    /**
-     * Determine the information of the week.
-     *
-     * @param HtmlPage
-     * @param Bistro
-     * @return String The content including week information
-     * @throws IOException
-     * @throws URISyntaxException
-     */
-    public String determineWeekText(final HtmlPage htmlPage, final Bistro bistro)
-            throws IOException, URISyntaxException {
-        String weekText = StringUtils.EMPTY;
-        if (bistro.isPdf()) {
-            weekText = htmlPage.querySelector(bistro.getWeekSelector()).getAttributes().getNamedItem("href")
-                    .getNodeValue();
-            if (!bistro.isPdfFullPath()) {
-                try {
-                    final URL url = new URI(bistro.getUrl()).toURL();
-                    final String host = url.getProtocol() + "://" + url.getHost();
-                    weekText = host + weekText;
-                } catch (MalformedURLException e) {
-                    log.error("URL could not be parsed.", e);
-                }
-            }
-            log.debug("prepare lunch for: '{}' with pdf link: '{}'", bistro.getName(), weekText);
-        } else {
-            String originalWeekText = htmlPage.querySelectorAll(bistro.getWeekSelector()).stream()
-                    .filter(node -> StringUtils.isNotBlank(MittagstischUtils.filterSpecialChars(node))).findFirst()
-                    .map(node -> node.getTextContent()).get();
-            if (StringUtils.isBlank(originalWeekText)) {
-                originalWeekText = ((DomNode) htmlPage
-                        .getFirstByXPath(bistro.getWeekSelectorXPath()))
-                        .asNormalizedText();
-            }
-            weekText = originalWeekText.replace(" ", StringUtils.EMPTY).trim();
-            log.debug("prepare lunch for: '{}' with weektext: '{}'", bistro.getName(), weekText);
-        }
-        return weekText;
-    }
-
-    /**
      * Filter out special chars from given node.
      *
      * @param node The element to filter
      * @return String
      */
-    public String filterSpecialChars(final DomNode node) {
+    public static String filterSpecialChars(final DomNode node) {
         // use regex '\u00A0' to match no-break space (&nbsp;)
         return node.getTextContent().replace("\u00A0", " ").trim().toUpperCase();
     }
@@ -142,7 +65,7 @@ public class MittagstischUtils {
      *
      * @return LocalDate
      */
-    public LocalDate getLocalizedDate(final boolean checkForNextWeek, final int days) {
+    public static LocalDate getLocalizedDate(final boolean checkForNextWeek, final int days) {
         final LocalDate now = LocalDate.now(ZoneId.of("Europe/Berlin"));
         final LocalDate date = now.plusDays(checkForNextWeek ? IN_NEXT_WEEK : days);
         return date;
@@ -154,46 +77,8 @@ public class MittagstischUtils {
      * @param days The number of days added to the current day
      * @return String
      */
-    public String getDay(final int days) {
+    public static String getDay(final int days) {
         return getLocalizedDate(false, days).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY);
-    }
-
-    public boolean isWithinWeek(final boolean checkForNextWeek, final String weekText, final int days,
-            final String regex, final DateTimeFormatter dateFormat, final String suffix1, final String suffix2)
-            throws Exception {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(weekText);
-        LocalDate firstDate = null;
-        LocalDate lastDate = null;
-        while (matcher.find()) {
-            if (firstDate == null) {
-                try {
-                    firstDate = LocalDate.parse(matcher.group(1) + suffix1, dateFormat);
-                    log.debug("extracted firstDate: '{}'", firstDate);
-                } catch (DateTimeParseException e) {
-                    if (matcher.group(1).length() == 5) {
-                        firstDate = LocalDate.parse(matcher.group(1) + "." + LocalDate.now().getYear() + suffix1,
-                                MittagstischUtils.ddMMYYYY);
-                        log.debug("second time extracted firstDate: '{}'", firstDate);
-                    }
-                }
-            } else {
-                try {
-                    lastDate = LocalDate.parse(matcher.group(1) + suffix2, dateFormat);
-                    log.debug("extracted lastDate: '{}'", lastDate);
-                } catch (DateTimeParseException e) {
-                    if (matcher.group(1).length() == 10) {
-                        lastDate = LocalDate.parse(matcher.group(1),
-                                MittagstischUtils.ddMMYYYY);
-                        log.debug("second time extracted lastDate: '{}'", lastDate);
-                    }
-                }
-            }
-        }
-        final boolean isWithinWeek = isWithinRange(firstDate, lastDate, checkForNextWeek,
-                days);
-        log.debug("is in week: '{}'", isWithinWeek);
-        return isWithinWeek;
     }
 
     /**
@@ -201,16 +86,53 @@ public class MittagstischUtils {
      * 
      * @return boolean True if within week otherwise false
      */
-    public boolean isWithinRange(final LocalDate firstDate, final LocalDate lastDate,
+    public static boolean isWithinRange(final LocalDate firstDate, final LocalDate lastDate,
             final boolean checkForNextWeek, final int days) throws Exception {
         final LocalDate now = getLocalizedDate(checkForNextWeek, days);
         log.debug("used day: '{}'", now);
         return now.isEqual(firstDate) || now.isEqual(lastDate) || (now.isAfter(firstDate) && now.isBefore(lastDate));
     }
 
-    public void setErrorState(final String bistro, final State state, final String url) {
-        state.setStatusText(String.format(STATUS_ERROR, bistro, url,
-                url));
-        state.setStatus("status-error");
+    public State setSuccessState(final String bistroName) {
+        final State state = new State();
+        state.setStatusText("");
+        state.setStatus("status-success");
+        return state;
+    }
+
+    public State setNextWeekState(final String bistroName) {
+        return setState(bistroName, STATUS_NEXT_WEEK, "next-week");
+    }
+
+    public State setOutdatedState(final String bistroName) {
+        return setState(bistroName, STATUS_OUTDATED, "outdated");
+    }
+
+    public State setDisabledState(final String bistroName) {
+        return setState(bistroName, STATUS_DISABLED, "warning");
+    }
+
+    public State setErrorState(final String bistroName) {
+        return setState(bistroName, STATUS_ERROR, "error");
+    }
+
+    private State setState(final String bistroName, final String status, final String statusType) {
+        final State state = new State();
+        state.setStatusText(String.format(status, bistroName));
+        state.setStatus("status-" + statusType);
+        return state;
+    }
+
+    public static Bistro readBistroConfig(final File file, final String bistroId) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode;
+        Bistro bistro = new Bistro();
+        try {
+            jsonNode = mapper.readTree(file).get(bistroId);
+            bistro = mapper.convertValue(jsonNode, Bistro.class);
+        } catch (IOException e) {
+            log.error("Reading configuration file 'bistro.json' failed.");
+        }
+        return bistro;
     }
 }

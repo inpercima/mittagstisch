@@ -1,60 +1,52 @@
 package net.inpercima.mittagstisch.service;
 
+import java.io.File;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.htmlunit.html.HtmlPage;
+import org.springframework.stereotype.Service;
 
-import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 
-@Slf4j
+@Service
 public class BistroImBic extends Mittagstisch {
 
-    public BistroImBic(final int days) {
-        Bistro bistro = new Bistro();
-        bistro.setDaily(true);
+    protected BistroImBic(File bistroConfigFile) {
+        super(bistroConfigFile);
+    }
+
+    public Lunch getLunch(final int days) {
+        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroConfigFile, "bistroImBic");
         bistro.setDays(days);
-        bistro.setLunchSelector("div#content_main div div");
-        bistro.setName("Bistro im BIC");
-        bistro.setUrl("http://www.bistro-bic.de/wochenkarte");
-        bistro.setWeekSelector("div#content_main div div h3");
-        bistro.setWeekSelectorXPath("/html/body/div[4]/div[4]/div[2]/div/div/div[1]/div[1]/h3");
-        setBistro(bistro);
+        return crawlLunch(bistro);
     }
 
     /**
-     * Parses and returns the output for the lunch in "Bistro im BIC".
-     *
-     * @param state
+     * Gets specific data of the lunch for "Bistro im BIC".
      */
-    public Lunch parse() {
-        String mealWithDayAndPrice = StringUtils.EMPTY;
-        if (StringUtils.isBlank(getState().getStatusText())) {
-            try {
-                // details are in paragraphs per day
-                mealWithDayAndPrice = mealWithDayAndPrice
-                        .replaceFirst(MittagstischUtils.getDay(getBistro().getDays()), "").trim()
-                        .replace("\n", "<br><br>");
+    protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
+        String content = StringUtils.EMPTY;
+        // details are in paragraphs per day
+        content = content
+                .replaceFirst(MittagstischUtils.getDay(bistro.getDays()), "").trim()
+                .replace("\n", "<br><br>");
 
-                final String extractedText = getHtmlPage().querySelectorAll(getBistro().getLunchSelector()).stream()
-                        .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
-                final String currentDay = MittagstischUtils.getDay(this.getBistro().getDays());
-                final String lastString = "Freitag".equals(currentDay) ? "Bei Fragen"
-                        : MittagstischUtils.getDay(this.getBistro().getDays() + 1);
-                mealWithDayAndPrice = extractedText.substring(extractedText.indexOf(currentDay) +
-                        currentDay.length(),
-                        extractedText.indexOf(lastString)).trim().replace("\n", "<br><br>");
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                MittagstischUtils.setErrorState(getBistro().getName(), getState(), getBistro().getUrl());
-            }
-        }
-        return buildLunch(mealWithDayAndPrice);
+        final String extractedText = htmlPage.querySelectorAll(bistro.getCssLunchSelector()).stream()
+                .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
+        final String currentDay = MittagstischUtils.getDay(bistro.getDays());
+        final String lastString = "Freitag".equals(currentDay) ? "Bei Fragen"
+                : MittagstischUtils.getDay(bistro.getDays() + 1);
+        return extractedText.substring(extractedText.indexOf(currentDay) +
+                currentDay.length(),
+                extractedText.indexOf(lastString)).trim().replace("\n", "<br><br>");
     }
 
-    public boolean isWithinWeek(final boolean checkForNextWeek) throws Exception {
-        return MittagstischUtils.isWithinWeek(checkForNextWeek, getWeekText(), getBistro().getDays(),
-                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2]).[0-9]{0,4})", MittagstischUtils.ddMMYY, "", "");
+    protected boolean isWithinRange(final Bistro bistro, final String weekText, final boolean checkForNextWeek)
+            throws Exception {
+                System.out.println(weekText);
+        return isWithinRange(checkForNextWeek, weekText, bistro.getDays(),
+                "((?:[0-2][0-9]|3[01]).(?:0[0-9]|1[0-2])\\.?[0-9]{0,4})", MittagstischUtils.ddMMYY, "", "");
     }
 }
