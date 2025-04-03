@@ -35,21 +35,28 @@
     "url": "https://www.bio-mare.com",
     "cssLunchSelector": "section#mittagstisch div.grid div",
     "cssWeekSelector": "section#mittagstisch div.grid div:nth-child(%d) article h3",
-    "xpathWeekSelector": ""
+    "xpathWeekSelector": "/html/body/main/div[4]/section/div[1]/div[%d]/article/h3"
   },
   "kantine3": {
     "name": "Rocky Maria - Kantine Tapetenwerk",
     "url": "https://www.tapetenwerk.de/aktuelles/speiseplan-kantine",
     "cssLunchSelector": "main section div div p",
     "cssWeekSelector": "main section div div h1",
-    "xpathWeekSelector": ""
+    "xpathWeekSelector": "/html/body/div/main/section/div/div[1]/h1"
   },
   "kaiserbad": {
     "name": "Kaiserbad",
-    "url": "https://www.kaiserbad-leipzig.de/",
+    "url": "https://www.kaiserbad-leipzig.de",
     "cssLunchSelector": "",
     "cssWeekSelector": "div.content section div div:nth-child(2) a",
     "xpathWeekSelector": "/html/body/div[2]/div[5]/section[1]/div[1]/div[2]/a",
     "document": true
+  },
+  "kirowKantine": {
+    "name": "Kirow Kantine im alten Kesselhaus",
+    "url": "https://www.kirow-kantine.de",
+    "cssLunchSelector": "html",
+    "cssWeekSelector": "html",
+    "xpathWeekSelector": "/html"
   }
 }
