@@ -13,6 +13,7 @@ import net.inpercima.mittagstisch.service.BistroAmKanal;
 import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.CafeteriaM9;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
+import net.inpercima.mittagstisch.service.Kaiserbad;
 import net.inpercima.mittagstisch.service.Kantine3;
 
 @RestController
@@ -25,6 +26,7 @@ public class BaseController {
     private final BistroAmKanal bistroAmKanal;
     private final Biomare biomare;
     private final Kantine3 kantine3;
+    private final Kaiserbad kaiserbad;
 
     @GetMapping(value = "/api/today")
     public List<Lunch> listToday() {
@@ -44,6 +46,7 @@ public class BaseController {
         lunch.add(bistroAmKanal.getLunch(days));
         lunch.add(biomare.getLunch(days));
         lunch.add(kantine3.getLunch(days));
+        lunch.add(kaiserbad.getLunch(days));
         return lunch;
     }
 }

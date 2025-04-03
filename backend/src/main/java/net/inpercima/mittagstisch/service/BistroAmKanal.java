@@ -27,7 +27,7 @@ public class BistroAmKanal extends Mittagstisch {
     protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
         // sometimes the lunch report is not a pdf
         String content = mainContent;
-        if (bistro.isPdf() && !mainContent.endsWith("pdf")) {
+        if (bistro.isDocument() && !mainContent.endsWith("pdf")) {
             content = htmlPage.querySelector(bistro.getCssLunchSelector()).getAttributes()
                     .getNamedItem("src")
                     .getNodeValue();

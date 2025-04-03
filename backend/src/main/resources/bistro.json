@@ -17,9 +17,9 @@
     "name": "Cafeteria M9",
     "url": "https://www.philippus-leipzig.de/catering/cafeteria-m9",
     "cssLunchSelector": "",
-    "cssWeekSelector": "div[id='content'] div[class='cs-row'] a[class='button']",
+    "cssWeekSelector": "div#content div.cs-row a.button",
     "xpathWeekSelector": "/html/body/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div/div/p/a",
-    "pdf": true
+    "document": true
   },
   "bistroAmKanal": {
     "name": "Bistro am Kanal",
@@ -27,8 +27,8 @@
     "cssLunchSelector": "main wow-image img",
     "cssWeekSelector": "main + div a[class~='wixui-button']",
     "xpathWeekSelector": "/html/body/div/div/div[4]/div/div/div/div/section/div[2]/div/div[2]/div/div[4]/a",
-    "pdf": true,
-    "pdfFullPath": true
+    "document": true,
+    "documentFullPath": true
   },
   "biomare": {
     "name": "Biomare",
@@ -43,5 +43,13 @@
     "cssLunchSelector": "main section div div p",
     "cssWeekSelector": "main section div div h1",
     "xpathWeekSelector": ""
+  },
+  "kaiserbad": {
+    "name": "Kaiserbad",
+    "url": "https://www.kaiserbad-leipzig.de/",
+    "cssLunchSelector": "",
+    "cssWeekSelector": "div.content section div div:nth-child(2) a",
+    "xpathWeekSelector": "/html/body/div[2]/div[5]/section[1]/div[1]/div[2]/a",
+    "document": true
   }
 }

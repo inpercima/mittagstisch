@@ -21,9 +21,9 @@ public class Bistro {
 
     private boolean daily = true;
 
-    private boolean pdf = false;
+    private boolean document = false;
 
-    private boolean pdfFullPath = false;
+    private boolean documentFullPath = false;
 
     private boolean disabled = false;
 }

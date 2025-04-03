@@ -67,8 +67,8 @@ abstract class Mittagstisch {
             HtmlPage htmlPage;
             try {
                 htmlPage = determineHtmlPage((bistro.getUrl()));
-                if (bistro.isPdf()) {
-                    content = determinePdfLink(htmlPage, bistro);
+                if (bistro.isDocument()) {
+                    content = determineDocumentLink(htmlPage, bistro);
                     state = MittagstischUtils.setSuccessState(bistro.getName());
                     content = crawlSpecificData(bistro, htmlPage, content);
                 } else {
@@ -138,17 +138,17 @@ abstract class Mittagstisch {
         return weekText;
     }
 
-    private String determinePdfLink(HtmlPage htmlPage, Bistro bistro) throws MalformedURLException, URISyntaxException {
-        String pdfLink = htmlPage.querySelector(bistro.getCssWeekSelector()).getAttributes()
+    private String determineDocumentLink(HtmlPage htmlPage, Bistro bistro) throws MalformedURLException, URISyntaxException {
+        String documentLink = htmlPage.querySelector(bistro.getCssWeekSelector()).getAttributes()
                 .getNamedItem("href")
                 .getNodeValue();
-        if (!bistro.isPdfFullPath()) {
+        if (!bistro.isDocumentFullPath()) {
             final URL url = new URI(bistro.getUrl()).toURL();
             final String host = url.getProtocol() + "://" + url.getHost();
-            pdfLink = host + pdfLink;
+            documentLink = host + documentLink;
         }
-        log.debug("prepare lunch for: '{}' with pdf link: '{}'", bistro.getName(), pdfLink);
-        return pdfLink;
+        log.debug("prepare lunch for: '{}' with document link: '{}'", bistro.getName(), documentLink);
+        return documentLink;
     }
 
     private State checkWeekAndGetState(final Bistro bistro, final String weekText) throws Exception {
