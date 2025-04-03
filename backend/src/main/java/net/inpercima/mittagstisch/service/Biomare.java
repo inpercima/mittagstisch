@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Matcher;
@@ -15,12 +14,12 @@ import net.inpercima.mittagstisch.model.Lunch;
 @Service
 public class Biomare extends Mittagstisch {
 
-    protected Biomare(File bistroConfigFile) {
-        super(bistroConfigFile);
+    protected Biomare(String bistroJson) {
+        super(bistroJson);
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroConfigFile, "biomare");
+        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroJson, "biomare");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

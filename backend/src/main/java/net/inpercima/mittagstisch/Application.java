@@ -1,24 +1,27 @@
 package net.inpercima.mittagstisch;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Marcel Hendrich
  */
 @SpringBootApplication
+@Slf4j
 public class Application {
 
     public static void main(String[] args) {
@@ -45,7 +48,13 @@ public class Application {
     }
 
     @Bean
-    public static File bistroConfigFile() throws IOException {
-        return new ClassPathResource("bistro.json").getFile();
+    public static String bistroJsoInputStream() {
+        final InputStream inputStream = Application.class.getClassLoader().getResourceAsStream("bistro.json");
+        try {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            log.error("Reading configuration file 'bistro.json' failed.");
+            return "";
+        }
     }
 }

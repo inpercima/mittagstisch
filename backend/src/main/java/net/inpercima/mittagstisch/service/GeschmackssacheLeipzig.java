@@ -1,7 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.File;
-
 import org.htmlunit.html.HtmlPage;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +9,12 @@ import net.inpercima.mittagstisch.model.Lunch;
 @Service
 public class GeschmackssacheLeipzig extends Mittagstisch {
 
-    protected GeschmackssacheLeipzig(File bistroConfigFile) {
-        super(bistroConfigFile);
+    protected GeschmackssacheLeipzig(String bistroJson) {
+        super(bistroJson);
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroConfigFile, "geschmackssache");
+        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroJson, "geschmackssache");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

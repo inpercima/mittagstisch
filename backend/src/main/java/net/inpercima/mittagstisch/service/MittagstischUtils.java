@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -123,12 +122,12 @@ public class MittagstischUtils {
         return state;
     }
 
-    public static Bistro readBistroConfig(final File file, final String bistroId) {
+    public static Bistro readBistroConfig(final String bistroJson, final String bistroId) {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode;
         Bistro bistro = new Bistro();
         try {
-            jsonNode = mapper.readTree(file).get(bistroId);
+            jsonNode = mapper.readTree(bistroJson).get(bistroId);
             bistro = mapper.convertValue(jsonNode, Bistro.class);
         } catch (IOException e) {
             log.error("Reading configuration file 'bistro.json' failed.");

@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
@@ -15,12 +14,12 @@ import net.inpercima.mittagstisch.model.Lunch;
 @Service
 public class Kantine3 extends Mittagstisch {
 
-    protected Kantine3(File bistroConfigFile) {
-        super(bistroConfigFile);
+    protected Kantine3(String bistroJson) {
+        super(bistroJson);
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroConfigFile, "kantine3");
+        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroJson, "kantine3");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

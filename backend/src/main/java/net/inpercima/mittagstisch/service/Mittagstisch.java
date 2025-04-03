@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -32,10 +31,10 @@ import net.inpercima.mittagstisch.model.State;
 @Slf4j
 abstract class Mittagstisch {
 
-    protected final File bistroConfigFile;
+    protected final String bistroJson;
 
-    protected Mittagstisch(File bistroConfigFile) {
-        this.bistroConfigFile = bistroConfigFile;
+    protected Mittagstisch(String bistroJson) {
+        this.bistroJson = bistroJson;
     }
 
     /**
