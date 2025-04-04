@@ -26,20 +26,16 @@ public class BistroImBic extends Mittagstisch {
          * Gets specific data of the lunch for "Bistro im BIC".
          */
         protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
-                String content = StringUtils.EMPTY;
-                // details are in paragraphs per day
-                content = content
-                                .replaceFirst(MittagstischUtils.getDay(bistro.getDays()), "").trim()
-                                .replace("\n", "<br><br>");
-
-                final String extractedText = htmlPage.querySelectorAll(bistro.getCssLunchSelector()).stream()
+                String content = htmlPage.querySelectorAll(bistro.getCssLunchSelector()).stream()
                                 .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
                 final String currentDay = MittagstischUtils.getDay(bistro.getDays());
-                final String lastString = "Freitag".equals(currentDay) ? "Bei Fragen"
-                                : MittagstischUtils.getDay(bistro.getDays() + 1);
-                return extractedText.substring(extractedText.indexOf(currentDay) +
+                final String nextDay = MittagstischUtils.getDay(bistro.getDays() + 1);
+                final int endIndex = "Freitag".equals(currentDay) ? content.length()
+                                : content.indexOf(nextDay) + nextDay.length();
+
+                return content.substring(content.indexOf(currentDay) +
                                 currentDay.length(),
-                                extractedText.indexOf(lastString)).trim().replace("\n", "<br><br>");
+                                endIndex).trim().replace("\n", "<br><br>");
         }
 
         protected boolean isWithinRange(final Bistro bistro, final String weekText, final boolean checkForNextWeek)
