@@ -55,8 +55,8 @@
   "kirowKantine": {
     "name": "Kirow Kantine im alten Kesselhaus",
     "url": "https://www.kirow-kantine.de",
-    "cssLunchSelector": "html",
-    "cssWeekSelector": "html",
-    "xpathWeekSelector": "/html"
+    "cssLunchSelector": "div#c2 div div p:nth-child(2)",
+    "cssWeekSelector": "div#c2 div div p:nth-child(2)",
+    "xpathWeekSelector": "/html/body/div[1]/div[2]/div[2]/div/div/section[2]/div/div[3]/div/div/p[2]"
   }
 }

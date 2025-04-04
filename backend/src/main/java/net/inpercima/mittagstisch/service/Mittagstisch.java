@@ -127,7 +127,7 @@ abstract class Mittagstisch {
         String weekText = StringUtils.EMPTY;
         String originalWeekText = htmlPage.querySelectorAll(bistro.getCssWeekSelector()).stream()
                 .filter(node -> StringUtils.isNotBlank(MittagstischUtils.filterSpecialChars(node))).findFirst()
-                .map(node -> node.getTextContent()).get();
+                .map(node -> node.asNormalizedText()).get();
         if (StringUtils.isBlank(originalWeekText)) {
             originalWeekText = ((DomNode) htmlPage
                     .getFirstByXPath(bistro.getXpathWeekSelector()))

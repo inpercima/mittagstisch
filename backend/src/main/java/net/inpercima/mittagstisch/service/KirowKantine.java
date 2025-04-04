@@ -1,5 +1,8 @@
 package net.inpercima.mittagstisch.service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.htmlunit.html.HtmlPage;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +26,18 @@ public class KirowKantine extends Mittagstisch {
      * Gets specific data of the lunch for "KirowKantine im alten Kesselhaus".
      */
     protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
-        return mainContent;
+        String content = htmlPage.querySelector(bistro.getCssLunchSelector()).asNormalizedText().trim();
+        final String currentDay = MittagstischUtils.getDay(bistro.getDays());
+        Pattern pattern = Pattern.compile("(?m)^" + currentDay + ": .*");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            content = matcher.group();
+        }
+        return content;
     }
 
     protected boolean isWithinRange(final Bistro bistro, final String weekText, final boolean checkForNextWeek) {
-        // always true b/c of pdf
-        return true;
+        final String currentDay = MittagstischUtils.getDay(bistro.getDays());
+        return weekText.contains(currentDay + ":");
     }
 }
