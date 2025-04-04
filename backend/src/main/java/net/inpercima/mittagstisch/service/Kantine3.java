@@ -29,13 +29,13 @@ public class Kantine3 extends Mittagstisch {
      */
     protected String crawlSpecificData(final Bistro bistro, final HtmlPage htmlPage, final String mainContent) {
         // details are in spans per day
-        final String extractedText = htmlPage.querySelectorAll(bistro.getCssLunchSelector()).stream()
+        final String content = htmlPage.querySelectorAll(bistro.getCssLunchSelector()).stream()
                 .map(node -> node.asNormalizedText()).collect(Collectors.joining(" "));
         final String currentDay = MittagstischUtils.getDay(bistro.getDays()).toUpperCase();
         final String lastString = currentDay.equals("FREITAG") ? "PREISE"
                 : MittagstischUtils.getDay(bistro.getDays() + 1).toUpperCase();
-        return extractedText.substring(extractedText.indexOf(currentDay) + currentDay.length(),
-                extractedText.indexOf(lastString)).trim();
+        return content.substring(content.indexOf(currentDay) + currentDay.length(),
+                content.indexOf(lastString)).trim();
     }
 
     protected boolean isWithinRange(final Bistro bistro, final String weekText, final boolean checkForNextWeek)
