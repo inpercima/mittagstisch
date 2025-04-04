@@ -2,7 +2,6 @@ package net.inpercima.mittagstisch.service;
 
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.htmlunit.html.HtmlPage;
 import org.springframework.stereotype.Service;
 
