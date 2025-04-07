@@ -1,28 +1,35 @@
-@if (!loaded) {
-<mat-card class="w-4/5 mx-auto">
-  <mat-card-content>
-    <mat-progress-bar mode="indeterminate" value="50"></mat-progress-bar>
-  </mat-card-content>
-</mat-card>
-} @if (loaded) { @for (item of lunch; track item) {
-<mat-card class="w-4/5 mx-auto">
-  <mat-card-header [class]="item.status">
-    <mat-card-title><a [href]="item.url" target="_blank">{{ item.bistroName }}</a></mat-card-title>
-  </mat-card-header>
-  <mat-divider></mat-divider>
-  <mat-card-content>
-    @if (item.content.endsWith('.pdf')) {
-    <p>
-      <a target="_blank" [href]="item.content">Wockenkarte als PDF</a>
-    </p>
-    } @else if (item.content.endsWith('.jpg')) {
-    <p>
-      <a target="_blank" [href]="item.content">Wockenkarte als JPG</a>
-    </p>
+<div class="lunch-item w-4/5 mx-auto">
+  @if (!loaded) {
+  <mat-card>
+    <mat-card-content>
+      <mat-progress-bar mode="indeterminate" value="50"></mat-progress-bar>
+    </mat-card-content>
+  </mat-card>
+  } @else {
+  <div class="lunch-item grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-y-2 md:gap-x-6">
+    @for (item of lunch; track item) {
+    <mat-card>
+      <mat-card-header [class]="item.status">
+        <mat-card-title>
+          <a [href]="item.url" target="_blank">{{ item.bistroName }}</a>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        @if (item.content.endsWith('.pdf')) {
+        <p>
+          <a target="_blank" [href]="item.content">Wockenkarte als PDF</a>
+        </p>
+        } @else if (item.content.endsWith('.jpg')) {
+        <p>
+          <a target="_blank" [href]="item.content">Wockenkarte als JPG</a>
+        </p>
+        } @else {
+        <p [innerHTML]="item.content"></p>
+        }
+      </mat-card-content>
+    </mat-card>
     }
-    @else {
-    <p [innerHTML]="item.content"></p>
-    }
-  </mat-card-content>
-</mat-card>
-} }
+  </div>
+  }
+</div>

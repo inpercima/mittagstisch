@@ -1,3 +1,11 @@
+mat-card {
+  border-radius: 2px;
+}
+
+mat-card mat-divider {
+  border-color: #bbb;
+}
+
 mat-card-header {
   padding: 10px;
 }
@@ -22,4 +30,8 @@ mat-card-header.status-next-week {
   background: rgb(0, 89, 224);
   background: linear-gradient(90deg, rgba(0, 89, 224, 0.77) 0%, rgba(0, 89, 224, 0.15) 80%);
   color: white;
+}
+
+.lunch-item {
+  margin-bottom: 20px;
 }
