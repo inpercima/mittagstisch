@@ -30,7 +30,7 @@ public class BistroImBic extends Mittagstisch {
                 final String currentDay = MittagstischUtils.getDay(bistro.getDays());
                 final String nextDay = MittagstischUtils.getDay(bistro.getDays() + 1);
                 final int endIndex = "Freitag".equals(currentDay) ? content.length()
-                                : content.indexOf(nextDay) + nextDay.length();
+                                : content.indexOf(nextDay);
 
                 return content.substring(content.indexOf(currentDay) +
                                 currentDay.length(),
