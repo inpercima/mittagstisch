@@ -72,15 +72,24 @@ abstract class Mittagstisch {
                     state = MittagstischUtils.setSuccessState(bistro.getName());
                     content = crawlSpecificData(bistro, htmlPage, content);
                 } else {
+                    boolean findWeekText = true;
                     // for biomare and other with special weekText detection
                     if (bistro.getCssWeekSelector().contains("%d")) {
-                        bistro.setCssWeekSelector(String.format(bistro.getCssWeekSelector(), bistro.getDays() + 1));
+                        final String day = MittagstischUtils.getDay(bistro.getDays());
+                        System.out.println(day);
+                        if ("Samstag".equals(day) || "Sonntag".equals(day)) {
+                            findWeekText = false;
+                            state = MittagstischUtils.setOutdatedState(bistro.getName());
+                        } else {
+                            bistro.setCssWeekSelector(String.format(bistro.getCssWeekSelector(), bistro.getDays() + 1));
+                        }
                     }
-
-                    final String weekText = determineWeekText(htmlPage, bistro);
-                    state = checkWeekAndGetState(bistro, weekText);
-                    if (StringUtils.isBlank(state.getStatusText())) {
-                        content = crawlSpecificData(bistro, htmlPage, content);
+                    if (findWeekText) {
+                        final String weekText = determineWeekText(htmlPage, bistro);
+                        state = checkWeekAndGetState(bistro, weekText);
+                        if (StringUtils.isBlank(state.getStatusText())) {
+                            content = crawlSpecificData(bistro, htmlPage, content);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -138,7 +147,8 @@ abstract class Mittagstisch {
         return weekText;
     }
 
-    private String determineDocumentLink(HtmlPage htmlPage, Bistro bistro) throws MalformedURLException, URISyntaxException {
+    private String determineDocumentLink(HtmlPage htmlPage, Bistro bistro)
+            throws MalformedURLException, URISyntaxException {
         String documentLink = htmlPage.querySelector(bistro.getCssWeekSelector()).getAttributes()
                 .getNamedItem("href")
                 .getNodeValue();
