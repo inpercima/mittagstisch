@@ -8,8 +8,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     defaults:
-  run:
-    working-directory: ./frontend
+      run:
+        working-directory: ./frontend
     strategy:
       matrix:
         node-version: [22]
