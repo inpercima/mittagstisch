@@ -8,28 +8,47 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 ## Prerequisites
 
-### Angular CLI
-
-* `@angular/cli 19.2.10` or higher
-
-### Docker
-
-* `docker 28.0.2` or higher
-* `docker compose v2.34.0` or higher
-
-### Java
-
-Is required if started locally and not with Docker.
-
-* `jdk 21` or higher
-
 ### Node, npm or pnpm
+
+It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
 * `node 22.15.0` or higher in combination with
   * `npm 10.9.2` or higher or
   * `pnpm 10.10.0` or higher, used in this repository
 
+Install pnpm by running:
+
+```bash
+npm install -g pnpm@10.10.0
+```
+
+### Info for npm and pnpm
+
+This repo uses `pnpm` as package manager.
+You can also use `npm` for your local work but changes will be made by `pnpm` only.
+
+### Angular CLI
+
+* `@angular/cli 19.2.10` or higher
+
+Install @angular/cli by running:
+
+```bash
+pnpm install -g @angular/cli@19
+```
+
+### Java
+
+* `jdk 21` or higher
+
+### Docker (when running services within docker)
+
+* `docker 28.0.2` or higher
+* `docker compose v2.34.0` or higher
+
 ## Getting started
+
+### Clone project
 
 ```bash
 # clone project
@@ -37,12 +56,32 @@ git clone https://github.com/inpercima/mittagstisch/
 cd mittagstisch
 ```
 
-## Usage
+### Read more
 
-### Modules
+Check the documentation for each module/component.
 
-For the frontend check [mittagstisch - frontend](./frontend).
+For frontend check [mittagstisch - frontend](./frontend/README.md).
 
-For the backend check [mittagstisch - backend](./backend).
+For backend check [mittagstisch - backend](./backend/README.md).
 
-For the docker check [mittagstisch - docker](./README_docker.md).
+For docker check [mittagstisch - docker](./README_docker.md).
+
+### Install Tools
+
+Some tools are both used by backend and frontend.
+Run the following command to install:
+
+```bash
+pnpm install
+```
+
+### Starting the application
+
+For development you can use two separate terminals for starting backend and frontend separately.
+More can find in the specified README files in the separate folders.
+
+You could also use following command in root folder to start in one single terminal:
+
+```bash
+pnpm start
+```

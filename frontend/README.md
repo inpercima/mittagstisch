@@ -10,14 +10,13 @@ cd frontend
 pnpm install
 ```
 
-Create environment files for `development mode` and `production mode`.
+Create environment file for `development mode`.
 
 ```bash
 cp src/environments/environment.ts src/environments/environment.dev.ts
-cp src/environments/environment.ts src/environments/environment.prod.ts
 ```
 
-**Note**: These files will not be under version control but listed in .gitignore.
+**Note**: These file will not be under version control but listed in .gitignore.
 
 ## Usage
 
