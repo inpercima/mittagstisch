@@ -17,3 +17,12 @@ spring:
   # jpa:
   #   open-in-view: false
   #   show-sql: false
+
+  ai:
+    openai:
+      api-key: <OPEN_AI_TOKEN>
+      chat:
+        options:
+          model: gpt-5-nano
+          # Only the default (1) value is supported.
+          temperature: 1
