@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Lunch } from './lunch';
+import { LunchModel } from './lunch.model';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +10,7 @@ import { Lunch } from './lunch';
 export class LunchService {
   private http = inject(HttpClient);
 
-  public get(route: string): Observable<Lunch[]> {
-    return this.http.get<Lunch[]>(environment.api + route);
+  public get(route: string): Observable<LunchModel[]> {
+    return this.http.get<LunchModel[]>(environment.api + route);
   }
 }

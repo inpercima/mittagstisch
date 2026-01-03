@@ -29,12 +29,12 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-* `@angular/cli 19.2.10` or higher
+* `@angular/cli 21.0.4` or higher
 
 Install @angular/cli by running:
 
 ```bash
-pnpm install -g @angular/cli@19
+pnpm install -g @angular/cli@21
 ```
 
 ### Java

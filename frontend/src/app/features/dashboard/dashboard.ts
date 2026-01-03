@@ -3,11 +3,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
-  selector: 'mt-dashboard',
-  templateUrl: './dashboard.component.html',
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.html',
   imports: [MatCardModule, MatProgressBarModule],
 })
-export class DashboardComponent implements OnInit {
+export class Dashboard implements OnInit {
   loaded = false;
 
   ngOnInit(): void {

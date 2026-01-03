@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-export const ROUTES: Routes = [
+export const routeConfig: Routes = [
   {
     path: '',
     redirectTo: 'dashboard',
@@ -8,14 +8,14 @@ export const ROUTES: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then((c) => c.DashboardComponent),
+    loadComponent: () => import('./features/dashboard/dashboard').then((c) => c.Dashboard),
   },
   {
     path: 'today',
-    loadComponent: () => import('./shared/lunch/lunch.component').then((c) => c.LunchComponent),
+    loadComponent: () => import('./shared/lunch/lunch').then((c) => c.Lunch),
   },
   {
     path: 'tomorrow',
-    loadComponent: () => import('./shared/lunch/lunch.component').then((c) => c.LunchComponent),
+    loadComponent: () => import('./shared/lunch/lunch').then((c) => c.Lunch),
   },
 ];

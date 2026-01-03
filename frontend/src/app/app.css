@@ -9,8 +9,8 @@ mat-card {
 }
 
 .github-link {
-  margin-right: 8px;
-  margin-top: 8px;
-  width: 24px;
-  height: 24px;
+  height: 20px;
+  top: 4px;
+  padding-right: 5px;
+  position: relative;
 }

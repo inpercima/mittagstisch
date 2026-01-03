@@ -1,9 +1,42 @@
-export interface Lunch {
-  bistroName: string;
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ActivatedRoute } from '@angular/router';
+import { LunchModel } from './lunch.model';
+import { LunchService } from './lunch.service';
 
-  content: string;
+@Component({
+  selector: 'app-lunch',
+  templateUrl: './lunch.html',
+  styleUrls: ['./lunch.css'],
+  imports: [MatCardModule, MatDividerModule, MatProgressBarModule],
+})
+export class Lunch implements OnInit {
+  route = inject(ActivatedRoute);
+  private lunchService = inject(LunchService);
 
-  status: string;
+  private destroyRef = inject(DestroyRef);
 
-  url: string;
+  lunch: LunchModel[] = [];
+  path: string;
+
+  loaded = false;
+
+  constructor() {
+    const route = this.route;
+
+    this.path = route.snapshot.routeConfig!.path!;
+  }
+
+  ngOnInit(): void {
+    this.lunchService
+      .get(this.path)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((lunch) => {
+        this.lunch = lunch;
+        this.loaded = true;
+      });
+  }
 }
