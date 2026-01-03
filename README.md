@@ -12,14 +12,14 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
-* `node 22.15.0` or higher in combination with
-  * `npm 10.9.2` or higher or
-  * `pnpm 10.10.0` or higher, used in this repository
+* `node 22.20.0` or higher in combination with
+  * `npm 10.9.3` or higher or
+  * `pnpm 10.27.0` or higher, used in this repository
 
 Install pnpm by running:
 
 ```bash
-npm install -g pnpm@10.10.0
+npm install -g pnpm@10.27.0
 ```
 
 ### Info for npm and pnpm
@@ -43,8 +43,7 @@ pnpm install -g @angular/cli@19
 
 ### Docker (when running services within docker)
 
-* `docker 28.0.2` or higher
-* `docker compose v2.34.0` or higher
+* `docker 28.3.2` or higher
 
 ## Getting started
 

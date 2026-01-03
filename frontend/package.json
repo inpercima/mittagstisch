@@ -1,10 +1,7 @@
 {
-  "author": "Marcel Hendrich",
+  "author": "Marcel Hendrich <inpercima@gmail.com>",
   "contributors": [
-    {
-      "name": "Marcel Hendrich",
-      "email": "inpercima@gmail.com"
-    }
+    "Marcel Hendrich <inpercima@gmail.com>"
   ],
   "dependencies": {
     "@angular/animations": "19.2.9",
@@ -45,7 +42,7 @@
     "typescript-eslint": "8.31.1"
   },
   "engines": {
-    "node": ">=22.15.0"
+    "node": ">=22.20.0"
   },
   "homepage": "https://github.com/inpercima/mittagstisch/",
   "license": "MIT",
