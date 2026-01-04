@@ -1,6 +1,5 @@
 package net.inpercima.mittagstisch.service;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -10,12 +9,8 @@ import java.util.Locale;
 
 import org.htmlunit.html.DomNode;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.State;
 
 @UtilityClass
@@ -120,18 +115,5 @@ public class MittagstischUtils {
         state.setStatusText(String.format(status, bistroName));
         state.setStatus("status-" + statusType);
         return state;
-    }
-
-    public static Bistro readBistroConfig(final String bistroJson, final String bistroId) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode;
-        Bistro bistro = new Bistro();
-        try {
-            jsonNode = mapper.readTree(bistroJson).get(bistroId);
-            bistro = mapper.convertValue(jsonNode, Bistro.class);
-        } catch (IOException e) {
-            log.error("Reading configuration file 'bistro.json' failed.");
-        }
-        return bistro;
     }
 }

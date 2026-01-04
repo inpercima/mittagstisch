@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,11 @@ import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.CafeteriaM9;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
 import net.inpercima.mittagstisch.service.Kaiserbad;
-import net.inpercima.mittagstisch.service.Kantine3;
 import net.inpercima.mittagstisch.service.KirowKantine;
+import net.inpercima.mittagstisch.service.RockyMaria;
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class BaseController {
 
@@ -26,16 +28,16 @@ public class BaseController {
     private final CafeteriaM9 cafeteriaM9;
     private final BistroAmKanal bistroAmKanal;
     private final Biomare biomare;
-    private final Kantine3 kantine3;
+    private final RockyMaria rockyMaria;
     private final Kaiserbad kaiserbad;
     private final KirowKantine kirowKantine;
 
-    @GetMapping(value = "/api/today")
+    @GetMapping(value = "/today")
     public List<Lunch> listToday() {
         return list(0);
     }
 
-    @GetMapping(value = "/api/tomorrow")
+    @GetMapping(value = "/tomorrow")
     public List<Lunch> listTomorrow() {
         return list(1);
     }
@@ -47,7 +49,7 @@ public class BaseController {
         lunch.add(cafeteriaM9.getLunch(days));
         lunch.add(bistroAmKanal.getLunch(days));
         lunch.add(biomare.getLunch(days));
-        lunch.add(kantine3.getLunch(days));
+        lunch.add(rockyMaria.getLunch(days));
         lunch.add(kaiserbad.getLunch(days));
         lunch.add(kirowKantine.getLunch(days));
         return lunch;

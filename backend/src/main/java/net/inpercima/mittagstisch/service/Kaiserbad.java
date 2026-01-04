@@ -4,6 +4,7 @@ import org.htmlunit.html.HtmlPage;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.inpercima.mittagstisch.Utils;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 
@@ -16,7 +17,7 @@ public class Kaiserbad extends Mittagstisch {
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroJson, "kaiserbad");
+        final Bistro bistro = Utils.readBistroConfig(bistroJson, "kaiserbad");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

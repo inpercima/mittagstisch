@@ -17,6 +17,8 @@ public class Bistro {
 
     private String cssLunchSelector;
 
+    private String selector;
+
     private int days;
 
     private boolean daily = true;
