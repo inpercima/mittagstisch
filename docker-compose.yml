@@ -1,0 +1,20 @@
+services:
+  mysql:
+    command: >
+      mysqld --character-set-server=utf8mb4
+             --collation-server=utf8mb4_unicode_ci
+             --lower_case_table_names=1
+    container_name: ${COMPOSE_PROJECT_NAME}_mysql
+    environment:
+      - MYSQL_DATABASE=${COMPOSE_PROJECT_NAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_USER=${MYSQL_USER}
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e 'SELECT 1' > /dev/null 2>&1"]
+    image: mysql:${MYSQL_VERSION}
+    restart: unless-stopped
+    volumes:
+      - data-mysql:/var/lib/mysql
+volumes:
+  data-mysql:

@@ -3,7 +3,6 @@ package net.inpercima.mittagstisch.service;
 import org.htmlunit.html.HtmlPage;
 import org.springframework.stereotype.Service;
 
-import net.inpercima.mittagstisch.Utils;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 

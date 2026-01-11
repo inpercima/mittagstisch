@@ -14,6 +14,7 @@ import net.inpercima.mittagstisch.service.BistroAmKanal;
 import net.inpercima.mittagstisch.service.BistroImBic;
 import net.inpercima.mittagstisch.service.CafeteriaM9;
 import net.inpercima.mittagstisch.service.GeschmackssacheLeipzig;
+import net.inpercima.mittagstisch.service.Hayai;
 import net.inpercima.mittagstisch.service.Kaiserbad;
 import net.inpercima.mittagstisch.service.KirowKantine;
 import net.inpercima.mittagstisch.service.RockyMaria;
@@ -31,6 +32,7 @@ public class BaseController {
     private final RockyMaria rockyMaria;
     private final Kaiserbad kaiserbad;
     private final KirowKantine kirowKantine;
+    private final Hayai hayai;
 
     @GetMapping(value = "/today")
     public List<Lunch> listToday() {
@@ -44,14 +46,15 @@ public class BaseController {
 
     private List<Lunch> list(final int days) {
         final List<Lunch> lunch = new ArrayList<>();
-        lunch.add(geschmackssacheLeipzig.getLunch(days));
-        lunch.add(bistroImBic.getLunch(days));
-        lunch.add(cafeteriaM9.getLunch(days));
-        lunch.add(bistroAmKanal.getLunch(days));
-        lunch.add(biomare.getLunch(days));
-        lunch.add(rockyMaria.getLunch(days));
-        lunch.add(kaiserbad.getLunch(days));
-        lunch.add(kirowKantine.getLunch(days));
+        // lunch.add(geschmackssacheLeipzig.getLunch(days));
+        // lunch.add(bistroImBic.getLunch(days));
+        // lunch.add(cafeteriaM9.getLunch(days));
+        // lunch.add(bistroAmKanal.getLunch(days));
+        // lunch.add(biomare.getLunch(days));
+        // lunch.add(rockyMaria.getLunch(days));
+        // lunch.add(kaiserbad.getLunch(days));
+        // lunch.add(kirowKantine.getLunch(days));
+        lunch.add(hayai.getLunch(days));
         return lunch;
     }
 }

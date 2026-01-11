@@ -60,7 +60,7 @@ Defines the user for mySQL
 
 Defines the version for mySQL
 
-* default: `8.0.30`
+* default: `8.0.44-debian`
 * type: `string`
 
 ### `PHPMYADMIN_PORT`
@@ -74,26 +74,24 @@ Defines the port for phpMyAdmin
 
 Defines the version for phpMyAdmin
 
-* default: `5.2.0`
+* default: `5.2.3`
 * type: `string`
 
 ## Usage
 
 ### Information
 
-To work with the compose file use following commands.
+To work with these compose files use following commands.
 Use as `project-name` the same name from the configuration `COMPOSE_PROJECT_NAME`.
 
-### Mysql in this project
-
-If you manage your data in this project, run following commands.
+### Manage Mysql within this project
 
 **Note**: On the first run you need to look into the logs of mysql to get the root password.
 The password will not shown again.
 
 ```bash
 # run compose file
-docker compose --project-name mittagstisch -f compose.yml -f compose-mysql.yml up -d
+docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 # check the log file of the mysql service and search for "GENERATED ROOT PASSWORD" and note this
 docker logs mittagstisch_mysql
@@ -102,7 +100,7 @@ docker logs mittagstisch_mysql
 docker compose --project-name mittagstisch down
 ```
 
-### Mysql out of this project
+### Manage Mysql outside of this project
 
 If you manage your data out of this project, you can use the dump file (`dump.sql`) and connect to your database.
 Then run following commands:

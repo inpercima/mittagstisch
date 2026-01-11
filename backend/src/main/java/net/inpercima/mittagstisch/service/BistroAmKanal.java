@@ -4,7 +4,6 @@ import org.htmlunit.html.HtmlPage;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.inpercima.mittagstisch.Utils;
 import net.inpercima.mittagstisch.model.Bistro;
 import net.inpercima.mittagstisch.model.Lunch;
 

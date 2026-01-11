@@ -8,13 +8,13 @@ import net.inpercima.mittagstisch.model.Lunch;
 
 @Component
 @AllArgsConstructor
-public class RockyMaria {
+public class Hayai {
 
     private final String bistroJson;
     private final ContentService contentService;
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = Utils.readBistroConfig(bistroJson, "rockyMaria");
+        final Bistro bistro = Utils.readBistroConfig(bistroJson, "hayai");
         return contentService.generateContent(bistro, days);
     }
 }

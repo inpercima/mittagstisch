@@ -1,4 +1,4 @@
-package net.inpercima.mittagstisch;
+package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
 

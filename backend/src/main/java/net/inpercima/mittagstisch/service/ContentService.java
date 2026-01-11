@@ -28,8 +28,13 @@ public class ContentService {
 
     public Lunch generateContent(final Bistro bistro, final int days) {
         String content = loadAndParse(bistro.getUrl(), bistro.getSelector());
-        Prompt prompt = aiService.build(
-                content, LocalDate.now().plusDays(days), bistro);
-        return aiService.analyze(prompt);
+        System.out.println(content);
+        if (content.trim().equals("")) {
+            return new Lunch();
+        } else {
+            Prompt prompt = aiService.build(
+                    content, LocalDate.now().plusDays(days), bistro);
+            return aiService.analyze(prompt);
+        }
     }
 }
