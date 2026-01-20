@@ -14,7 +14,7 @@ public class GeschmackssacheLeipzig extends Mittagstisch {
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = Utils.readBistroConfig(bistroJson, "geschmackssache");
+        final Bistro bistro = Utils.readBistroConfigById(bistroJson, "geschmackssache");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

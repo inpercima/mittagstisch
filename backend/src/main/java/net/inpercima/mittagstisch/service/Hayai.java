@@ -13,8 +13,8 @@ public class Hayai {
     private final String bistroJson;
     private final ContentService contentService;
 
-    public Lunch getLunch(final int days) {
-        final Bistro bistro = Utils.readBistroConfig(bistroJson, "hayai");
-        return contentService.generateContent(bistro, days);
-    }
+    // public Lunch getLunch(final int days) {
+    //     final Bistro bistro = Utils.readBistroConfigById(bistroJson, "hayai");
+    //     return contentService.generateContent(bistro, days);
+    // }
 }

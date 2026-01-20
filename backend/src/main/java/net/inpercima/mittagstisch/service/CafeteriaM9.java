@@ -14,7 +14,7 @@ public class CafeteriaM9 extends Mittagstisch {
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = Utils.readBistroConfig(bistroJson, "cafeteriaM9");
+        final Bistro bistro = Utils.readBistroConfigById(bistroJson, "cafeteriaM9");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

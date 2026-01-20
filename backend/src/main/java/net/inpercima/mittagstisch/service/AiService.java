@@ -9,8 +9,7 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import net.inpercima.mittagstisch.model.Bistro;
-import net.inpercima.mittagstisch.model.Lunch;
+import net.inpercima.mittagstisch.entity.BistroEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -18,14 +17,18 @@ public class AiService {
 
   private final ChatClient chatClient;
 
-  public Lunch analyze(Prompt prompt) {
-    return chatClient
-        .prompt(prompt)
-        .call()
-        .entity(Lunch.class);
+  public String extractLunches(String content, LocalDate date, final BistroEntity bistro) {
+    Prompt prompt = build(content, date, bistro);
+    return analyze(prompt);
   }
 
-  public Prompt build(String content, LocalDate date, final Bistro bistro) {
+  private String analyze(Prompt prompt) {
+    return chatClient
+        .prompt(prompt)
+        .call().content();
+  }
+
+  private Prompt build(String content, LocalDate date, final BistroEntity bistro) {
     String template = """
         Du bist ein Parser für Mittagsmenüs.
         Der Text enthält eine Wochentagsübersicht von Montag bis Freitag.
