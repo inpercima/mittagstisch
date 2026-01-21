@@ -1,0 +1,25 @@
+<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  @for (lunch of lunches(); track lunch) {
+  <div
+    class="rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col gap-3"
+    [ngClass]="{
+    'bg-slate-50': lunch.status === 'status-error',
+    'bg-white': lunch.status === 'status-success'
+  }"
+  >
+    <div class="flex items-start justify-between">
+      <a [href]="lunch.url" class="text-lg font-semibold hover:underline">{{ lunch.bistroName }}</a>
+      <span
+        class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700"
+        [ngClass]="{
+    'bg-amber-100 text-amber-700': lunch.status === 'status-error',
+    'bg-emerald-100 text-emerald-700': lunch.status === 'status-success'
+  }"
+        >{{ lunch.status }}</span
+      >
+    </div>
+    <p class="text-sm text-slate-700 leading-relaxed">{{ lunch.content }}</p>
+    <p class="text-xs text-slate-400">Aktualisiert: DATUM</p>
+  </div>
+  }
+</div>
