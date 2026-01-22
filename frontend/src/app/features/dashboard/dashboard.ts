@@ -8,5 +8,5 @@ import { routeConfig } from '../../app.routes';
   imports: [RouterLinkActive, RouterLink, RouterOutlet],
 })
 export class Dashboard {
-  public routes: Routes = routeConfig.find((r) => r.children)?.children ?? [{ path: '', data: { label: '' } }];
+  protected routes: Routes = routeConfig.find((r) => r.children)?.children ?? [{ path: '', data: { label: '' } }];
 }

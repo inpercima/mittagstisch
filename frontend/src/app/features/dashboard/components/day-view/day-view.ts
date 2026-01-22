@@ -1,14 +1,16 @@
+import { NgClass } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { DayViewService } from './day-view.service';
 import { LunchModel } from '../../models/lunch.model';
-import { NgClass } from '@angular/common';
+import { StatusBoxClassPipe } from '../pipes/status-box-class.pipe';
+import { StatusTextClassPipe } from '../pipes/status-text-class.pipe';
+import { DayViewService } from './day-view.service';
 
 @Component({
   selector: 'app-day-view',
   templateUrl: './day-view.html',
-  imports: [NgClass],
+  imports: [NgClass, StatusBoxClassPipe, StatusTextClassPipe],
 })
 export class DayView implements OnInit {
   readonly #route = inject(ActivatedRoute);
@@ -17,8 +19,8 @@ export class DayView implements OnInit {
 
   readonly day = this.#route.snapshot.routeConfig!.path! as 'today' | 'tomorrow';
 
-  lunches = signal<LunchModel[]>([]);
-  loading = signal<boolean>(false);
+  readonly lunches = signal<LunchModel[]>([]);
+  readonly loading = signal<boolean>(false);
 
   ngOnInit(): void {
     this.loading.set(true);

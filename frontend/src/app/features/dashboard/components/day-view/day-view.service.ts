@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable, } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { LunchModel } from '../../models/lunch.model';
@@ -10,7 +10,7 @@ import { LunchModel } from '../../models/lunch.model';
 export class DayViewService {
   private http = inject(HttpClient);
 
-  public get(day: 'today' | 'tomorrow'): Observable<LunchModel[]> {
+  get(day: 'today' | 'tomorrow'): Observable<LunchModel[]> {
     return this.http.get<LunchModel[]>(environment.api + day);
   }
 }

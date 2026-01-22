@@ -12,10 +12,10 @@ import { routeConfig } from './app.routes';
 export class App {
   readonly #titleService = inject(Title);
 
-  public appname: string;
-  public routes: Routes;
+  appname: string;
+  routes: Routes;
 
-  public constructor() {
+  constructor() {
     this.appname = environment.appname;
     this.routes = routeConfig;
     this.#titleService.setTitle(this.appname);

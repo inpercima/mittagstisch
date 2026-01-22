@@ -1,4 +1,4 @@
-export interface LunchModel {
+export type LunchModel = {
   bistroName: string;
 
   content: string;

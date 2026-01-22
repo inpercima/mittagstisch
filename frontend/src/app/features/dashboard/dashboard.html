@@ -15,14 +15,14 @@
     <nav class="flex gap-8">
       @for (route of routes; track route) {
       <a
-        [routerLink]="route.path"
-        routerLinkActive="text-blue-600 border-b-2 border-blue-600"
         class="pb-3 text-slate-500 hover:text-slate-700"
+        routerLinkActive="text-blue-600 border-b-2 border-blue-600"
+        [routerLink]="route.path"
         >{{ route.data!['label'] }}</a
       >
       }
     </nav>
   </div>
 
-  <router-outlet></router-outlet>
+  <router-outlet />
 </main>
