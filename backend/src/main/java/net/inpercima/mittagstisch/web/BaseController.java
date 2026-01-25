@@ -28,8 +28,8 @@ public class BaseController {
         return lunchService.getDataByDay(Day.TOMORROW);
     }
 
-    @GetMapping(value = "/data")
-    public void loadData() {
+    @GetMapping("/data")
+    public void getData() {
         lunchService.importLunches();
     }
 }

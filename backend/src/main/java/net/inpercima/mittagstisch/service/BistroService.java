@@ -18,9 +18,8 @@ public class BistroService {
         return bistroRepository.findAll();
     }
 
-    public BistroEntity findById(long id) {
-        BistroEntity bistro = bistroRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Bistro not found"));
-        return bistro;
+    public long count() {
+        return bistroRepository.count();
     }
+
 }

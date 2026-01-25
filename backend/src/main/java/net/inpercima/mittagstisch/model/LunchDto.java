@@ -1,13 +1,10 @@
 package net.inpercima.mittagstisch.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-public class LunchDto {
-
-    private BistroDto bistro;
-
-    private String meals;
+public record LunchDto(
+        BistroDto bistro,
+        String lunches,
+        Status status,
+        LocalDate importDate) {
 }

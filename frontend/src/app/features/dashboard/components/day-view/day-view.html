@@ -5,14 +5,14 @@
     [ngClass]=" lunch.status | statusBoxClass"
   >
     <div class="flex items-start justify-between">
-      <a class="text-lg font-semibold hover:underline" [href]="lunch.url">{{ lunch.bistroName }}</a>
+      <a class="text-lg font-semibold hover:underline" [href]="lunch.bistro.url">{{ lunch.bistro.name }}</a>
       <span
         class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700"
         [ngClass]=" lunch.status | statusTextClass"
-        >{{ lunch.status }}</span
+        >{{ lunch.status | statusText }}</span
       >
     </div>
-    <p class="text-sm text-slate-700 leading-relaxed">{{ lunch.content }}</p>
+    <p class="text-sm text-slate-700 leading-relaxed">{{ lunch.lunches }}</p>
     <p class="text-xs text-slate-400">Aktualisiert: DATUM</p>
   </div>
   }

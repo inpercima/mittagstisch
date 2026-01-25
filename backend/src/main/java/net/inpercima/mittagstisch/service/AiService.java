@@ -30,29 +30,34 @@ public class AiService {
 
   private Prompt build(String content, LocalDate date, final BistroEntity bistro) {
     String template = """
+        Rolle:
         Du bist ein Parser für Mittagsmenüs.
-        Der Text enthält eine Wochentagsübersicht von Montag bis Freitag.
-        Der Inhalt variiert je nach Bistro.
+        Aufgabe:
+        Extrahiere aus dem gegebenen Text die Mittagsgerichte von Montag bis Freitag für den angegebenen Tag in einer Wochenübersicht.
+        Informationen:
         Es ist immer eine Überschrift für die Woche enthalten.
         Sie kann folgendermaßen aussehen: "Speiseplan vom 01.12.-05.12.2025" oder "Mittagstisch KW 49/2025" oder "Wochenkarte".
         Die Tage sind in der Regel mit dem Wochentag benannt, z.B. "Montag", "Dienstag" usw. oder abgekürzt "Mo", "Di" usw.
-
-        1. Nutze folgendes JSON-Format für die Ausgabe:
+        Anweisungen:
+        - Nutze folgendes JSON-Format für die Ausgabe:
         {{
-          "bistroName": "{bistroName}",
-          "url": "{bistroUrl}",
           "content": string,
           "status": string
         }}
-        2. Prüfe, ob die im Titel angegebene Woche die aktuelle Woche ist (heute ist {today}).
-        3. Wenn nicht, gib im Feld "content" den Wert "Der Speiseplan ist nicht für die aktuelle Woche." zurück und im Feld "status" den Wert "error".
-        4. Wenn ja, bestimme automatisch den heutigen Wochentag.
-        5. Extrahiere nur die Gerichte für den heutigen Tag.
-        6. Gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück:
+        - Prüfe, ob der heutige Tag innerhalb der angegebenen Woche liegt (heute ist {today}).
+        - Wenn der heutige Tag vor der angegebenen Woche liegt, gib im Feld "content" den Wert "[]" und im Feld "status" den Wert "OUTDATED" zurück.
+        - Wenn der heutige Tag nach der angegebenen Woche liegt, gib im Feld "content" den Wert "[]" und im Feld "status" den Wert "NEXT_WEEK" zurück.
+        - Wenn der heutige Tag innerhalb der angegebenen Woche liegt, extrahiere die Gerichte für diesen Tag.
+        - Gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück:
         [
           {{ "name": string, "preis": string }}
         ]
-        7. Setze für das Feld "status" den Wert "success", wenn Gerichte gefunden wurden.
+        - Setze für das Feld "status" den Wert "SUCCESS", wenn Gerichte gefunden wurden.
+        - Wurden keine Gerichte gefunden, setzte für das Feld "status" den Wert "NO_DATA".
+        WICHTIG:
+        - Gib das Feld "content" als echtes JSON-Array zurück
+        - Das Feld darf KEIN String sein
+        - Verwende KEINE Escapes
         Text:
         {content}
         """;
@@ -60,8 +65,6 @@ public class AiService {
     PromptTemplate promptTemplate = new PromptTemplate(template);
     Prompt prompt = promptTemplate.create(Map.of(
         "today", date.toString(),
-        "bistroName", bistro.getName(),
-        "bistroUrl", bistro.getUrl(),
         "content", content));
     return prompt;
   }

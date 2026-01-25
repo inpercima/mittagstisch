@@ -10,13 +10,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.inpercima.mittagstisch.model.Day;
+import net.inpercima.mittagstisch.model.Status;
 
 @Entity
 @Table(name = "lunch")
@@ -33,8 +33,7 @@ public class LunchEntity {
   @Column(nullable = false)
   private Day day;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "bistro_id", nullable = false)
+  @ManyToOne(fetch = FetchType.EAGER)
   private BistroEntity bistro;
 
   @Column(nullable = false)
@@ -42,4 +41,8 @@ public class LunchEntity {
 
   @Column(nullable = false)
   private LocalDate importDate;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Status status;
 }
