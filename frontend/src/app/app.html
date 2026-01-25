@@ -1,39 +1,19 @@
-<mat-toolbar class="mat-elevation-z4 justify-between">
-  {{ appname }}
-  <div>
-    <button mat-button (click)="openDialog(dialog)">APP INFO</button>
-    |
-    <a
-      mat-button
-      href="https://github.com/inpercima/mittagstisch"
-      aria-label="GitHub Repository"
-      title="Go to project on Github"
-      target="_blank"
-    >
-      <span matButtonIcon>
-        <img class="github-link" alt="GitHub Repository" src="github-mark.svg" />
-      </span>
-      GitHub
-    </a>
+<header class="bg-white border-b border-gray-300">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between">
+    <h1 class="text-xl font-semibold">Mittagstisch</h1>
+
+    <nav class="flex gap-6 text-sm text-slate-500">
+      <a
+        class="flex items-center gap-2 text-sm hover:text-slate-800"
+        href="https://github.com/inpercima/mittagstisch"
+        rel="noopener noreferrer"
+        target="_blank"
+        title="Go to project on Github"
+      >
+        <img src="github-mark.svg" alt="GitHub Logo" class="h-5 w-5" />
+        <span class="pt-1">GitHub</span>
+      </a>
+    </nav>
   </div>
-</mat-toolbar>
-<nav mat-tab-nav-bar [tabPanel]="tabPanel">
-  @for (route of routes | appRouting; track route) {
-  <a mat-tab-link [routerLink]="route.path" routerLinkActive
-    #rla="routerLinkActive" [active]="rla.isActive">{{ route.path }}</a>
-  }
-</nav>
-<mat-tab-nav-panel #tabPanel>
-  <router-outlet></router-outlet>
-</mat-tab-nav-panel>
-<ng-template #dialog>
-  <h2 mat-dialog-title>Overview</h2>
-  <mat-dialog-content>
-    The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).
-    <br />
-    With this app you can check the lunch in bistros or restaurants in Leipzig (Plagwitz, Lindenau) from this day and the next.
-  </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close cdkFocusInitial>Close</button>
-  </mat-dialog-actions>
-</ng-template>
+</header>
+<router-outlet />

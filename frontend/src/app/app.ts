@@ -1,39 +1,23 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, TemplateRef, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { Component, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterLink, RouterLinkActive, RouterOutlet, Routes } from '@angular/router';
+import { RouterOutlet, Routes } from '@angular/router';
 import { environment } from '../environments/environment';
-import { AppRoutingPipe } from './app-routing.pipe';
 import { routeConfig } from './app.routes';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
-  styleUrl: './app.css',
-  imports: [MatButtonModule, MatDialogModule, MatTabsModule, MatToolbarModule, RouterLinkActive, RouterLink, RouterOutlet, AppRoutingPipe],
+  imports: [RouterOutlet],
 })
 export class App {
-  readonly #dialog = inject(MatDialog);
   readonly #titleService = inject(Title);
-  readonly #document = inject<Document>(DOCUMENT);
 
-  public appname: string;
-  public routes: Routes;
+  appname: string;
+  routes: Routes;
 
-  public constructor() {
+  constructor() {
     this.appname = environment.appname;
     this.routes = routeConfig;
     this.#titleService.setTitle(this.appname);
-    this.#document.body.classList.add(`${environment.theme}-theme`);
-  }
-
-  openDialog(ref: TemplateRef<Element>): void {
-    this.#dialog.open(ref, {
-      maxWidth: '800px',
-    });
   }
 }

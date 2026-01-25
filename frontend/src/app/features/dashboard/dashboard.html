@@ -1,6 +1,28 @@
-<mat-card class="w-4/5 mx-auto">
-  <mat-card-content>
-    Du hast Hunger und weist noch nicht was du essen möchtest?
-    Schau einfach unter 'Heute' oder 'Morgen' was es in deiner Nähe gibt.
-  </mat-card-content>
-</mat-card>
+<section class="bg-white border-b border-gray-300">
+  <div class="max-w-4xl mx-auto px-4 py-18 text-center">
+    <h2 class="text-4xl font-bold mb-8">Mittagstisch auf einen Blick</h2>
+
+    <p class="text-lg text-slate-600">
+      Tägliche Mittagsangebote aus Bistros des Leipziger Westens (Plagwitz und Lindenau)
+      <br />
+      automatisch gesammelt und übersichtlich dargestellt.
+    </p>
+  </div>
+</section>
+
+<main class="max-w-7xl mx-auto px-4 py-10">
+  <div class="border-b border-gray-300 mb-8">
+    <nav class="flex gap-8">
+      @for (route of routes; track route) {
+      <a
+        class="pb-3 text-slate-500 hover:text-slate-700"
+        routerLinkActive="text-blue-600 border-b-2 border-blue-600"
+        [routerLink]="route.path"
+        >{{ route.data!['label'] }}</a
+      >
+      }
+    </nav>
+  </div>
+
+  <router-outlet />
+</main>

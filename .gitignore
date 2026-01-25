@@ -6,6 +6,7 @@ application-prod.yml
 
 # ignore all in '.vscode' b/c some vsc config files contain user specific content
 .vscode/*
+!.vscode/settings.json
 
 # end project specific
 

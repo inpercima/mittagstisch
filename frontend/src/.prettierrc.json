@@ -1,0 +1,12 @@
+{
+  "printWidth": 140,
+  "bracketSameLine": false,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 100
+      }
+    }
+  ]
+}
