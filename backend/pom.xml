@@ -126,7 +126,7 @@
               <outputDirectory>${basedir}/target/classes/public</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../frontend/dist/browser</directory>
+                  <directory>../frontend/dist/mittagstisch/browser</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>

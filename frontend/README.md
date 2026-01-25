@@ -16,7 +16,7 @@ Create environment file for `development mode`.
 cp src/environments/environment.ts src/environments/environment.dev.ts
 ```
 
-**Note**: These file will not be under version control but listed in .gitignore.
+**Note**: This file will not be under version control but listed in .gitignore.
 
 ## Usage
 

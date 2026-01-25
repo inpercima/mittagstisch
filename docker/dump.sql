@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Erstellungszeit: 20. Jan 2026 um 20:45
+-- Erstellungszeit: 25. Jan 2026 um 19:32
 -- Server-Version: 8.0.44
 -- PHP-Version: 8.3.30
 
@@ -54,7 +54,8 @@ CREATE TABLE `lunch` (
   `id` int NOT NULL,
   `import_date` date NOT NULL,
   `lunches` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `day` enum('TODAY','TOMORROW') COLLATE utf8mb4_unicode_ci NOT NULL
+  `day` enum('TODAY','TOMORROW') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('OUTDATED','NEXT_WEEK','SUCCESS','NO_DATA') COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -88,7 +89,7 @@ ALTER TABLE `bistro`
 -- AUTO_INCREMENT für Tabelle `lunch`
 --
 ALTER TABLE `lunch`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- Constraints der exportierten Tabellen

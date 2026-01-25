@@ -12,10 +12,6 @@ cp default.env .env
 
 **Note**: This file will not be under version control but listed in .gitignore.
 
-Check for the existence of `environment.prod.ts` as described in [Mittagstisch - frontend](./frontend).
-
-Check for the existence of `application-prod.yml` as described in [Mittagstisch - backend](./backend).
-
 ## Configuration
 
 ### Table of contents
@@ -90,8 +86,11 @@ Use as `project-name` the same name from the configuration `COMPOSE_PROJECT_NAME
 The password will not shown again.
 
 ```bash
-# run compose file
+# run compose file dev
 docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+# run compose file prod
+docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 # check the log file of the mysql service and search for "GENERATED ROOT PASSWORD" and note this
 docker logs mittagstisch_mysql
@@ -103,12 +102,3 @@ docker compose --project-name mittagstisch down
 ### Manage Mysql outside of this project
 
 If you manage your data out of this project, you can use the dump file (`dump.sql`) and connect to your database.
-Then run following commands:
-
-```bash
-# run compose file
-docker compose --project-name mittagstisch up -d
-
-# stop compose file
-docker compose --project-name mittagstisch down
-```

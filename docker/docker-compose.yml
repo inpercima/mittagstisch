@@ -11,10 +11,15 @@ services:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
       - MYSQL_USER=${MYSQL_USER}
     healthcheck:
-      test: ["CMD-SHELL", "mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e 'SELECT 1' > /dev/null 2>&1"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     image: mysql:${MYSQL_VERSION}
+    mem_limit: 1g
     restart: unless-stopped
     volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
       - data-mysql:/var/lib/mysql
 volumes:
   data-mysql:

@@ -7,14 +7,13 @@
 cd backend
 ```
 
-Create environment files for `development mode` and `production mode`.
+Create environment file for `development mode`.
 
 ```bash
 cp src/main/resources/application.yml src/main/resources/application-dev.yml
-cp src/main/resources/application.yml src/main/resources/application-prod.yml
 ```
 
-**Note**: These files will not be under version control but listed in .gitignore.
+**Note**: This file will not be under version control but listed in .gitignore.
 
 ## Usage
 
@@ -50,5 +49,5 @@ cp src/main/resources/application.yml src/main/resources/application-prod.yml
 # place the `application-prod.yml` aside the mittagstisch-1.0.0-SNAPSHOT.jar and run the jar
 cp src/main/resources/application-prod.yml target/application-prod.yml
 cd target
-java -jar mittagstisch-1.0.0-SNAPSHOT.jar --spring.profiles.active=prod
+java -jar ./mittagstisch-1.0.0-SNAPSHOT.jar --spring.profiles.active=prod
 ```
