@@ -1,19 +1,19 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-  name: 'statusBoxClass'
+  name: 'statusText'
 })
-export class StatusBoxClassPipe implements PipeTransform {
+export class StatusTextPipe implements PipeTransform {
   transform(status: string): string {
     switch (status) {
       case 'SUCCESS':
-        return 'bg-emerald-50';
+        return 'Aktuell';
       case 'NO_DATA':
-        return 'bg-red-50';
+        return 'Keine Daten';
       case 'NEXT_WEEK':
-        return 'bg-blue-50';
+        return 'Nächste Woche';
       case 'OUTDATED':
-        return 'bg-amber-50';
+        return 'Veraltet';
       default:
         return '';
     }

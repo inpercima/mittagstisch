@@ -1,0 +1,25 @@
+services:
+  mysql:
+    command: >
+      mysqld --character-set-server=utf8mb4
+             --collation-server=utf8mb4_unicode_ci
+             --lower_case_table_names=1
+    container_name: ${COMPOSE_PROJECT_NAME}_mysql
+    environment:
+      - MYSQL_DATABASE=${COMPOSE_PROJECT_NAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_USER=${MYSQL_USER}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    image: mysql:${MYSQL_VERSION}
+    mem_limit: 1g
+    restart: unless-stopped
+    volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - data-mysql:/var/lib/mysql
+volumes:
+  data-mysql:

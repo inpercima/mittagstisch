@@ -2,7 +2,6 @@
 
 environment.dev.ts
 application-dev.yml
-application-prod.yml
 
 # ignore all in '.vscode' b/c some vsc config files contain user specific content
 .vscode/*

@@ -14,6 +14,23 @@ server:
     enabled: true
 
 spring:
-  # jpa:
-  #   open-in-view: false
-  #   show-sql: false
+  ai:
+    openai:
+      chat:
+        options:
+          model: gpt-5-nano
+          # Only the default (1) value is supported.
+          temperature: 1
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        format_sql: true
+    open-in-view: false
+  sql:
+    init:
+      mode: never

@@ -16,13 +16,13 @@ Create environment file for `development mode`.
 cp src/environments/environment.ts src/environments/environment.dev.ts
 ```
 
-**Note**: These file will not be under version control but listed in .gitignore.
+**Note**: This file will not be under version control but listed in .gitignore.
 
 ## Usage
 
 ### Recommendation
 
-It is recommanded to use a server to get full access of all angular.
+It is recommended to use a server to get full access of all angular.
 For the other options your app should run on a server which you like.
 
 ### Run in development mode

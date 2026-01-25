@@ -1,0 +1,18 @@
+services:
+  mysql:
+    ports:
+      - "${MYSQL_PORT}:3306"
+  phpmyadmin:
+    container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      - PMA_HOSTS=mysql
+      - UPLOAD_LIMIT=200M
+    image: phpmyadmin:${PHPMYADMIN_VERSION}
+    mem_limit: 256m
+    ports:
+      - "${PHPMYADMIN_PORT}:80"
+    restart: unless-stopped
+volumes:
+  data-mysql:

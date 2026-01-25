@@ -1,9 +1,11 @@
-export type LunchModel = {
-  bistroName: string;
+import { BistroModel } from './bistro.model';
 
-  content: string;
+export type LunchModel = {
+  bistro: BistroModel;
+
+  lunches: string;
 
   status: string;
 
-  url: string;
-}
+  importDate: Date;
+};

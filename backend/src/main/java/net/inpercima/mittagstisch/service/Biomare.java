@@ -19,7 +19,7 @@ public class Biomare extends Mittagstisch {
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroJson, "biomare");
+        final Bistro bistro = Utils.readBistroConfigById(bistroJson, "biomare");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

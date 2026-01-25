@@ -16,7 +16,7 @@ public class Kaiserbad extends Mittagstisch {
     }
 
     public Lunch getLunch(final int days) {
-        final Bistro bistro = MittagstischUtils.readBistroConfig(bistroJson, "kaiserbad");
+        final Bistro bistro = Utils.readBistroConfigById(bistroJson, "kaiserbad");
         bistro.setDays(days);
         return crawlLunch(bistro);
     }

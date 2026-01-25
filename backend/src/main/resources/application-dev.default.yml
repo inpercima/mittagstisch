@@ -3,15 +3,12 @@
 #
 
 spring:
+  ai:
+    openai:
+      api-key: <OPEN_AI_API_KEY>
   datasource:
     password: <PASSWORD>
     url: jdbc:mysql://<SERVER>[:PORT]/<DATABASE>?useUnicode=true&characterEncoding=utf8&useSSL=false
     username: <USERNAME>
-  jpa:
-    hibernate:
-      ddl-auto: create
   main:
     banner-mode: "off"
-  sql:
-    init:
-      mode: always

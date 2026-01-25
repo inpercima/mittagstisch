@@ -1,62 +1,12 @@
 {
-  "geschmackssache": {
-    "name": "Geschmackssache Leipzig",
-    "url": "https://geschmackssache-leipzig.de",
-    "cssLunchSelector": "table:first-of-type tr",
-    "cssWeekSelector": "div[id='main'] div h2",
-    "xpathWeekSelector": "/html/body/div/div/div/div[1]/h2//*[contains(text(),'Wochenkarte')]"
-  },
   "bistroImBic": {
     "name": "Bistro im BIC",
     "url": "http://www.bistro-bic.de/wochenkarte",
-    "cssLunchSelector": "div#content_main div div",
-    "cssWeekSelector": "div#content_main h2",
-    "xpathWeekSelector": "/html/body/div[4]/div[4]/div[2]/div/div/div[1]/div[1]/h3"
+    "selector": "main#content_main"
   },
-  "cafeteriaM9": {
-    "name": "Cafeteria M9",
-    "url": "https://www.philippus-leipzig.de/catering/cafeteria-m9",
-    "cssLunchSelector": "",
-    "cssWeekSelector": "div#content div.cs-row a.button",
-    "xpathWeekSelector": "/html/body/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div/div/p/a",
-    "document": true
-  },
-  "bistroAmKanal": {
-    "name": "Bistro am Kanal",
-    "url": "https://buschmannle.wixsite.com/meinewebsite/wochenkarte",
-    "cssLunchSelector": "main wow-image img",
-    "cssWeekSelector": "main + div a[class~='wixui-button']",
-    "xpathWeekSelector": "/html/body/div/div/div[4]/div/div/div/div/section/div[2]/div/div[2]/div/div[4]/a",
-    "document": true,
-    "documentFullPath": true
-  },
-  "biomare": {
-    "name": "Biomare",
-    "url": "https://www.bio-mare.com",
-    "cssLunchSelector": "section#mittagstisch div.grid div",
-    "cssWeekSelector": "section#mittagstisch div.grid div:nth-child(%d) article h3",
-    "xpathWeekSelector": "/html/body/main/div[4]/section/div[1]/div[%d]/article/h3"
-  },
-  "kantine3": {
+  "rockyMaria": {
     "name": "Rocky Maria - Kantine Tapetenwerk",
-    "url": "https://www.tapetenwerk.de/aktuelles/speiseplan-kantine",
-    "cssLunchSelector": "main section div div p",
-    "cssWeekSelector": "main section div div h1",
-    "xpathWeekSelector": "/html/body/div/main/section/div/div[1]/h1"
-  },
-  "kaiserbad": {
-    "name": "Kaiserbad",
-    "url": "https://www.kaiserbad-leipzig.de",
-    "cssLunchSelector": "",
-    "cssWeekSelector": "div.content section div div:nth-child(2) a",
-    "xpathWeekSelector": "/html/body/div[2]/div[5]/section[1]/div[1]/div[2]/a",
-    "document": true
-  },
-  "kirowKantine": {
-    "name": "Kirow Kantine im alten Kesselhaus",
-    "url": "https://www.kirow-kantine.de",
-    "cssLunchSelector": "div#c2 div div p:nth-child(2)",
-    "cssWeekSelector": "div#c2 div div p:nth-child(2)",
-    "xpathWeekSelector": "/html/body/div[1]/div[2]/div[2]/div/div/section[2]/div/div[3]/div/div/p[2]"
+    "url": "https://rocky-maria.de/kantine",
+    "selector": "main div section.info-box"
   }
 }
