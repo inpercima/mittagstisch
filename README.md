@@ -29,7 +29,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-* `@angular/cli 21.0.4` or higher
+* `@angular/cli 21.1.1` or higher
 
 Install @angular/cli by running:
 
