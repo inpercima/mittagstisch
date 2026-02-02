@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -11,7 +11,7 @@ import { DayViewService } from './day-view.service';
 @Component({
   selector: 'app-day-view',
   templateUrl: './day-view.html',
-  imports: [NgClass, StatusTextPipe, StatusBoxClassPipe, StatusTextClassPipe],
+  imports: [NgClass, DatePipe, StatusTextPipe, StatusBoxClassPipe, StatusTextClassPipe],
 })
 export class DayView implements OnInit {
   readonly #route = inject(ActivatedRoute);

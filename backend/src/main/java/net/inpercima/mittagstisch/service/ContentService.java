@@ -1,6 +1,8 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +58,7 @@ public class ContentService {
         return entity;
     }
 
-    private List<LunchAiItemDto> extractContentItems(ObjectMapper mapper, JsonNode contentNode)
+    private static List<LunchAiItemDto> extractContentItems(ObjectMapper mapper, JsonNode contentNode)
             throws Exception {
         List<LunchAiItemDto> items;
         try {
@@ -86,11 +88,20 @@ public class ContentService {
         return items;
     }
 
-    private String joinNameAndPrice(List<LunchAiItemDto> items) {
+    private static String joinNameAndPrice(List<LunchAiItemDto> items) {
         String lunchesHtml = items.stream()
                 .map(item -> {
-                    return !item.preis().isBlank() ? item.name() + " – " + item.preis() : item.name();
+                    return !item.preis().isBlank() ? item.name() + " – " + normalizePrice(item.preis()) : item.name();
                 }).collect(Collectors.joining("<br>"));
         return lunchesHtml;
+    }
+
+    private static String normalizePrice(String input) {
+        String cleaned = input.trim();
+
+        cleaned = cleaned.replaceAll("[.–-]$", ",00 €");
+        cleaned = cleaned.replaceAll("(\\d)\\s*€", "$1 €");
+
+        return cleaned;
     }
 }
