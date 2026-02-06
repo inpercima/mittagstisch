@@ -17,7 +17,7 @@
   "license": "MIT",
   "name": "mittagstisch",
   "private": true,
-  "repository": "https://github.com/inpercima/mittagstisch/",
+  "repository": "https://github.com/inpercima/mittagstisch.git",
   "scripts": {
     "start": "concurrently \"cd backend && ./mvnw\" \"cd frontend && pnpm start\""
   },
