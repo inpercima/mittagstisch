@@ -15,7 +15,7 @@
   <description>The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).</description>
   <name>Mittagstisch</name>
   <packaging>jar</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <dependencies>
     <dependency>
