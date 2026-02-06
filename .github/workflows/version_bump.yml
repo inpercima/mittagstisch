@@ -62,9 +62,11 @@ jobs:
           cd ..
 
           # Maven
+          cd backend
           mvn -B versions:set \
             -DnewVersion="$VERSION" \
             -DgenerateBackupPoms=false
+          cd ..
 
       - name: Commit & tag
         if: steps.version.outputs.release == 'true'
