@@ -33,12 +33,10 @@ jobs:
 
       - name: Determine next version
         id: version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
 
-          pnpm dlx semantic-release --dry-run | tee release.log
+          pnpm dlx semantic-release --dry-run --no-ci | tee release.log
 
           if ! grep -q "next release version is" release.log; then
             echo "No release required"
@@ -66,7 +64,7 @@ jobs:
           pnpm version "$VERSION" --no-git-tag-version
           cd ..
 
-          # Maven
+          # backend pom.xml
           cd backend
           mvn -B versions:set \
             -DnewVersion="$VERSION" \
