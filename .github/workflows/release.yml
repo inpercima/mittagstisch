@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Determine next version
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:%s)
+
+          BUMP="patch"
+          if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
+            BUMP="major"
+          elif echo "$COMMITS" | grep -q "^feat"; then
+            BUMP="minor"
+          fi
+
+          VERSION=$(pnpm version $BUMP --no-git-tag-version)
+          VERSION=${VERSION#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Update versions
+        run: |
+          # root package.json
+          pnpm version $VERSION --no-git-tag-version
+
+          # frontend package.json
+          cd frontend
+          pnpm version $VERSION --no-git-tag-version
+          cd ..
+
+          # backend pom.xml
+          cd backend
+          mvn -B versions:set \
+            -DnewVersion=$VERSION \
+            -DgenerateBackupPoms=false
+          cd ..
+
+      - name: Commit & tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "chore(release): v$VERSION"
+          git tag v$VERSION
+          git push origin main --tags
+
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: v${{ env.VERSION }}
+          generate_release_notes: true
