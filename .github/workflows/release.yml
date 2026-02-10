@@ -35,27 +35,32 @@ jobs:
         id: determine_next_version
         run: |
           set +e
+          set -o pipefail
 
-          pnpm dlx semantic-release --dry-run | tee release.log || EXIT_CODE=$?
+          pnpm dlx semantic-release --dry-run | tee release.log
+          EXIT_CODE=${PIPESTATUS[0]}
 
-          # set default exit code to 0 if not set by semantic-release
-          EXIT_CODE=${EXIT_CODE:-0}
-
-          # if semantic-release exits with code 1 and the log contains "no relevant changes", this is not an error
-          if [ "$EXIT_CODE" = "1" ] && grep -q "no relevant changes" release.log; then
+          # semantic-release: no relevant changes → not an error
+          if [ "$EXIT_CODE" = "1" ] && grep -qi "no relevant changes" release.log; then
             echo "No new changes, no release necessary."
             echo "release=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          # run normal exit code check
+          # real error
           if [ "$EXIT_CODE" != "0" ]; then
-            echo "Error on semantic-release"
+            echo "semantic-release failed"
             exit $EXIT_CODE
           fi
 
           VERSION=$(grep "next release version is" release.log \
             | sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+
+          if [ -z "$VERSION" ]; then
+            echo "No version detected, skipping release."
+            echo "release=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
           echo "Next version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -64,17 +69,17 @@ jobs:
       - name: Update version files
         if: steps.determine_next_version.outputs.release == 'true'
         run: |
-
           # root package.json
-          pnpm version $VERSION --no-git-tag-version
+          pnpm version "$VERSION" --no-git-tag-version
 
           # frontend package.json
           cd frontend
-          pnpm version $VERSION --no-git-tag-version
+          pnpm version "$VERSION" --no-git-tag-version
           cd ..
 
+          # backend pom.xml
           mvn -f backend/pom.xml versions:set \
-            -DnewVersion=$VERSION \
+            -DnewVersion="$VERSION" \
             -DgenerateBackupPoms=false
 
       - name: Commit & tag release
@@ -84,7 +89,7 @@ jobs:
           git config user.email "github-actions@github.com"
 
           git commit -am "chore(release): v$VERSION"
-          git tag v$VERSION
+          git tag "v$VERSION"
           git push origin main --tags
 
       - name: Create GitHub release
