@@ -36,19 +36,52 @@ jobs:
         run: |
           set -euo pipefail
 
-          VERSION=$(npx -p semantic-release -p @semantic-release/commit-analyzer -p @semantic-release/release-notes-generator -- semantic-release --dry-run | grep "The next release version is" | awk '{print $NF}')
+          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+            LAST_TAG=$(git describe --tags --abbrev=0)
+            RANGE="$LAST_TAG..HEAD"
+          else
+            RANGE="HEAD"
+          fi
+
+          COMMITS=$(git log $RANGE --pretty=format:%s)
+
+          echo "Commit range:"
+          echo "$RANGE"
+          echo "Commits:"
+          echo "$COMMITS"
+
+          # Check if any release-relevant commits exist
+          if ! echo "$COMMITS" | grep -Eq "^(feat|fix)|BREAKING CHANGE"; then
+            echo "No release-relevant commits found."
+            echo "release=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          BUMP="patch"
+          if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
+            BUMP="major"
+          elif echo "$COMMITS" | grep -q "^feat"; then
+            BUMP="minor"
+          fi
+
+          echo "release=true" >> $GITHUB_OUTPUT
+
+          VERSION=$(pnpm version $BUMP --no-git-tag-version)
+          VERSION=${VERSION#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Next version: $VERSION"
 
       - name: Update version files
+        if: steps.determine_next_version.outputs.release == 'true'
         run: |
-          pnpm version $VERSION --no-git-tag-version
+          pnpm version $VERSION --no-git-tag-version --allow-same-version
           (cd frontend && pnpm version $VERSION --no-git-tag-version)
           mvn -f backend/pom.xml versions:set \
             -DnewVersion=$VERSION \
             -DgenerateBackupPoms=false
 
       - name: Commit & tag release
+        if: steps.determine_next_version.outputs.release == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -57,6 +90,7 @@ jobs:
           git push origin main --tags
 
       - name: Create GitHub release
+        if: steps.determine_next_version.outputs.release == 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
