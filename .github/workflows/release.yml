@@ -34,7 +34,7 @@ jobs:
       - name: Determine next version
         id: determine_next_version
         run: |
-          set -euo pipefail
+          set +e
 
           pnpm dlx semantic-release --dry-run | tee release.log || EXIT_CODE=$?
 
