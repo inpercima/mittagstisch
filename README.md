@@ -12,9 +12,9 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
-* `node 22.20.0` or higher in combination with
-  * `npm 10.9.3` or higher or
-  * `pnpm 10.27.0` or higher, used in this repository
+- `node 22.20.0` or higher in combination with
+    - `npm 10.9.3` or higher or
+    - `pnpm 10.27.0` or higher, used in this repository
 
 Install pnpm by running:
 
@@ -29,7 +29,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-* `@angular/cli 21.1.1` or higher
+- `@angular/cli 21.1.3` or higher
 
 Install @angular/cli by running:
 
@@ -39,11 +39,11 @@ pnpm install -g @angular/cli@21
 
 ### Java
 
-* `jdk 21` or higher
+- `jdk 21` or higher
 
 ### Docker (when running services within docker)
 
-* `docker 28.3.2` or higher
+- `docker 28.3.2` or higher
 
 ## Getting started
 
@@ -101,11 +101,11 @@ Build the backend by using `./mvnw clean package`.
 
 Copy following files to the server:
 
-* `.env`
-* `dump.sql`
-* `docker-compose.yml` and `docker-compose.prod.yml`
-* `mittagstisch-1.0.0-SNAPSHOT.jar`
-* `application-prod.yml`
+- `.env`
+- `dump.sql`
+- `docker-compose.yml` and `docker-compose.prod.yml`
+- `mittagstisch-1.0.0-SNAPSHOT.jar`
+- `application-prod.yml`
 
 Modify the `.env` file for your needs.
 Modify the `application-prod.yml` for your needs.
