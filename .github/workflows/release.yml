@@ -38,12 +38,17 @@ jobs:
 
           pnpm dlx semantic-release --dry-run | tee release.log || EXIT_CODE=$?
 
+          # set default exit code to 0 if not set by semantic-release
+          EXIT_CODE=${EXIT_CODE:-0}
+
+          # if semantic-release exits with code 1 and the log contains "no relevant changes", this is not an error
           if [ "$EXIT_CODE" = "1" ] && grep -q "no relevant changes" release.log; then
             echo "No new changes, no release necessary."
             echo "release=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
+          # run normal exit code check
           if [ "$EXIT_CODE" != "0" ]; then
             echo "Error on semantic-release"
             exit $EXIT_CODE
