@@ -32,8 +32,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Determine next version
+        id: determine_next_version
         run: |
-          set -e
+          set -euo pipefail
 
           if git describe --tags --abbrev=0 >/dev/null 2>&1; then
             LAST_TAG=$(git describe --tags --abbrev=0)
@@ -71,7 +72,7 @@ jobs:
           echo "Next version: $VERSION"
 
       - name: Update version files
-        if: steps.analyze.outputs.release == 'true'
+        if: steps.determine_next_version.outputs.release == 'true'
         run: |
           pnpm version $VERSION --no-git-tag-version
           (cd frontend && pnpm version $VERSION --no-git-tag-version)
@@ -80,7 +81,7 @@ jobs:
             -DgenerateBackupPoms=false
 
       - name: Commit & tag release
-        if: steps.analyze.outputs.release == 'true'
+        if: steps.determine_next_version.outputs.release == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -89,7 +90,7 @@ jobs:
           git push origin main --tags
 
       - name: Create GitHub release
-        if: steps.analyze.outputs.release == 'true'
+        if: steps.determine_next_version.outputs.release == 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
