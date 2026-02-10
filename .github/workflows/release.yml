@@ -42,7 +42,7 @@ jobs:
             | sed -E 's/.* ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 
           echo "Next version: $VERSION"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "release=true" >> $GITHUB_OUTPUT
 
           # if ! grep -q "next release version is" release.log; then
@@ -91,11 +91,11 @@ jobs:
         run: |
 
           # root package.json
-          pnpm version "$VERSION" --no-git-tag-version
+          pnpm version $VERSION --no-git-tag-version
 
           # frontend package.json
           cd frontend
-          pnpm version "$VERSION" --no-git-tag-version
+          pnpm version $VERSION --no-git-tag-version
           cd ..
 
           mvn -f backend/pom.xml versions:set \
