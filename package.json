@@ -22,5 +22,5 @@
   "scripts": {
     "start": "concurrently \"cd backend && ./mvnw\" \"cd frontend && pnpm start\""
   },
-  "version": "1.0.4"
+  "version": "1.0.5"
 }
