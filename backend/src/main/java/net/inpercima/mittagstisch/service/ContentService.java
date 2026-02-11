@@ -92,7 +92,7 @@ public class ContentService {
         String lunchesHtml = items.stream()
                 .map(item -> {
                     return !item.preis().isBlank() ? item.name() + " – " + normalizePrice(item.preis()) : item.name();
-                }).collect(Collectors.joining("<br>"));
+                }).collect(Collectors.joining("<br><br>"));
         return lunchesHtml;
     }
 

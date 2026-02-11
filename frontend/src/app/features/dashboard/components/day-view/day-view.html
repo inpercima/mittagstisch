@@ -14,7 +14,7 @@
         >{{ lunch.status | statusText }}</span
       >
     </div>
-    <p class="text-sm text-slate-700 leading-relaxed">{{ lunch.lunches }}</p>
+    <p class="text-sm text-slate-700 leading-relaxed" [innerHTML]="lunch.lunches"></p>
     <p class="text-xs text-slate-400">
       Aktualisiert am: {{ lunch.importDate | date: 'dd.MM.yyyy' }}
     </p>
