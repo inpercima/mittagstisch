@@ -62,47 +62,39 @@ Change for `production mode` the option `production` to `true`.
 
 ### Table of contents
 
-* [api](#api)
-* [appname](#appname)
-* [defaultRoute](#defaultroute)
-* [production](#production)
-* [theme](#theme)
+- [api](#api)
+- [appname](#appname)
+- [production](#production)
+- [theme](#theme)
 
 ### `api`
 
 Defines the URL to the backend.
 
-* default: `http://localhost:8080/`
-* type: `string`
+- default: `http://localhost:8080/`
+- type: `string`
 
 ### `appname`
 
 Applicationwide title of the app, displayed in title and toolbar.
 
-* default: `Mittagstisch`
-* type: `string`
-
-### `defaultRoute`
-
-The default route and the route to be redirected after a login if no route is stored or if a route does not exist.
-
-* default: `dashboard`
-* type: `string`
+- default: `Mittagstisch`
+- type: `string`
 
 ### `production`
 
 Defines whether the app is in production or not.
 
-* default: `false`
-* type: `boolean`
-* values: `true`/`false`
+- default: `false`
+- type: `boolean`
+- values: `true`/`false`
 
 ### `theme`
 
 Name of a pre-build-theme or a custom theme.
 
-* default: `rose-red`
-* type: `string`
-* values: `rose-red`/`azure-blue`/`magenta-violet`/`cyan-orange`/`custom`
+- default: `rose-red`
+- type: `string`
+- values: `rose-red`/`azure-blue`/`magenta-violet`/`cyan-orange`/`custom`
 
 To modify the custom theme just edit the colors and themes in `themes.scss`.

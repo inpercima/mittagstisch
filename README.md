@@ -13,8 +13,8 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
 - `node 22.20.0` or higher in combination with
-    - `npm 10.9.3` or higher or
-    - `pnpm 10.27.0` or higher, used in this repository
+  - `npm 10.9.3` or higher or
+  - `pnpm 10.27.0` or higher, used in this repository
 
 Install pnpm by running:
 
@@ -104,7 +104,7 @@ Copy following files to the server:
 - `.env`
 - `dump.sql`
 - `docker-compose.yml` and `docker-compose.prod.yml`
-- `mittagstisch-1.0.0-SNAPSHOT.jar`
+- `mittagstisch-<VERSION>-SNAPSHOT.jar`
 - `application-prod.yml`
 
 Modify the `.env` file for your needs.
