@@ -1,7 +1,6 @@
 export const environment = {
-  api: 'http://mittagstisch.inpercima.net/api/',
+  api: './api/',
   appname: 'Mittagstisch',
-  defaultRoute: 'dashboard',
   production: true,
   theme: 'azure-blue',
 };
