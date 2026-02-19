@@ -5,7 +5,7 @@
     [ngClass]=" lunch.status | statusBoxClass"
   >
     <div class="flex items-start justify-between">
-      <a class="text-lg font-semibold hover:underline" [href]="lunch.bistro.url"
+      <a class="text-lg font-semibold hover:underline" target="_blank" rel="noopener noreferrer" [href]="lunch.bistro.url"
         >{{ lunch.bistro.name }}</a
       >
       <span
