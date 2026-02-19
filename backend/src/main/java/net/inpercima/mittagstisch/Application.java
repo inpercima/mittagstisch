@@ -1,8 +1,5 @@
 package net.inpercima.mittagstisch;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -11,8 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -49,17 +46,6 @@ public class Application {
         return (request, status, model) -> status == HttpStatus.NOT_FOUND
                 ? new ModelAndView("forward:/index.html", Collections.<String, Object>emptyMap(), HttpStatus.OK)
                 : null;
-    }
-
-    @Bean
-    public static String bistroJsoInputStream() {
-        final InputStream inputStream = Application.class.getClassLoader().getResourceAsStream("bistro.json");
-        try {
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            log.error("Reading configuration file 'bistro.json' failed.");
-            return "";
-        }
     }
 
     @Bean

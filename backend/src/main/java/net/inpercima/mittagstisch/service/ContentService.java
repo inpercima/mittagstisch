@@ -1,8 +1,6 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
