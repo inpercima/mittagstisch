@@ -9,7 +9,6 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import net.inpercima.mittagstisch.entity.BistroEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +16,9 @@ public class AiService {
 
   private final ChatClient chatClient;
 
-  public String extractLunches(String content, LocalDate date, final BistroEntity bistro) {
-    Prompt prompt = build(content, date, bistro);
+  public String extractLunches(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
+      LocalDate tomorrow) {
+    Prompt prompt = build(content, weekStartDate, weekEndDate, today, tomorrow);
     return analyze(prompt);
   }
 
@@ -28,43 +28,70 @@ public class AiService {
         .call().content();
   }
 
-  private Prompt build(String content, LocalDate date, final BistroEntity bistro) {
+  private Prompt build(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
+      LocalDate tomorrow) {
     String template = """
         Rolle:
         Du bist ein Parser für Mittagsmenüs.
+
         Aufgabe:
-        Extrahiere aus dem gegebenen Text die Mittagsgerichte von Montag bis Freitag für den angegebenen Tag in einer Wochenübersicht.
-        Informationen:
-        Es ist immer eine Überschrift für die Woche enthalten.
-        Sie kann folgendermaßen aussehen: "Speiseplan vom 01.12.-05.12.2025" oder "Mittagstisch KW 49/2025" oder "Wochenkarte".
-        Die Tage sind in der Regel mit dem Wochentag benannt, z.B. "Montag", "Dienstag" usw. oder abgekürzt "Mo", "Di" usw.
-        Anweisungen:
+        Extrahiere aus dem gegebenen Text die Mittagsgerichte für {today} und {tomorrow}.
+        Ermittle dazu die gültige Wocheninformation, die unterschiedlich auf den Webseiten stehen kann, z.B.:
+        - "Speiseplan vom 01.12.-05.12.2025"
+        - Mo 16.2., Di 17.2.
+        - Mittwoch, 25. Februar 2026
+        Speichere den Anfang der Woche als weekStartDate und das Ende der Woche als weekEndDate ab, um zu prüfen, ob die Woche aktuell, veraltet oder in der Zukunft liegt.
+        Ist das nicht ermittelbar, setze weekStartDate auf {weekStartDate} und weekEndDate auf {weekEndDate}.
+
+        Die Tage sind benannt als:
+        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
+
+        Ausgabeformat:
         - Nutze folgendes JSON-Format für die Ausgabe:
         {{
-          "content": string,
-          "status": string
+          today:
+          {{
+            "content": string,
+            "status": string
+          }}
+        }},
+        {{
+          tomorrow:
+          {{
+            "content": string,
+            "status": string
+          }}
         }}
-        - Prüfe, ob der heutige Tag innerhalb der angegebenen Woche liegt (heute ist {today}).
-        - Wenn der heutige Tag vor der angegebenen Woche liegt, gib im Feld "content" den Wert "[]" und im Feld "status" den Wert "OUTDATED" zurück.
-        - Wenn der heutige Tag nach der angegebenen Woche liegt, gib im Feld "content" den Wert "[]" und im Feld "status" den Wert "NEXT_WEEK" zurück.
-        - Wenn der heutige Tag innerhalb der angegebenen Woche liegt, extrahiere die Gerichte für diesen Tag.
-        - Gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück:
+
+        Status-Regeln:
+        - wenn {today} > weekEndDate → OUTDATED
+        - wenn {today} < weekStartDate → NEXT_WEEK
+        - wenn weekStartDate ≤ {today} ≤ weekEndDate → Woche ist aktuell → weiter prüfen
+        - suche den Abschnitt für {today}
+        - suche den Abschnitt für {tomorrow}
+        - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
+        - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
         [
           {{ "name": string, "preis": string }}
         ]
-        - Setze für das Feld "status" den Wert "SUCCESS", wenn Gerichte gefunden wurden.
-        - Wurden keine Gerichte gefunden, setzte für das Feld "status" den Wert "NO_DATA".
+        - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
+
         WICHTIG:
-        - Gib das Feld "content" als echtes JSON-Array zurück
-        - Das Feld darf KEIN String sein
-        - Verwende KEINE Escapes
+        - content ist ein echtes JSON-Array
+        - keine Strings statt Array
+        - eine Erklärung
+        - kein zusätzlicher Text
+
         Text:
         {content}
         """;
 
     PromptTemplate promptTemplate = new PromptTemplate(template);
     Prompt prompt = promptTemplate.create(Map.of(
-        "today", date.toString(),
+        "weekStartDate", weekStartDate.toString(),
+        "weekEndDate", weekEndDate.toString(),
+        "today", today.toString(),
+        "tomorrow", tomorrow.toString(),
         "content", content));
     return prompt;
   }

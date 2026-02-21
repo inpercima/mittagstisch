@@ -1,6 +1,8 @@
 package net.inpercima.mittagstisch.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -44,29 +46,43 @@ public class LunchService {
     }
 
     public void importLunches() {
-        for (Day day : Day.values()) {
-            for (BistroEntity bistro : bistroService.findAll()) {
-                String text = contentService.extractText(bistro.getUrl(), bistro.getSelector());
-                String lunches = aiService.extractLunches(text,
-                        day == Day.TODAY ? LocalDate.now() : LocalDate.now().plusDays(1),
-                        bistro);
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+
+        LocalDate weekStartDate = today.with(DayOfWeek.MONDAY);
+        LocalDate weekEndDate = today.with(DayOfWeek.FRIDAY);
+
+        for (BistroEntity bistro : bistroService.findAll()) {
+            String content = contentService.extractText(bistro.getUrl(), bistro.getSelector());
+            String lunches = aiService.extractLunches(content,
+                    weekStartDate, weekEndDate, today, tomorrow);
+            List<LunchEntity> lunchEntities = new ArrayList<>();
+            try {
+                lunchEntities = contentService.prepareLunchEntities(lunches);
+            } catch (Exception e) {
+                log.error("Error preparing lunch entity for bistro {}: {}", bistro.getName(), e.getMessage());
                 LunchEntity lunchEntity = new LunchEntity();
-                try {
-                    lunchEntity = contentService.prepareLunchEntity(lunches);
-                } catch (Exception e) {
-                    log.error("Error preparing lunch entity for bistro {}: {}", bistro.getName(), e.getMessage());
-                    lunchEntity.setLunches("Für heute liegen leider keine Informationen vor.");
-                    lunchEntity.setStatus(Status.NO_DATA);
-                }
+                lunchEntity.setStatus(Status.NO_DATA);
+                lunchEntity.setDay(Day.TODAY);
+                lunchEntities.add(lunchEntity);
+
+                lunchEntity = new LunchEntity();
+                lunchEntity.setStatus(Status.NO_DATA);
+                lunchEntity.setDay(Day.TOMORROW);
+                lunchEntities.add(lunchEntity);
+            }
+            for (LunchEntity lunchEntity : lunchEntities) {
                 if (lunchEntity.getStatus() == Status.NEXT_WEEK) {
                     lunchEntity.setLunches("Die Speisekarte ist bereits für die nächste Woche verfügbar.");
                 }
                 if (lunchEntity.getStatus() == Status.OUTDATED) {
                     lunchEntity.setLunches("Die Speisekarte ist noch von letzter Woche.");
                 }
+                if (lunchEntity.getStatus() == Status.NO_DATA) {
+                    lunchEntity.setLunches("Für heute liegen leider keine Informationen vor.");
+                }
                 lunchEntity.setBistro(bistro);
                 lunchEntity.setImportDate(LocalDate.now());
-                lunchEntity.setDay(day);
                 lunchRepository.save(lunchEntity);
             }
         }

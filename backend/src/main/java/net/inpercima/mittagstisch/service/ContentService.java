@@ -1,10 +1,13 @@
 package net.inpercima.mittagstisch.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.inpercima.mittagstisch.entity.LunchEntity;
+import net.inpercima.mittagstisch.model.Day;
 import net.inpercima.mittagstisch.model.LunchAiItemDto;
 import net.inpercima.mittagstisch.model.Status;
 
@@ -21,14 +25,21 @@ public class ContentService {
 
     public String extractText(String url, String selector) {
         try {
-            final var doc = Jsoup.connect(url).get();
-            return doc.select(selector).text();
+            Document doc = Jsoup.connect(url).get();
+            Element content = doc.selectFirst(selector);
+            if (content == null) {
+                return "";
+            }
+
+            content.select("img, picture, source, script, style").remove();
+
+            return content.wholeText().replaceAll("\\n{2,}", "\n").trim();
         } catch (IOException e) {
             return "";
         }
     }
 
-    public LunchEntity prepareLunchEntity(String lunchesJson) throws Exception {
+    public List<LunchEntity> prepareLunchEntities(String lunchesJson) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         JsonNode root;
@@ -38,20 +49,30 @@ public class ContentService {
             throw new Exception("Invalid root JSON", e);
         }
 
-        JsonNode contentNode = root.get("content");
+        List<LunchEntity> result = new ArrayList<>();
+
+        result.add(parseDayNode(mapper, root.path("today"), Day.TODAY));
+        result.add(parseDayNode(mapper, root.path("tomorrow"), Day.TOMORROW));
+
+        return result;
+    }
+
+    private LunchEntity parseDayNode(ObjectMapper mapper, JsonNode dayNode, Day day) throws Exception {
+        JsonNode contentNode = dayNode.get("content");
         List<LunchAiItemDto> items = extractContentItems(mapper, contentNode);
 
         Status status;
         try {
-            status = Status.valueOf(root.path("status").asText());
+            status = Status.valueOf(dayNode.path("status").asText());
         } catch (Exception e) {
-            throw new Exception("Invalid status value: " + root.path("status").asText(), e);
+            throw new Exception("Invalid status value for " + day + ": " + dayNode.path("status").asText(), e);
         }
 
         String lunches = joinNameAndPrice(items);
         LunchEntity entity = new LunchEntity();
         entity.setLunches(lunches);
         entity.setStatus(status);
+        entity.setDay(day);
 
         return entity;
     }
