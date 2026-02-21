@@ -1,3 +1,4 @@
+@if(lunches().length) {
 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
   @for (lunch of lunches(); track lunch) {
   <div
@@ -5,7 +6,11 @@
     [ngClass]=" lunch.status | statusBoxClass"
   >
     <div class="flex items-start justify-between">
-      <a class="text-lg font-semibold hover:underline" target="_blank" rel="noopener noreferrer" [href]="lunch.bistro.url"
+      <a
+        class="text-lg font-semibold hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+        [href]="lunch.bistro.url"
         >{{ lunch.bistro.name }}</a
       >
       <span
@@ -21,3 +26,15 @@
   </div>
   }
 </div>
+} @else {
+<p class="text-center text-slate-500">Keine Mittagsangebote verfügbar.</p>
+@if(isWeekend()) {
+<p class="text-center text-slate-500">
+  Es ist Wochenende, an diesen Tagen werden keine Mittagsangebote gesammelt und angezeigt.
+</p>
+} @else {
+<p class="text-center text-slate-500">
+  Von Montag bis Freitag werden täglich 10 Uhr die Mittagsangebote der umliegenden Bistros gesammelt
+  und hier angezeigt.
+</p>
+} }

@@ -15,9 +15,10 @@ public class ScheduledTasks {
 
     /**
      * Scheduled task to import lunch data automatically.
-     * Runs every day at 10:00 AM Berlin time to prepare data before lunch hours.
+     * Runs from Monday to Friday at 10:00 AM Berlin time to prepare data before
+     * lunch hours.
      */
-    @Scheduled(cron = "0 0 10 * * *", zone = "Europe/Berlin")
+    @Scheduled(cron = "0 0 10 * * MON-FRI", zone = "Europe/Berlin")
     public void scheduledLunchImport() {
         log.info("Starting scheduled lunch import task");
         try {
