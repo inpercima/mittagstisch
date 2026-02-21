@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,8 +23,13 @@ public class ContentService {
 
     public String extractText(String url, String selector) {
         try {
-            final var doc = Jsoup.connect(url).get();
-            return doc.select(selector).text();
+            Document doc = Jsoup.connect(url).get();
+            Element content = doc.selectFirst(selector);
+            if (content == null) return "";
+
+            content.select("img, picture, source, script, style").remove();
+
+            return content.wholeText().replaceAll("\\n{2,}", "\n").trim();
         } catch (IOException e) {
             return "";
         }

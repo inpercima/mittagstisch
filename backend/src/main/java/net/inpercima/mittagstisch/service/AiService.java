@@ -9,7 +9,6 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import net.inpercima.mittagstisch.entity.BistroEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +16,8 @@ public class AiService {
 
   private final ChatClient chatClient;
 
-  public String extractLunches(String content, LocalDate date, final BistroEntity bistro) {
-    Prompt prompt = build(content, date, bistro);
+  public String extractLunches(String content, LocalDate weekStartDate, LocalDate weekEndDate, String todayWeekday, String tomorrowWeekDay) {
+    Prompt prompt = build(content, weekStartDate, weekEndDate, todayWeekday, tomorrowWeekDay);
     return analyze(prompt);
   }
 
@@ -28,43 +27,72 @@ public class AiService {
         .call().content();
   }
 
-  private Prompt build(String content, LocalDate date, final BistroEntity bistro) {
+  private Prompt build(String content, LocalDate weekStartDate, LocalDate weekEndDate, String todayWeekday, String tomorrowWeekDay) {
     String template = """
         Rolle:
         Du bist ein Parser für Mittagsmenüs.
+
+        Gegebene Parameter:
+        weekStartDate: {weekStartDate}
+        weekEndDate: {weekEndDate}
+        todayWeekday: {todayWeekday}
+        tomorrowWeekday: {tomorrowWeekday}
+
         Aufgabe:
-        Extrahiere aus dem gegebenen Text die Mittagsgerichte von Montag bis Freitag für den angegebenen Tag in einer Wochenübersicht.
-        Informationen:
-        Es ist immer eine Überschrift für die Woche enthalten.
-        Sie kann folgendermaßen aussehen: "Speiseplan vom 01.12.-05.12.2025" oder "Mittagstisch KW 49/2025" oder "Wochenkarte".
-        Die Tage sind in der Regel mit dem Wochentag benannt, z.B. "Montag", "Dienstag" usw. oder abgekürzt "Mo", "Di" usw.
-        Anweisungen:
+        Extrahiere aus dem gegebenen Text die Mittagsgerichte für todayWeekday und tomorrowWeekday.
+
+        Die Wocheninformationen werden unterschiedlich gegeben, z.B.:
+        "Speiseplan vom 01.12.-05.12.2025"
+        Mo 16.2., Di 17.2.
+        Mittwoch, 25. Februar 2026
+        Die Tage sind benannt als:
+        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
+
+        Ausgabeformat:
         - Nutze folgendes JSON-Format für die Ausgabe:
         {{
+          today: {{
+          "content": string,
+          "status": string
+        }},
+        {{
+          tomorrow: {{
           "content": string,
           "status": string
         }}
-        - Prüfe, ob der heutige Tag innerhalb der angegebenen Woche liegt (heute ist {today}).
-        - Wenn der heutige Tag vor der angegebenen Woche liegt, gib im Feld "content" den Wert "[]" und im Feld "status" den Wert "OUTDATED" zurück.
-        - Wenn der heutige Tag nach der angegebenen Woche liegt, gib im Feld "content" den Wert "[]" und im Feld "status" den Wert "NEXT_WEEK" zurück.
-        - Wenn der heutige Tag innerhalb der angegebenen Woche liegt, extrahiere die Gerichte für diesen Tag.
+
+        Status-Regeln:
+        - wenn Gerichte gefunden -> "SUCCESS"
+        - wenn kein Abschnitt gefunden -> "NO_DATA"
+        - wenn die Woche vor weekStartDate liegt -> "OUTDATED"
+        - wenn die Woche nach weekEndDate liegt -> "NEXT_WEEK"
+
+        - Prüfe, ob der Datumsbereich für weekStartDate bis weekEndDate passt.
+        - Suche den Abschnitt für todayWeekday.
+        - Suche den Abschnitt für tomorrowWeekday.
+        - Wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
         - Gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück:
         [
           {{ "name": string, "preis": string }}
         ]
-        - Setze für das Feld "status" den Wert "SUCCESS", wenn Gerichte gefunden wurden.
-        - Wurden keine Gerichte gefunden, setzte für das Feld "status" den Wert "NO_DATA".
+        - Wenn kein Abschnitt gefdunden wurde, gib im Feld "content" ein leeres Array [] zurück.
+
         WICHTIG:
-        - Gib das Feld "content" als echtes JSON-Array zurück
-        - Das Feld darf KEIN String sein
-        - Verwende KEINE Escapes
+        - content ist ein echtes JSON-Array
+        - keine Strings statt Array
+        - eine Erklärung
+        - kein zusätzlicher Text
+      
         Text:
         {content}
         """;
 
     PromptTemplate promptTemplate = new PromptTemplate(template);
     Prompt prompt = promptTemplate.create(Map.of(
-        "today", date.toString(),
+        "weekStartDate", weekStartDate.toString(),
+        "weekEndDate", weekEndDate.toString(),
+        "todayWeekday", todayWeekday,
+        "tomorrowWeekDate", tomorrowWeekDay,
         "content", content));
     return prompt;
   }
