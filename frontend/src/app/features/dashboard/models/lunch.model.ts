@@ -1,9 +1,10 @@
 import { BistroModel } from './bistro.model';
+import { DishModel } from './dish.model';
 
 export type LunchModel = {
   bistro: BistroModel;
 
-  lunches: string;
+  dishes: DishModel[];
 
   status: string;
 
