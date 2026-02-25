@@ -1,10 +1,11 @@
 package net.inpercima.mittagstisch.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record LunchDto(
         BistroDto bistro,
-        String lunches,
-        Status status,
+        List<DishDto> dishes,
+        StatusEnum status,
         LocalDate importDate) {
 }

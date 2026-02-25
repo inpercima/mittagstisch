@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import net.inpercima.mittagstisch.model.Day;
+import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.LunchDto;
 import net.inpercima.mittagstisch.service.LunchService;
 
@@ -20,12 +20,12 @@ public class BaseController {
 
     @GetMapping("/today")
     public List<LunchDto> getToday() {
-        return lunchService.getDataByDay(Day.TODAY);
+        return lunchService.getDataByDay(DayEnum.TODAY);
     }
 
     @GetMapping("/tomorrow")
     public List<LunchDto> getTomorrow() {
-        return lunchService.getDataByDay(Day.TOMORROW);
+        return lunchService.getDataByDay(DayEnum.TOMORROW);
     }
 
     @GetMapping("/data")

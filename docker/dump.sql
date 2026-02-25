@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Erstellungszeit: 19. Feb 2026 um 20:41
+-- Erstellungszeit: 25. Feb 2026 um 22:00
 -- Server-Version: 8.0.44
 -- PHP-Version: 8.3.30
 
@@ -55,7 +55,7 @@ CREATE TABLE `lunch` (
   `bistro_id` int NOT NULL,
   `id` int NOT NULL,
   `import_date` date NOT NULL,
-  `lunches` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dishes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `day` enum('TODAY','TOMORROW') COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` enum('OUTDATED','NEXT_WEEK','SUCCESS','NO_DATA') COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

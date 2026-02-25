@@ -1,6 +1,6 @@
 package net.inpercima.mittagstisch.model;
 
-public enum Status {
+public enum StatusEnum {
     OUTDATED,
     NEXT_WEEK,
     SUCCESS,

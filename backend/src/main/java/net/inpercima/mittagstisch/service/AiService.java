@@ -16,7 +16,7 @@ public class AiService {
 
   private final ChatClient chatClient;
 
-  public String extractLunches(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
+  public String extractDishes(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
       LocalDate tomorrow) {
     Prompt prompt = build(content, weekStartDate, weekEndDate, today, tomorrow);
     return analyze(prompt);
@@ -72,7 +72,7 @@ public class AiService {
         - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
         - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
         [
-          {{ "name": string, "preis": string }}
+          {{ "name": string, "price": string }}
         ]
         - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
 

@@ -1,6 +1,6 @@
 package net.inpercima.mittagstisch.model;
 
-public record LunchAiItemDto(
+public record DishDto(
         String name,
-        String preis) {
+        String price) {
 }

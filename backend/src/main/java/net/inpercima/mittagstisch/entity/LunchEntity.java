@@ -15,8 +15,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.inpercima.mittagstisch.model.Day;
-import net.inpercima.mittagstisch.model.Status;
+import net.inpercima.mittagstisch.model.DayEnum;
+import net.inpercima.mittagstisch.model.StatusEnum;
 
 @Entity
 @Table(name = "lunch")
@@ -31,18 +31,18 @@ public class LunchEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Day day;
+  private DayEnum day;
 
   @ManyToOne(fetch = FetchType.EAGER)
   private BistroEntity bistro;
 
   @Column(nullable = false)
-  private String lunches;
+  private String dishes;
 
   @Column(nullable = false)
   private LocalDate importDate;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Status status;
+  private StatusEnum status;
 }

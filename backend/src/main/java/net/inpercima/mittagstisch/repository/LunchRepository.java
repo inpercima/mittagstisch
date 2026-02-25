@@ -7,12 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import net.inpercima.mittagstisch.entity.LunchEntity;
-import net.inpercima.mittagstisch.model.Day;
+import net.inpercima.mittagstisch.model.DayEnum;
 
 public interface LunchRepository extends JpaRepository<LunchEntity, Long> {
 
     List<LunchEntity> findByImportDateAndDay(
             LocalDate importDate,
-            Day day,
+            DayEnum day,
             Pageable pageable);
 }

@@ -1,6 +1,6 @@
 package net.inpercima.mittagstisch.model;
 
-public enum Day {
+public enum DayEnum {
     TODAY,
     TOMORROW,
 }
