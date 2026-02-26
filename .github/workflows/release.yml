@@ -107,7 +107,9 @@ jobs:
           distribution: "temurin"
 
       - name: Build backend JAR
-        run: ./mvnw -f backend/pom.xml clean package -Pprod -DskipTests
+        run: |
+          cd backend
+          ./mvnw clean package -Pprod -DskipTests
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
