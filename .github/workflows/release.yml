@@ -72,11 +72,8 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "release=true" >> $GITHUB_OUTPUT
 
-      - name: Stop if no release
-        if: steps.version.outputs.release != 'true'
-        run: exit 0
-
       - name: Update versions in files
+        if: steps.version.outputs.release == 'true'
         run: |
           # root package.json
           pnpm version "$VERSION" --no-git-tag-version
@@ -92,6 +89,7 @@ jobs:
             -DgenerateBackupPoms=false
 
       - name: Commit and tag release
+        if: steps.version.outputs.release == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -101,17 +99,20 @@ jobs:
           git push origin main --tags
 
       - name: Set up JDK 21
+        if: steps.version.outputs.release == 'true'
         uses: actions/setup-java@v5
         with:
           java-version: "21"
           distribution: "temurin"
 
       - name: Build backend JAR
+        if: steps.version.outputs.release == 'true'
         run: |
           cd backend
           ./mvnw clean package -Pprod -DskipTests
 
       - name: Create GitHub release
+        if: steps.version.outputs.release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
