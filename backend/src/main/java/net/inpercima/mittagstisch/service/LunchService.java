@@ -36,7 +36,7 @@ public class LunchService {
     private final AiService aiService;
 
     public List<LunchDto> getDataByDay(DayEnum day) {
-        final Pageable top = PageRequest.of(0, (int) bistroService.count(), Sort.by("id").descending());
+        final Pageable top = PageRequest.of(0, (int) bistroService.count(), Sort.by("id").ascending());
         System.out.println("Fetching lunches with pageable: " + top);
         return lunchRepository.findByImportDateAndDay(LocalDate.now(), day, top)
                 .stream()
