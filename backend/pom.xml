@@ -169,6 +169,23 @@
             <version>3.1.0</version>
             <executions>
               <execution>
+                <id>pnpm-install</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>pnpm</executable>
+                  <arguments>
+                    <argument>--dir</argument>
+                    <argument>../frontend</argument>
+                    <argument>install</argument>
+                    <argument>--frozen-lockfile</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <execution>
                 <id>build-frontend</id>
                 <phase>generate-resources</phase>
                 <goals>
