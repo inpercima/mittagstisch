@@ -110,30 +110,6 @@
           </excludes>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.0</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/public</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../frontend/dist/mittagstisch/browser</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
 
     <resources>
@@ -174,6 +150,8 @@
       <id>prod</id>
       <build>
         <plugins>
+
+          <!-- Spring Boot with prod profile -->
           <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
@@ -182,6 +160,56 @@
                 <profile>prod</profile>
               </profiles>
             </configuration>
+          </plugin>
+
+          <!-- Frontend Build -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>build-frontend</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>pnpm</executable>
+                  <arguments>
+                    <argument>--dir</argument>
+                    <argument>../frontend</argument>
+                    <argument>run</argument>
+                    <argument>build:prod</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Copy Angular dist in JAR -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.3.0</version>
+            <executions>
+              <execution>
+                <id>copy-frontend</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}/public</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>../frontend/dist/mittagstisch/browser</directory>
+                      <filtering>false</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
