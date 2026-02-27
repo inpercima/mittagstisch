@@ -70,53 +70,57 @@ public class LunchService {
     public void importLunches() {
         final LocalDate today = LocalDate.now();
         final LocalDate tomorrow = today.plusDays(1);
-
         final LocalDate weekStartDate = today.with(DayOfWeek.MONDAY);
         final LocalDate weekEndDate = today.with(DayOfWeek.FRIDAY);
+        bistroService.findAll().forEach(bistro -> importBistroLunches(bistro, today, tomorrow, weekStartDate, weekEndDate));
+    }
 
-        for (BistroEntity bistro : bistroService.findAll()) {
-            String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
-            String dishes = aiService.extractDishes(lunch,
-                    weekStartDate, weekEndDate, today, tomorrow);
-            List<LunchEntity> lunchEntities = new ArrayList<>();
-            try {
-                lunchEntities = contentService.prepareLunchEntities(dishes);
-            } catch (Exception e) {
-                log.error("Error preparing lunch entity for bistro {}: {}", bistro.getName(), e.getMessage());
-                LunchEntity lunchEntity = new LunchEntity();
-                lunchEntity.setStatus(StatusEnum.NO_DATA);
-                lunchEntity.setDay(DayEnum.TODAY);
-                lunchEntities.add(lunchEntity);
+    private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart, LocalDate weekEnd) {
+        String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
+        String dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+        List<LunchEntity> entities = parseLunchEntities(dishes, bistro.getName());
+        entities.forEach(entity -> persistLunchEntity(entity, bistro, today, tomorrow));
+    }
 
-                lunchEntity = new LunchEntity();
-                lunchEntity.setStatus(StatusEnum.NO_DATA);
-                lunchEntity.setDay(DayEnum.TOMORROW);
-                lunchEntities.add(lunchEntity);
-            }
-            for (LunchEntity lunchEntity : lunchEntities) {
-                if (lunchEntity.getStatus() == StatusEnum.NEXT_WEEK) {
-                    LocalDate nextMonday = today.plusWeeks(1).with(DayOfWeek.MONDAY);
-                    LocalDate nextFriday = today.plusWeeks(1).with(DayOfWeek.FRIDAY);
-                    lunchEntity.setDishes("Die Speisekarte ist bereits für die nächste Woche verfügbar (" + formatDateRange(nextMonday, nextFriday) + ").");
-                }
-                if (lunchEntity.getStatus() == StatusEnum.OUTDATED) {
-                    LocalDate prevMonday = today.minusWeeks(1).with(DayOfWeek.MONDAY);
-                    LocalDate prevFriday = today.minusWeeks(1).with(DayOfWeek.FRIDAY);
-                    lunchEntity.setDishes("Die Speisekarte ist noch von letzter Woche (" + formatDateRange(prevMonday, prevFriday) + ").");
-                }
-                if (lunchEntity.getStatus() == StatusEnum.NO_DATA) {
-                    LocalDate date = resolveDate(lunchEntity.getDay(), today, tomorrow);
-                    lunchEntity.setDishes("Für den " + formatDate(date) + " liegen leider keine Informationen vor.");
-                }
-                lunchEntity.setBistro(bistro);
-                lunchEntity.setImportDate(LocalDate.now());
-                lunchRepository.save(lunchEntity);
-            }
+    private List<LunchEntity> parseLunchEntities(String dishes, String bistroName) {
+        try {
+            return contentService.prepareLunchEntities(dishes);
+        } catch (Exception e) {
+            log.error("Error preparing lunch entity for bistro {}: {}", bistroName, e.getMessage());
+            return createNoDataEntities();
         }
     }
 
-    private LocalDate resolveDate(DayEnum day, LocalDate today, LocalDate tomorrow) {
-        return day == DayEnum.TOMORROW ? tomorrow : today;
+    private static List<LunchEntity> createNoDataEntities() {
+        List<LunchEntity> entities = new ArrayList<>();
+        for (DayEnum day : DayEnum.values()) {
+            LunchEntity entity = new LunchEntity();
+            entity.setStatus(StatusEnum.NO_DATA);
+            entity.setDay(day);
+            entities.add(entity);
+        }
+        return entities;
+    }
+
+    private void persistLunchEntity(LunchEntity entity, BistroEntity bistro, LocalDate today, LocalDate tomorrow) {
+        String message = buildStatusMessage(entity.getStatus(), entity.getDay(), today, tomorrow);
+        if (message != null) {
+            entity.setDishes(message);
+        }
+        entity.setBistro(bistro);
+        entity.setImportDate(LocalDate.now());
+        lunchRepository.save(entity);
+    }
+
+    String buildStatusMessage(StatusEnum status, DayEnum day, LocalDate today, LocalDate tomorrow) {
+        return switch (status) {
+            case NEXT_WEEK -> "Die Speisekarte ist bereits für die nächste Woche verfügbar ("
+                    + formatDateRange(today.plusWeeks(1).with(DayOfWeek.MONDAY), today.plusWeeks(1).with(DayOfWeek.FRIDAY)) + ").";
+            case OUTDATED -> "Die Speisekarte ist noch von letzter Woche ("
+                    + formatDateRange(today.minusWeeks(1).with(DayOfWeek.MONDAY), today.minusWeeks(1).with(DayOfWeek.FRIDAY)) + ").";
+            case NO_DATA -> "Für den " + formatDate(day == DayEnum.TOMORROW ? tomorrow : today) + " liegen leider keine Informationen vor.";
+            default -> null;
+        };
     }
 
     private String formatDate(LocalDate date) {
