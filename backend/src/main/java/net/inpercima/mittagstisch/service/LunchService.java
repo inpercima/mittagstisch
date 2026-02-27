@@ -2,6 +2,7 @@ package net.inpercima.mittagstisch.service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,8 @@ import net.inpercima.mittagstisch.repository.LunchRepository;
 @Service
 @AllArgsConstructor
 public class LunchService {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private final LunchRepository lunchRepository;
     private final BistroService bistroService;
@@ -92,18 +95,35 @@ public class LunchService {
             }
             for (LunchEntity lunchEntity : lunchEntities) {
                 if (lunchEntity.getStatus() == StatusEnum.NEXT_WEEK) {
-                    lunchEntity.setDishes("Die Speisekarte ist bereits für die nächste Woche verfügbar.");
+                    LocalDate nextMonday = today.plusWeeks(1).with(DayOfWeek.MONDAY);
+                    LocalDate nextFriday = today.plusWeeks(1).with(DayOfWeek.FRIDAY);
+                    lunchEntity.setDishes("Die Speisekarte ist bereits für die nächste Woche verfügbar (" + formatDateRange(nextMonday, nextFriday) + ").");
                 }
                 if (lunchEntity.getStatus() == StatusEnum.OUTDATED) {
-                    lunchEntity.setDishes("Die Speisekarte ist noch von letzter Woche.");
+                    LocalDate prevMonday = today.minusWeeks(1).with(DayOfWeek.MONDAY);
+                    LocalDate prevFriday = today.minusWeeks(1).with(DayOfWeek.FRIDAY);
+                    lunchEntity.setDishes("Die Speisekarte ist noch von letzter Woche (" + formatDateRange(prevMonday, prevFriday) + ").");
                 }
                 if (lunchEntity.getStatus() == StatusEnum.NO_DATA) {
-                    lunchEntity.setDishes("Für heute liegen leider keine Informationen vor.");
+                    LocalDate date = resolveDate(lunchEntity.getDay(), today, tomorrow);
+                    lunchEntity.setDishes("Für den " + formatDate(date) + " liegen leider keine Informationen vor.");
                 }
                 lunchEntity.setBistro(bistro);
                 lunchEntity.setImportDate(LocalDate.now());
                 lunchRepository.save(lunchEntity);
             }
         }
+    }
+
+    private LocalDate resolveDate(DayEnum day, LocalDate today, LocalDate tomorrow) {
+        return day == DayEnum.TOMORROW ? tomorrow : today;
+    }
+
+    private String formatDate(LocalDate date) {
+        return date.format(DATE_FORMATTER);
+    }
+
+    private String formatDateRange(LocalDate start, LocalDate end) {
+        return formatDate(start) + " bis " + formatDate(end);
     }
 }
