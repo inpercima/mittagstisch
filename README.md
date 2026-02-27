@@ -2,9 +2,7 @@
 
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
 
-The lunch in your area. Based on Leipzig (Plagwitz, Lindenau).
-
-This project was generated with [swaaplate](https://github.com/inpercima/swaaplate) version 2.5.3.
+Daily lunches from bistros in western Leipzig (Plagwitz and Lindenau) automatically collected and clearly displayed.
 
 ## Prerequisites
 
@@ -12,14 +10,14 @@ This project was generated with [swaaplate](https://github.com/inpercima/swaapla
 
 It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
-- `node 22.20.0` or higher in combination with
-  - `npm 10.9.3` or higher or
-  - `pnpm 10.27.0` or higher, used in this repository
+- `node 24.14.0` or higher in combination with
+  - `npm 11.9.0` or higher or
+  - `pnpm 10.30.3` or higher, used in this repository
 
 Install pnpm by running:
 
 ```bash
-npm install -g pnpm@10.27.0
+npm install -g pnpm@10.30.3
 ```
 
 ### Info for npm and pnpm
@@ -29,7 +27,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-- `@angular/cli 21.1.3` or higher
+- `@angular/cli 21.2.0` or higher
 
 Install @angular/cli by running:
 
