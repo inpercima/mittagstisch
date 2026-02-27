@@ -6,14 +6,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,23 +72,24 @@ public class LunchService {
         final LocalDate tomorrow = today.plusDays(1);
         final LocalDate weekStartDate = today.with(DayOfWeek.MONDAY);
         final LocalDate weekEndDate = today.with(DayOfWeek.FRIDAY);
-        bistroService.findAll().forEach(bistro -> importBistroLunches(bistro, today, tomorrow, weekStartDate, weekEndDate));
+        bistroService.findAll()
+                .forEach(bistro -> importBistroLunches(bistro, today, tomorrow, weekStartDate, weekEndDate));
     }
 
-    private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart, LocalDate weekEnd) {
+    private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart,
+            LocalDate weekEnd) {
         String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
         String dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
-        List<LunchEntity> entities = parseLunchEntities(dishes, bistro.getName());
-        entities.forEach(entity -> persistLunchEntity(entity, bistro, today, tomorrow));
-    }
+        List<LunchEntity> lunches = new ArrayList<>();
 
-    private List<LunchEntity> parseLunchEntities(String dishes, String bistroName) {
         try {
-            return contentService.prepareLunchEntities(dishes);
+            lunches = contentService.prepareLunchEntities(dishes);
         } catch (Exception e) {
-            log.error("Error preparing lunch entity for bistro {}: {}", bistroName, e.getMessage());
-            return createNoDataEntities();
+            log.error("Error preparing lunch entity for bistro {}: {}", bistro.getName(), e.getMessage());
+            lunches = createNoDataEntities();
         }
+
+        lunches.forEach(entity -> persistLunchEntity(entity, bistro, today, tomorrow));
     }
 
     private static List<LunchEntity> createNoDataEntities() {
@@ -115,10 +116,15 @@ public class LunchService {
     String buildStatusMessage(StatusEnum status, DayEnum day, LocalDate today, LocalDate tomorrow) {
         return switch (status) {
             case NEXT_WEEK -> "Die Speisekarte ist bereits für die nächste Woche verfügbar ("
-                    + formatDateRange(today.plusWeeks(1).with(DayOfWeek.MONDAY), today.plusWeeks(1).with(DayOfWeek.FRIDAY)) + ").";
+                    + formatDateRange(today.plusWeeks(1).with(DayOfWeek.MONDAY),
+                            today.plusWeeks(1).with(DayOfWeek.FRIDAY))
+                    + ").";
             case OUTDATED -> "Die Speisekarte ist noch von letzter Woche ("
-                    + formatDateRange(today.minusWeeks(1).with(DayOfWeek.MONDAY), today.minusWeeks(1).with(DayOfWeek.FRIDAY)) + ").";
-            case NO_DATA -> "Für den " + formatDate(day == DayEnum.TOMORROW ? tomorrow : today) + " liegen leider keine Informationen vor.";
+                    + formatDateRange(today.minusWeeks(1).with(DayOfWeek.MONDAY),
+                            today.minusWeeks(1).with(DayOfWeek.FRIDAY))
+                    + ").";
+            case NO_DATA -> "Für den " + formatDate(day == DayEnum.TOMORROW ? tomorrow : today)
+                    + " liegen leider keine Informationen vor.";
             default -> null;
         };
     }
