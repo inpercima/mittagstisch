@@ -14,11 +14,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.entity.LunchEntity;
 import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.StatusEnum;
 
+@Slf4j
 @Service
 public class ContentService {
 
@@ -41,6 +43,28 @@ public class ContentService {
 
             return content.wholeText().replaceAll("\\n{2,}", "\n").trim();
         } catch (IOException e) {
+            return "";
+        }
+    }
+
+    /**
+     * Extracts the absolute URL of the first image found by the given CSS selector on the specified page.
+     *
+     * @param url the URL of the web page to search for an image
+     * @param imageSelector the CSS selector to locate the image element
+     * @return the absolute URL of the image, or an empty string if not found or an error occurs
+     */
+    public String extractImageUrlFromWebsite(String url, String imageSelector) {
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Element img = doc.selectFirst(imageSelector);
+            if (img == null) {
+                return "";
+            }
+            return img.attr("abs:src");
+        } catch (IOException e) {
+            log.error("Failed to extract image URL from '{}' with selector '{}': {}", url, imageSelector,
+                    e.getMessage());
             return "";
         }
     }

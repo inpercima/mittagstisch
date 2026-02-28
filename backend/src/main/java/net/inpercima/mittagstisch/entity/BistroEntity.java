@@ -29,4 +29,7 @@ public class BistroEntity {
 
     @Column(nullable = false)
     private String selector;
+
+    @Column
+    private String imageSelector;
 }

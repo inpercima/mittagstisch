@@ -78,8 +78,14 @@ public class LunchService {
 
     private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart,
             LocalDate weekEnd) {
-        String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
-        String dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+        String dishes;
+        if (bistro.getImageSelector() != null && !bistro.getImageSelector().isBlank()) {
+            String imageUrl = contentService.extractImageUrlFromWebsite(bistro.getUrl(), bistro.getImageSelector());
+            dishes = aiService.extractDishesFromImage(imageUrl, weekStart, weekEnd, today, tomorrow);
+        } else {
+            String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
+            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+        }
         List<LunchEntity> lunches = new ArrayList<>();
 
         try {
