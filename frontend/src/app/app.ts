@@ -14,10 +14,12 @@ export class App {
 
   appname: string;
   routes: Routes;
+  version: string;
 
   constructor() {
     this.appname = environment.appname;
     this.routes = routeConfig;
+    this.version = environment.version;
     this.#titleService.setTitle(this.appname);
   }
 }

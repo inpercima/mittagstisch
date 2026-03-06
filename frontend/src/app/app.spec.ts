@@ -32,8 +32,17 @@ describe('App', () => {
     expect(component.appname).toEqual('Mittagstisch');
   });
 
-  it('should render toolbar', async () => {
+  it('should have a version', () => {
+    expect(component.version).toBeTruthy();
+  });
+
+  it('should render header with title', async () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-toolbar')?.textContent).toContain('Mittagstisch');
+    expect(compiled.querySelector('header h1')?.textContent).toContain('Mittagstisch');
+  });
+
+  it('should render version in header', async () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('header nav span')?.textContent).toContain(component.version);
   });
 });
