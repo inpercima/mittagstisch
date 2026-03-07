@@ -40,7 +40,6 @@ public class LunchService {
 
     public List<LunchDto> getDataByDay(DayEnum day) {
         final Pageable top = PageRequest.of(0, (int) bistroService.count(), Sort.by("id").ascending());
-        System.out.println("Fetching lunches with pageable: " + top);
         return lunchRepository.findByImportDateAndDay(LocalDate.now(), day, top)
                 .stream()
                 .map(lunch -> new LunchDto(
@@ -79,9 +78,9 @@ public class LunchService {
     private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart,
             LocalDate weekEnd) {
         String dishes;
-        if (bistro.getImageSelector() != null && !bistro.getImageSelector().isBlank()) {
-            String imageUrl = contentService.extractImageUrlFromWebsite(bistro.getUrl(), bistro.getImageSelector());
-            dishes = aiService.extractDishesFromImage(imageUrl, weekStart, weekEnd, today, tomorrow);
+        if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
+            String pdfUrl = contentService.extractPdfUrlFromWebsite(bistro.getUrl(), bistro.getDocumentSelector());
+            dishes = aiService.extractDishesFromImage(pdfUrl, weekStart, weekEnd, today, tomorrow);
         } else {
             String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
             dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
