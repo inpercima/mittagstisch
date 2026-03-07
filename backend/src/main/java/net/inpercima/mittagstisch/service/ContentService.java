@@ -25,11 +25,13 @@ import net.inpercima.mittagstisch.model.StatusEnum;
 public class ContentService {
 
     /**
-     * Extracts text content from a web page specified by the given URL and CSS selector.
+     * Extracts text content from a web page specified by the given URL and CSS
+     * selector.
      *
-     * @param url the URL of the web page to extract text from
+     * @param url      the URL of the web page to extract text from
      * @param selector the CSS selector to locate the desired element
-     * @return the extracted text content, or an empty string if the element is not found or an error occurs
+     * @return the extracted text content, or an empty string if the element is not
+     *         found or an error occurs
      */
     public String extractLunchFromWebsite(String url, String selector) {
         try {
@@ -48,29 +50,32 @@ public class ContentService {
     }
 
     /**
-     * Extracts the absolute URL of the first image found by the given CSS selector on the specified page.
+     * Extracts the absolute URL of the first PDF found by the given CSS selector on
+     * the specified page.
      *
-     * @param url the URL of the web page to search for an image
-     * @param imageSelector the CSS selector to locate the image element
-     * @return the absolute URL of the image, or an empty string if not found or an error occurs
+     * @param url         the URL of the web page to search for a PDF
+     * @param pdfSelector the CSS selector to locate the PDF element
+     * @return the absolute URL of the PDF, or an empty string if not found or an
+     *         error occurs
      */
-    public String extractImageUrlFromWebsite(String url, String imageSelector) {
+    public String extractPdfUrlFromWebsite(String url, String pdfSelector) {
         try {
             Document doc = Jsoup.connect(url).get();
-            Element img = doc.selectFirst(imageSelector);
-            if (img == null) {
+            Element pdf = doc.selectFirst(pdfSelector);
+            if (pdf == null) {
                 return "";
             }
-            return img.attr("abs:src");
+            return pdf.attr("abs:href");
         } catch (IOException e) {
-            log.error("Failed to extract image URL from '{}' with selector '{}': {}", url, imageSelector,
+            log.error("Failed to extract PDF URL from '{}' with selector '{}': {}", url, pdfSelector,
                     e.getMessage());
             return "";
         }
     }
 
     /**
-     * Prepares a list of LunchEntity objects from the given JSON string containing dish information.
+     * Prepares a list of LunchEntity objects from the given JSON string containing
+     * dish information.
      *
      * @param dishesJson the JSON string containing dish information
      * @return a list of LunchEntity objects
@@ -122,13 +127,15 @@ public class ContentService {
     }
 
     /**
-    * Extracts a list of DishDto objects from the given JsonNode representing the content.
+     * Extracts a list of DishDto objects from the given JsonNode representing the
+     * content.
      * The content can be either a JSON array or a JSON string containing an array.
-     * If the content is null, empty, or cannot be parsed, an empty list is returned.
+     * If the content is null, empty, or cannot be parsed, an empty list is
+     * returned.
      *
-     * @param mapper the ObjectMapper used for JSON parsing
+     * @param mapper      the ObjectMapper used for JSON parsing
      * @param contentNode the JsonNode representing the content
-    * @return a list of DishDto objects
+     * @return a list of DishDto objects
      * @throws Exception if the content cannot be parsed
      */
     private static List<DishDto> extractDishes(ObjectMapper mapper, JsonNode contentNode)
@@ -162,7 +169,7 @@ public class ContentService {
     }
 
     /**
-    * Normalizes the prices of the given list of DishDto objects.
+     * Normalizes the prices of the given list of DishDto objects.
      *
      * @param dishes the list of DishDto objects
      * @return a list of DishDto objects with normalized prices
@@ -174,12 +181,15 @@ public class ContentService {
     }
 
     /**
-     * Normalizes the given price string by trimming whitespace, replacing certain patterns, and ensuring a consistent format.
+     * Normalizes the given price string by trimming whitespace, replacing certain
+     * patterns, and ensuring a consistent format.
      * The following transformations are applied:
      * - If the price is null or blank, it returns an empty string.
      * - Trims leading and trailing whitespace.
-     * - Replaces any occurrence of a dot, dash, or similar character at the end of the string with ",00 €".
-     * - Ensures that if a number is followed by a euro symbol, there is a space in between (e.g., "5€" becomes "5 €").
+     * - Replaces any occurrence of a dot, dash, or similar character at the end of
+     * the string with ",00 €".
+     * - Ensures that if a number is followed by a euro symbol, there is a space in
+     * between (e.g., "5€" becomes "5 €").
      *
      * @param price the price string to normalize
      * @return the normalized price string
