@@ -27,9 +27,9 @@ public class BistroEntity {
     @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false)
+    @Column
     private String selector;
 
     @Column
-    private String imageSelector;
+    private String documentSelector;
 }

@@ -80,7 +80,7 @@ public class LunchService {
         String dishes;
         if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
             String pdfUrl = contentService.extractPdfUrlFromWebsite(bistro.getUrl(), bistro.getDocumentSelector());
-            dishes = aiService.extractDishesFromImage(pdfUrl, weekStart, weekEnd, today, tomorrow);
+            dishes = aiService.extractDishesFromDocument(pdfUrl, weekStart, weekEnd, today, tomorrow);
         } else {
             String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
             dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);

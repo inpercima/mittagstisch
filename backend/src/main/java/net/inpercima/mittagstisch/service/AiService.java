@@ -1,9 +1,11 @@
 package net.inpercima.mittagstisch.service;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Map;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -29,14 +31,20 @@ public class AiService {
     return analyze(prompt);
   }
 
-  public String extractDishesFromImage(String imageUrl, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
+  public String extractDishesFromDocument(String imageUrl, LocalDate weekStartDate, LocalDate weekEndDate,
+      LocalDate today,
       LocalDate tomorrow) {
     String promptText = buildPromptText(weekStartDate, weekEndDate, today, tomorrow);
     try {
       URL url = URI.create(imageUrl).toURL();
       MimeType mimeType = detectMimeType(imageUrl);
+      InputStream in = url.openStream();
+      byte[] pdfBytes = in.readAllBytes();
+      String base64 = Base64.getEncoder().encodeToString(pdfBytes);
+      String dataUrl = "data:" + mimeType.toString() + ";base64," + base64;
+      URL data = URI.create(dataUrl).toURL();
       return chatClient.prompt()
-          .user(u -> u.text(promptText).media(mimeType, url))
+          .user(u -> u.text(promptText).media(mimeType, data))
           .call().content();
     } catch (MalformedURLException e) {
       log.error("Invalid image URL '{}': {}", imageUrl, e.getMessage());
