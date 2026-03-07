@@ -34,7 +34,7 @@ public class AiService {
     String promptText = buildPromptText(weekStartDate, weekEndDate, today, tomorrow);
     try {
       URL url = URI.create(imageUrl).toURL();
-      MimeType mimeType = detectImageMimeType(imageUrl);
+      MimeType mimeType = detectMimeType(imageUrl);
       return chatClient.prompt()
           .user(u -> u.text(promptText).media(mimeType, url))
           .call().content();
@@ -47,9 +47,9 @@ public class AiService {
     }
   }
 
-  private MimeType detectImageMimeType(String imageUrl) {
-    int queryStart = imageUrl.indexOf('?');
-    String path = queryStart >= 0 ? imageUrl.substring(0, queryStart) : imageUrl;
+  private MimeType detectMimeType(String fileUrl) {
+    int queryStart = fileUrl.indexOf('?');
+    String path = queryStart >= 0 ? fileUrl.substring(0, queryStart) : fileUrl;
     int dotIndex = path.lastIndexOf('.');
     if (dotIndex >= 0) {
       String ext = path.substring(dotIndex + 1).toLowerCase();
@@ -58,6 +58,9 @@ public class AiService {
       }
       if (ext.equals("gif")) {
         return MimeTypeUtils.IMAGE_GIF;
+      }
+      if (ext.equals("pdf")) {
+        return MimeType.valueOf("application/pdf");
       }
     }
     return MimeTypeUtils.IMAGE_JPEG;
