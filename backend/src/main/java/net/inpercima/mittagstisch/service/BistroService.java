@@ -18,6 +18,10 @@ public class BistroService {
         return bistroRepository.findAll();
     }
 
+    public BistroEntity findById(Long id) {
+        return bistroRepository.findById(id).orElse(null);
+    }
+
     public long count() {
         return bistroRepository.count();
     }

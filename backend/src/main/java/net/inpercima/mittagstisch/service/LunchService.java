@@ -1,5 +1,6 @@
 package net.inpercima.mittagstisch.service;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +41,6 @@ public class LunchService {
 
     public List<LunchDto> getDataByDay(DayEnum day) {
         final Pageable top = PageRequest.of(0, (int) bistroService.count(), Sort.by("id").ascending());
-        System.out.println("Fetching lunches with pageable: " + top);
         return lunchRepository.findByImportDateAndDay(LocalDate.now(), day, top)
                 .stream()
                 .map(lunch -> new LunchDto(
@@ -78,8 +78,20 @@ public class LunchService {
 
     private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart,
             LocalDate weekEnd) {
-        String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
-        String dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+        String dishes;
+        String lunch;
+        log.info("Prepare lunch for bistro '{}': {}", bistro.getName(), bistro.getUrl());
+        if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
+            try {
+                lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getDocumentSelector());
+            } catch (IOException e) {
+                log.error("Error extracting lunch from PDF for bistro '{}'': {}", bistro.getName(), e.getMessage());
+                lunch = "";
+            }
+        } else {
+            lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
+        }
+        dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         List<LunchEntity> lunches = new ArrayList<>();
 
         try {
