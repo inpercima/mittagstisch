@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.10</version>
+    <version>3.3.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -44,6 +44,13 @@
       <version>1.0.3</version>
     </dependency>
 
+    <!-- Apache PDFBox -->
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+      <version>3.0.6</version>
+    </dependency>
+
     <!-- Spring Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -54,6 +61,13 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.20.0</version>
+    </dependency>
+
+    <!-- Tabula for PDF table extraction -->
+    <dependency>
+      <groupId>technology.tabula</groupId>
+      <artifactId>tabula</artifactId>
+      <version>1.0.5</version>
     </dependency>
 
     <dependency>
@@ -82,7 +96,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.20.1</version>
     </dependency>
   </dependencies>
 

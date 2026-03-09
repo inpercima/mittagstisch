@@ -1,5 +1,6 @@
 package net.inpercima.mittagstisch.service;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -78,13 +79,19 @@ public class LunchService {
     private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart,
             LocalDate weekEnd) {
         String dishes;
+        String lunch;
+        log.info("Prepare lunch for bistro '{}': {}", bistro.getName(), bistro.getUrl());
         if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
-            String pdfUrl = contentService.extractPdfUrlFromWebsite(bistro.getUrl(), bistro.getDocumentSelector());
-            dishes = aiService.extractDishesFromDocument(pdfUrl, weekStart, weekEnd, today, tomorrow);
+            try {
+                lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getDocumentSelector());
+            } catch (IOException e) {
+                log.error("Error extracting lunch from PDF for bistro '{}'': {}", bistro.getName(), e.getMessage());
+                lunch = "";
+            }
         } else {
-            String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
-            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+            lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
         }
+        dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         List<LunchEntity> lunches = new ArrayList<>();
 
         try {

@@ -3,11 +3,16 @@ package net.inpercima.mittagstisch.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -19,6 +24,11 @@ import net.inpercima.mittagstisch.entity.LunchEntity;
 import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.StatusEnum;
+import technology.tabula.ObjectExtractor;
+import technology.tabula.Page;
+import technology.tabula.RectangularTextContainer;
+import technology.tabula.Table;
+import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 @Slf4j
 @Service
@@ -38,6 +48,7 @@ public class ContentService {
             Document doc = Jsoup.connect(url).get();
             Element content = doc.selectFirst(selector);
             if (content == null) {
+                log.warn("No content found for selector '{}' on page '{}'.", selector, url);
                 return "";
             }
 
@@ -45,6 +56,7 @@ public class ContentService {
 
             return content.wholeText().replaceAll("\\n{2,}", "\n").trim();
         } catch (IOException e) {
+            log.error("Failed to extract content from '{}' with selector '{}': {}", url, selector, e.getMessage());
             return "";
         }
     }
@@ -74,37 +86,110 @@ public class ContentService {
     }
 
     /**
+     * Extracts text from a PDF document by parsing its table structure.
+     *
+     * @param pdfUrl   the URL of the PDF document to extract text from
+     * @param selector the CSS selector to locate the PDF element (not used in this
+     *                 method, but kept for consistency)
+     * @return the extracted text content with table data separated by pipes and
+     *         newlines
+     * @throws IOException if the PDF cannot be downloaded or processed
+     */
+    public String extractLunchFromPdf(String url, String selector) throws IOException {
+        String pdfUrl = this.extractPdfUrlFromWebsite(url, selector);
+        if (pdfUrl == null || pdfUrl.isBlank()) {
+            throw new IllegalArgumentException("PDF URL cannot be null or blank");
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        byte[] pdfBytes = restTemplate.getForObject(pdfUrl, byte[].class);
+
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            throw new IOException("PDF content is empty or could not be downloaded from: " + pdfUrl);
+        }
+
+        List<String> resultRows = new ArrayList<>();
+
+        try (PDDocument document = Loader.loadPDF(pdfBytes);
+                ObjectExtractor extractor = new ObjectExtractor(document)) {
+
+            Page page = extractor.extract(1);
+            SpreadsheetExtractionAlgorithm sea = new SpreadsheetExtractionAlgorithm();
+            List<Table> tables = sea.extract(page);
+
+            for (Table table : tables) {
+                for (List<RectangularTextContainer> row : table.getRows()) {
+                    String rowText = row.stream()
+                            .map(RectangularTextContainer::getText)
+                            .map(String::trim)
+                            .filter(text -> !text.isEmpty())
+                            .collect(Collectors.joining(" | "));
+
+                    if (!rowText.isEmpty()) {
+                        log.debug("Extracted table row: {}", rowText);
+                        resultRows.add(rowText);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to extract lunch from PDF '{}': {}", pdfUrl, e.getMessage());
+            throw new IOException("PDF lunch extraction failed: " + e.getMessage(), e);
+        }
+
+        return String.join("\n", resultRows);
+    }
+
+    /**
      * Prepares a list of LunchEntity objects from the given JSON string containing
      * dish information.
      *
      * @param dishesJson the JSON string containing dish information
      * @return a list of LunchEntity objects
-     * @throws Exception if the JSON is invalid or cannot be parsed
+     * @throws JsonProcessingException  if the JSON is invalid or cannot be parsed
+     * @throws IllegalArgumentException if dishesJson is null or blank
      */
-    public List<LunchEntity> prepareLunchEntities(String dishesJson) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
+    public List<LunchEntity> prepareLunchEntities(String dishesJson) throws JsonProcessingException {
+        if (dishesJson == null || dishesJson.isBlank()) {
+            throw new IllegalArgumentException("Dishes JSON cannot be null or blank");
+        }
 
+        ObjectMapper mapper = new ObjectMapper();
         JsonNode root;
+
         try {
             root = mapper.readTree(dishesJson);
         } catch (JsonProcessingException e) {
-            throw new Exception("Invalid root JSON", e);
+            log.error("Failed to parse dishes JSON: {}", e.getMessage());
+            throw new JsonProcessingException("Invalid root JSON") {
+                @Override
+                public String getMessage() {
+                    return "Invalid root JSON: " + e.getMessage();
+                }
+            };
         }
 
         List<LunchEntity> result = new ArrayList<>();
-
         result.add(parseDayNode(mapper, root.path("today"), DayEnum.TODAY));
         result.add(parseDayNode(mapper, root.path("tomorrow"), DayEnum.TOMORROW));
 
         return result;
     }
 
-    private LunchEntity parseDayNode(ObjectMapper mapper, JsonNode dayNode, DayEnum day) throws Exception {
+    private LunchEntity parseDayNode(ObjectMapper mapper, JsonNode dayNode, DayEnum day)
+            throws JsonProcessingException {
         StatusEnum status;
+        String statusText = dayNode.path("status").asText();
+
         try {
-            status = StatusEnum.valueOf(dayNode.path("status").asText());
-        } catch (Exception e) {
-            throw new Exception("Invalid status value for " + day + ": " + dayNode.path("status").asText(), e);
+            status = StatusEnum.valueOf(statusText);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid status value for {}: '{}'", day, statusText);
+            throw new JsonProcessingException("Invalid status value for " + day + ": " + statusText) {
+                @Override
+                public String getMessage() {
+                    return "Invalid status value for " + day + ": " + statusText;
+                }
+            };
         }
 
         JsonNode contentNode = dayNode.get("content");
@@ -115,7 +200,13 @@ public class ContentService {
         try {
             dishesJson = mapper.writeValueAsString(normalizedDishes);
         } catch (JsonProcessingException e) {
-            throw new Exception("Failed to serialize content for " + day, e);
+            log.error("Failed to serialize content for {}: {}", day, e.getMessage());
+            throw new JsonProcessingException("Failed to serialize content for " + day) {
+                @Override
+                public String getMessage() {
+                    return "Failed to serialize content for " + day + ": " + e.getMessage();
+                }
+            };
         }
 
         LunchEntity entity = new LunchEntity();
@@ -136,36 +227,46 @@ public class ContentService {
      * @param mapper      the ObjectMapper used for JSON parsing
      * @param contentNode the JsonNode representing the content
      * @return a list of DishDto objects
-     * @throws Exception if the content cannot be parsed
+     * @throws JsonProcessingException if the content cannot be parsed
      */
     private static List<DishDto> extractDishes(ObjectMapper mapper, JsonNode contentNode)
-            throws Exception {
-        List<DishDto> dishes;
-        try {
-            if (contentNode == null || contentNode.isNull()) {
-                dishes = List.of();
+            throws JsonProcessingException {
+        if (contentNode == null || contentNode.isNull()) {
+            return List.of();
+        }
 
-            } else if (contentNode.isArray()) {
+        try {
+            if (contentNode.isArray()) {
                 // if content is real JSON array
-                dishes = mapper.convertValue(contentNode, new TypeReference<List<DishDto>>() {
+                return mapper.convertValue(contentNode, new TypeReference<List<DishDto>>() {
                 });
 
             } else if (contentNode.isTextual()) {
                 // if content is JSON array as string
                 String rawJson = contentNode.asText();
                 if (rawJson.isBlank() || rawJson.equals("[]")) {
-                    dishes = List.of();
-                } else {
-                    dishes = mapper.readValue(rawJson, new TypeReference<List<DishDto>>() {
-                    });
+                    return List.of();
                 }
+                return mapper.readValue(rawJson, new TypeReference<List<DishDto>>() {
+                });
+
             } else {
-                throw new Exception("Unsupported content type: " + contentNode.getNodeType());
+                throw new JsonProcessingException("Unsupported content type: " + contentNode.getNodeType()) {
+                    @Override
+                    public String getMessage() {
+                        return "Unsupported content type: " + contentNode.getNodeType();
+                    }
+                };
             }
         } catch (JsonProcessingException e) {
-            throw new Exception("Failed to parse content", e);
+            log.error("Failed to parse dishes content: {}", e.getMessage());
+            throw new JsonProcessingException("Failed to parse content") {
+                @Override
+                public String getMessage() {
+                    return "Failed to parse content: " + e.getMessage();
+                }
+            };
         }
-        return dishes;
     }
 
     /**
@@ -195,14 +296,11 @@ public class ContentService {
      * @return the normalized price string
      */
     private static String normalizePrice(String price) {
-        if (price == null || price.isBlank()) {
-            return "";
-        }
-
-        String cleaned = price.trim();
-        cleaned = cleaned.replaceAll("\\s*[\\.,]?\\s*[.–-]\\s*(€)?\\s*$", ",00 €");
-        cleaned = cleaned.replaceAll("(\\d)\\s*€", "$1 €");
-
-        return cleaned;
+        return Optional.ofNullable(price)
+                .filter(p -> !p.isBlank())
+                .map(String::trim)
+                .map(p -> p.replaceAll("\\s*[\\.,]?\\s*[.–-]\\s*(€)?\\s*$", ",00 €"))
+                .map(p -> p.replaceAll("(\\d)\\s*€", "$1 €"))
+                .orElse("");
     }
 }
