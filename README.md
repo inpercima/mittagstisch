@@ -75,41 +75,91 @@ Run the following command to install:
 pnpm install
 ```
 
-### Starting the application in dev mode
+## Development Mode
 
-For development you can use two separate terminals for starting backend and frontend separately.
-More can find in the specified README files in the separate folders.
+### Starting the application in development
 
-You could also use following command in root folder to start in one single terminal:
+For development, you have multiple options to run the application:
+
+#### Option 1: Start everything with one command (Recommended for quick start)
 
 ```bash
 pnpm start
 ```
 
-### Deploy the application
+This command will start both backend and frontend concurrently.
 
-#### Server preparation
+#### Option 2: Start backend and frontend separately
 
-First you need to have Docker installed on the server.
+Use two separate terminals for more control and better log visibility:
 
-#### Build process
+**Terminal 1 - Backend:**
+```bash
+cd backend
+./mvnw spring-boot:run -Pdev
+```
 
-Check for the existence of `environment.prod.ts` as described in [Mittagstisch - frontend](./frontend).
-Build the backend by using `./mvnw clean package`.
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+pnpm start
+```
 
-#### Deployment
+For detailed development setup and configuration options, check:
+* [Frontend Development Guide](./frontend/README.md)
+* [Backend Development Guide](./backend/README.md)
+* [Docker Setup for Development](./docker/README.md)
 
-Copy following files to the server:
+### Access the application
 
-* `.env`
-* `dump.sql`
-* `docker-compose.yml` and `docker-compose.prod.yml`
-* `mittagstisch-1.0.0-SNAPSHOT.jar`
-* `application-prod.yml`
+* **Frontend:** http://localhost:4200/
+* **Backend API:** http://localhost:8080/
+* **phpMyAdmin:** http://localhost (or configured port in `.env`)
 
-Modify the `.env` file for your needs.
-Modify the `application-prod.yml` for your needs.
+## Production Mode
 
-#### Run
+### Prerequisites for production
 
-Run the compose files for prod mode as described in [mittagstisch - docker](./docker/README.md).
+* Docker and Docker Compose installed on the server
+* Server with sufficient resources (RAM, CPU, storage)
+
+### Build process
+
+1. **Prepare frontend environment:**
+   
+   Check for the existence of `environment.prod.ts` as described in [Frontend Guide](./frontend/README.md).
+
+2. **Build the backend:**
+   
+   ```bash
+   cd backend
+   ./mvnw clean package
+   ```
+
+   This creates `mittagstisch-1.0.0-SNAPSHOT.jar` in the `target` directory.
+
+### Deployment
+
+1. **Prepare configuration files:**
+
+   Copy the following files to your server:
+   * `.env` (Docker environment configuration)
+   * `dump.sql` (Database dump file)
+   * `docker-compose.yml` and `docker-compose.prod.yml`
+   * `mittagstisch-1.0.0-SNAPSHOT.jar` (from backend/target)
+   * `application-prod.yml` (Spring Boot production configuration)
+
+2. **Configure for your environment:**
+
+   * Modify `.env` with your production settings
+   * Update `application-prod.yml` with production-specific configurations (database credentials, API keys, etc.)
+
+3. **Deploy and run:**
+
+   Run the Docker Compose setup as described in the [Docker Production Guide](./docker/README.md).
+
+   ```bash
+   docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.prod.yml up -d
+   ```
+
+For detailed production deployment instructions, see [Docker Guide](./docker/README.md).
