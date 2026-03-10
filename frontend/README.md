@@ -1,54 +1,111 @@
 # Mittagstisch - frontend
 
+This guide covers the Angular frontend setup and usage for both development and production environments.
+
+## Prerequisites
+
+* Node.js 22.20.0 or higher
+* pnpm 10.27.0 or higher
+* Angular CLI 21.1.1 or higher
+
 ## Getting started
 
 ```bash
-# all commands used in ./frontend
+# Navigate to frontend directory
 cd frontend
 
-# install tools and frontend dependencies
+# Install dependencies
 pnpm install
 ```
 
-Create environment file for `development mode`.
+## Development Mode
+
+### Setup for development
+
+1. **Create development environment file:**
+
+   ```bash
+   cp src/environments/environment.ts src/environments/environment.dev.ts
+   ```
+
+   **Note**: This file will not be under version control (listed in .gitignore).
+
+2. **Configure development settings:**
+
+   Edit `src/environments/environment.dev.ts` to match your local setup:
+   * Set `production: false`
+   * Configure `api` URL (default: `http://localhost:8080/`)
+   * Adjust other settings as needed (see [Configuration](#configuration) section)
+
+### Running in development mode
+
+**Option 1: Development server with hot reload (Recommended)**
 
 ```bash
-cp src/environments/environment.ts src/environments/environment.dev.ts
-```
-
-**Note**: This file will not be under version control but listed in .gitignore.
-
-## Usage
-
-### Recommendation
-
-It is recommended to use a server to get full access of all angular.
-For the other options your app should run on a server which you like.
-
-### Run in development mode
-
-```bash
-# build, reachable on http://localhost/app/path/to/dist/
-pnpm build:dev
-
-# build and starts a server, rebuild after changes, reachable on http://localhost:4200/
 pnpm start
 ```
 
-### Package
+The application will be available at **http://localhost:4200/** and automatically reload when you make changes to the source code.
+
+**Option 2: Build for development**
 
 ```bash
-# build in production mode, compressed
+pnpm build:dev
+```
+
+This creates a development build in the `dist/` directory. You can serve it with any static file server.
+
+### Development workflow
+
+1. Start the development server: `pnpm start`
+2. Make changes to your code
+3. The browser will automatically reload with your changes
+4. Check the console for any compilation errors
+
+## Production Mode
+
+### Setup for production
+
+1. **Create production environment file:**
+
+   ```bash
+   cp src/environments/environment.ts src/environments/environment.prod.ts
+   ```
+
+2. **Configure production settings:**
+
+   Edit `src/environments/environment.prod.ts`:
+   * Set `production: true`
+   * Configure production `api` URL
+   * Set appropriate theme and other production-specific settings
+
+### Building for production
+
+```bash
+# Build optimized production bundle
 pnpm build:prod
 ```
 
-### Tests
+This creates an optimized, compressed production build in the `dist/` directory with:
+* Minified code
+* Tree-shaking (removal of unused code)
+* Optimized bundle sizes
+* AOT (Ahead-of-Time) compilation
+
+### Deployment
+
+The production build files in `dist/` should be:
+1. Served by a web server (nginx, Apache, etc.)
+2. Configured with proper routing for Angular's router
+3. Served over HTTPS in production
+
+## Testing
 
 ```bash
-# test
+# Run unit tests
 ng test
 
-# e2e
+# Run end-to-end tests
 ng e2e
 ```
 
