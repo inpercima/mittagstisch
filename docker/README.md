@@ -170,15 +170,21 @@ If you have an existing database dump (`dump.sql`):
 # Copy dump file to MySQL container
 docker cp dump.sql mittagstisch_mysql:/dump.sql
 
-# Import the dump (replace YOUR_PASSWORD with your actual MySQL root password)
-docker exec -i mittagstisch_mysql mysql -uroot -pYOUR_PASSWORD mittagstisch < dump.sql
+# Import the dump (you will be prompted for password)
+docker exec -it mittagstisch_mysql mysql -uroot -p mittagstisch < dump.sql
+
+# Alternative: Import without interactive prompt (less secure)
+# docker exec -i mittagstisch_mysql sh -c 'mysql -uroot -p$MYSQL_ROOT_PASSWORD mittagstisch' < dump.sql
 ```
 
 ### Export database backup
 
 ```bash
-# Export database to dump file (replace YOUR_PASSWORD with your actual MySQL root password)
-docker exec mittagstisch_mysql mysqldump -uroot -pYOUR_PASSWORD mittagstisch > backup.sql
+# Export database to dump file (you will be prompted for password)
+docker exec -it mittagstisch_mysql mysqldump -uroot -p mittagstisch > backup.sql
+
+# Alternative: Export without interactive prompt (less secure)
+# docker exec mittagstisch_mysql sh -c 'mysqldump -uroot -p$MYSQL_ROOT_PASSWORD mittagstisch' > backup.sql
 ```
 
 ### External database management
