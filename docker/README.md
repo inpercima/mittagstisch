@@ -43,28 +43,28 @@ Defines a global name for the compose project used for the container and the dat
 
 ### `MYSQL_PASSWORD`
 
-Defines the password for mySQL
+Defines the password for MySQL
 
 * default: `mysql`
 * type: `string`
 
 ### `MYSQL_PORT`
 
-Defines the port for mySQL
+Defines the port for MySQL
 
 * default: `3306`
 * type: `string`
 
 ### `MYSQL_USER`
 
-Defines the user for mySQL
+Defines the user for MySQL
 
 * default: `mysql`
 * type: `string`
 
 ### `MYSQL_VERSION`
 
-Defines the version for mySQL
+Defines the version for MySQL
 
 * default: `8.0.44-debian`
 * type: `string`
@@ -170,15 +170,15 @@ If you have an existing database dump (`dump.sql`):
 # Copy dump file to MySQL container
 docker cp dump.sql mittagstisch_mysql:/dump.sql
 
-# Import the dump
-docker exec -i mittagstisch_mysql mysql -uroot -p[password] mittagstisch < dump.sql
+# Import the dump (replace YOUR_PASSWORD with your actual MySQL root password)
+docker exec -i mittagstisch_mysql mysql -uroot -pYOUR_PASSWORD mittagstisch < dump.sql
 ```
 
 ### Export database backup
 
 ```bash
-# Export database to dump file
-docker exec mittagstisch_mysql mysqldump -uroot -p[password] mittagstisch > backup.sql
+# Export database to dump file (replace YOUR_PASSWORD with your actual MySQL root password)
+docker exec mittagstisch_mysql mysqldump -uroot -pYOUR_PASSWORD mittagstisch > backup.sql
 ```
 
 ### External database management

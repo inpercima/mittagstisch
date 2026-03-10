@@ -113,7 +113,7 @@ ng e2e
 
 ### General
 
-All options have to been set in the environment files but some of them do not need to be changed.
+All options have to be set in the environment files but some of them do not need to be changed.
 All defaults refer to the environment file (`environment.ts`), they are prepared in `development mode` (`environment.dev.ts`).
 Change for `production mode` the option `production` to `true`.
 
