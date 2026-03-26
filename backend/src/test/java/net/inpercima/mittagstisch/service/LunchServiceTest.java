@@ -104,6 +104,29 @@ class LunchServiceTest {
         }
     }
 
+    @Test
+    void getDataByDay_fallsBackToFriday_onMondayWhenTodayEmpty() {
+        LocalDate monday = LocalDate.of(2026, 3, 30); // Monday
+        LocalDate friday = monday.minusDays(3);
+        LunchEntity entity = buildLunchEntity(friday);
+
+        when(bistroService.count()).thenReturn(1L);
+        when(lunchRepository.findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class)))
+                .thenAnswer(invocation -> {
+                    LocalDate date = invocation.getArgument(0);
+                    return monday.equals(date) ? List.of() : List.of(entity);
+                });
+
+        try (MockedStatic<LocalDate> mockedDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            mockedDate.when(LocalDate::now).thenReturn(monday);
+
+            var result = lunchService.getDataByDay(DayEnum.TODAY);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).importDate()).isEqualTo(friday);
+        }
+    }
+
     @ParameterizedTest(name = "getDataByDay does NOT fall back on {0}")
     @MethodSource("weekendDays")
     void getDataByDay_doesNotFallBack_onWeekend(LocalDate weekend) {

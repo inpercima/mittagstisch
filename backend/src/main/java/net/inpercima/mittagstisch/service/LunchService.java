@@ -46,8 +46,9 @@ public class LunchService {
 
         if (result.isEmpty()) {
             final DayOfWeek dow = today.getDayOfWeek();
-            final boolean isWeekday = dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY;
-            if (isWeekday) {
+            if (dow == DayOfWeek.MONDAY) {
+                result = lunchRepository.findByImportDateAndDay(today.minusDays(3), day, top);
+            } else if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
                 result = lunchRepository.findByImportDateAndDay(today.minusDays(1), day, top);
             }
         }
