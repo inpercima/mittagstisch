@@ -41,8 +41,18 @@ public class LunchService {
 
     public List<LunchDto> getDataByDay(DayEnum day) {
         final Pageable top = PageRequest.of(0, (int) bistroService.count(), Sort.by("id").ascending());
-        return lunchRepository.findByImportDateAndDay(LocalDate.now(), day, top)
-                .stream()
+        final LocalDate today = LocalDate.now();
+        var result = lunchRepository.findByImportDateAndDay(today, day, top);
+
+        if (result.isEmpty()) {
+            final DayOfWeek dow = today.getDayOfWeek();
+            final boolean isWeekday = dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY;
+            if (isWeekday) {
+                result = lunchRepository.findByImportDateAndDay(today.minusDays(1), day, top);
+            }
+        }
+
+        return result.stream()
                 .map(lunch -> new LunchDto(
                         new BistroDto(
                                 lunch.getBistro().getName(),
