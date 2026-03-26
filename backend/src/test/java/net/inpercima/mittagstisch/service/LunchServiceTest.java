@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -104,49 +105,27 @@ class LunchServiceTest {
         }
     }
 
-    @Test
-    void getDataByDay_fallsBackToFriday_onMondayWhenTodayEmpty() {
-        LocalDate monday = LocalDate.of(2026, 3, 30); // Monday
-        LocalDate friday = monday.minusDays(3);
-        LunchEntity entity = buildLunchEntity(friday);
-
-        when(bistroService.count()).thenReturn(1L);
-        when(lunchRepository.findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class)))
-                .thenAnswer(invocation -> {
-                    LocalDate date = invocation.getArgument(0);
-                    return monday.equals(date) ? List.of() : List.of(entity);
-                });
-
-        try (MockedStatic<LocalDate> mockedDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            mockedDate.when(LocalDate::now).thenReturn(monday);
-
-            var result = lunchService.getDataByDay(DayEnum.TODAY);
-
-            assertThat(result).hasSize(1);
-            assertThat(result.get(0).importDate()).isEqualTo(friday);
-        }
-    }
-
     @ParameterizedTest(name = "getDataByDay does NOT fall back on {0}")
-    @MethodSource("weekendDays")
-    void getDataByDay_doesNotFallBack_onWeekend(LocalDate weekend) {
+    @MethodSource("noFallbackDays")
+    void getDataByDay_doesNotFallBack_onMondayOrWeekend(LocalDate date) {
         when(bistroService.count()).thenReturn(1L);
         when(lunchRepository.findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class)))
                 .thenReturn(List.of());
 
         try (MockedStatic<LocalDate> mockedDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            mockedDate.when(LocalDate::now).thenReturn(weekend);
+            mockedDate.when(LocalDate::now).thenReturn(date);
 
             var result = lunchService.getDataByDay(DayEnum.TODAY);
 
             assertThat(result).isEmpty();
-            verify(lunchRepository, never())
-                    .findByImportDateAndDay(eq(weekend.minusDays(1)), any(DayEnum.class), any(Pageable.class));
+            verify(lunchRepository, times(1))
+                    .findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class));
         }
     }
 
-    private static Stream<Arguments> weekendDays() {
+    private static Stream<Arguments> noFallbackDays() {
         return Stream.of(
+                Arguments.of(LocalDate.of(2026, 3, 30)), // Monday
                 Arguments.of(LocalDate.of(2026, 3, 28)), // Saturday
                 Arguments.of(LocalDate.of(2026, 3, 29))  // Sunday
         );
