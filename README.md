@@ -12,12 +12,12 @@ It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/n
 
 - `node 24.14.0` or higher in combination with
   - `npm 11.9.0` or higher or
-  - `pnpm 10.32.0` or higher, used in this repository
+  - `pnpm 10.33.0` or higher, used in this repository
 
 Install pnpm by running:
 
 ```bash
-npm install -g pnpm@10.32.0
+npm install -g pnpm@10.33.0
 ```
 
 ### Info for npm and pnpm
@@ -27,7 +27,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-- `@angular/cli 21.2.2` or higher
+- `@angular/cli 21.2.6` or higher
 
 Install @angular/cli by running:
 
