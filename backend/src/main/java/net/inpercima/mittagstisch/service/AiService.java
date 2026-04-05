@@ -5,6 +5,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -177,7 +178,7 @@ public class AiService {
             return null;
           }
         })
-        .filter(media -> media != null)
+        .filter(Objects::nonNull)
         .toList();
 
     UserMessage userMessage = new UserMessage(promptText, mediaList);
@@ -185,14 +186,17 @@ public class AiService {
   }
 
   private static MimeType resolveMimeType(String url) {
-    String lower = url.toLowerCase();
-    if (lower.contains(".png")) {
-      return MimeTypeUtils.IMAGE_PNG;
-    } else if (lower.contains(".gif")) {
-      return MimeTypeUtils.IMAGE_GIF;
-    } else if (lower.contains(".webp")) {
-      return MimeType.valueOf("image/webp");
+    try {
+      String path = new URL(url).getPath();
+      String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
+      return switch (ext) {
+        case "png" -> MimeTypeUtils.IMAGE_PNG;
+        case "gif" -> MimeTypeUtils.IMAGE_GIF;
+        case "webp" -> MimeType.valueOf("image/webp");
+        default -> MimeTypeUtils.IMAGE_JPEG;
+      };
+    } catch (MalformedURLException | StringIndexOutOfBoundsException e) {
+      return MimeTypeUtils.IMAGE_JPEG;
     }
-    return MimeTypeUtils.IMAGE_JPEG;
   }
 }
