@@ -6,7 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
+import org.springframework.boot.webmvc.autoconfigure.error.ErrorViewResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableScheduling;
