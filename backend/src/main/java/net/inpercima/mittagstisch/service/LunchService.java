@@ -89,19 +89,30 @@ public class LunchService {
     private void importBistroLunches(BistroEntity bistro, LocalDate today, LocalDate tomorrow, LocalDate weekStart,
             LocalDate weekEnd) {
         String dishes;
-        String lunch;
         log.info("Prepare lunch for bistro '{}': {}", bistro.getName(), bistro.getUrl());
-        if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
+        if (bistro.getImageSelector() != null && !bistro.getImageSelector().isBlank()) {
+            List<String> imageUrls = contentService.extractImageUrlsFromWebsite(bistro.getUrl(),
+                    bistro.getImageSelector());
+            if (imageUrls.isEmpty()) {
+                log.warn("No images found for bistro '{}' with selector '{}'", bistro.getName(),
+                        bistro.getImageSelector());
+                dishes = "";
+            } else {
+                dishes = aiService.extractDishesFromImages(imageUrls, weekStart, weekEnd, today, tomorrow);
+            }
+        } else if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
+            String lunch;
             try {
                 lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getDocumentSelector());
             } catch (IOException e) {
                 log.error("Error extracting lunch from PDF for bistro '{}'': {}", bistro.getName(), e.getMessage());
                 lunch = "";
             }
+            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         } else {
-            lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
+            String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
+            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         }
-        dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         List<LunchEntity> lunches = new ArrayList<>();
 
         try {

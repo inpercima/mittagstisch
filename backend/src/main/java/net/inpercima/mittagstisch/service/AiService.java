@@ -1,12 +1,20 @@
 package net.inpercima.mittagstisch.service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.model.Media;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +29,12 @@ public class AiService {
   public String extractDishes(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
       LocalDate tomorrow) {
     Prompt prompt = build(content, weekStartDate, weekEndDate, today, tomorrow);
+    return analyze(prompt);
+  }
+
+  public String extractDishesFromImages(List<String> imageUrls, LocalDate weekStartDate, LocalDate weekEndDate,
+      LocalDate today, LocalDate tomorrow) {
+    Prompt prompt = buildForImages(imageUrls, weekStartDate, weekEndDate, today, tomorrow);
     return analyze(prompt);
   }
 
@@ -96,5 +110,93 @@ public class AiService {
         "tomorrow", tomorrow.toString(),
         "content", content));
     return prompt;
+  }
+
+  private Prompt buildForImages(List<String> imageUrls, LocalDate weekStartDate, LocalDate weekEndDate,
+      LocalDate today, LocalDate tomorrow) {
+    String promptText = """
+        Rolle:
+        Du bist ein Parser für Mittagsmenüs.
+
+        Aufgabe:
+        Extrahiere aus den gegebenen Bildern die Mittagsgerichte für %s und %s.
+        Ermittle dazu die gültige Wocheninformation, die unterschiedlich auf den Bildern stehen kann, z.B.:
+        - "Speiseplan vom 01.12.-05.12.2025"
+        - Mo 16.2., Di 17.2.
+        - Mittwoch, 25. Februar 2026
+        Speichere den Anfang der Woche als weekStartDate und das Ende der Woche als weekEndDate ab, um zu prüfen, ob die Woche aktuell, veraltet oder in der Zukunft liegt.
+        Ist das nicht ermittelbar, setze weekStartDate auf %s und weekEndDate auf %s.
+
+        Die Tage sind benannt als:
+        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
+
+        Ausgabeformat:
+        - Nutze folgendes JSON-Format für die Ausgabe:
+        {
+          today:
+          {
+            "content": string,
+            "status": string
+          }
+        },
+        {
+          tomorrow:
+          {
+            "content": string,
+            "status": string
+          }
+        }
+
+        Status-Regeln:
+        - wenn %s > weekEndDate → OUTDATED
+        - wenn %s < weekStartDate → NEXT_WEEK
+        - wenn weekStartDate ≤ %s ≤ weekEndDate → Woche ist aktuell → weiter prüfen
+        - suche den Abschnitt für %s
+        - suche den Abschnitt für %s
+        - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
+        - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
+        [
+          { "name": string, "price": string }
+        ]
+        - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
+
+        WICHTIG:
+        - content ist ein echtes JSON-Array
+        - keine Strings statt Array
+        - keine Erklärung
+        - kein zusätzlicher Text
+        """.formatted(today, tomorrow, weekStartDate, weekEndDate,
+        today, today, today, today, tomorrow);
+
+    List<Media> mediaList = imageUrls.stream()
+        .map(url -> {
+          try {
+            MimeType mimeType = resolveMimeType(url);
+            return new Media(mimeType, new URL(url));
+          } catch (MalformedURLException e) {
+            log.warn("Skipping invalid image URL '{}': {}", url, e.getMessage());
+            return null;
+          }
+        })
+        .filter(Objects::nonNull)
+        .toList();
+
+    UserMessage userMessage = new UserMessage(promptText, mediaList);
+    return new Prompt(List.of(userMessage));
+  }
+
+  private static MimeType resolveMimeType(String url) {
+    try {
+      String path = new URL(url).getPath();
+      String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
+      return switch (ext) {
+        case "png" -> MimeTypeUtils.IMAGE_PNG;
+        case "gif" -> MimeTypeUtils.IMAGE_GIF;
+        case "webp" -> MimeType.valueOf("image/webp");
+        default -> MimeTypeUtils.IMAGE_JPEG;
+      };
+    } catch (MalformedURLException | StringIndexOutOfBoundsException e) {
+      return MimeTypeUtils.IMAGE_JPEG;
+    }
   }
 }
