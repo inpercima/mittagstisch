@@ -62,6 +62,29 @@ public class ContentService {
     }
 
     /**
+     * Extracts absolute URLs of images found by the given CSS selector on the
+     * specified page.
+     *
+     * @param url           the URL of the web page to extract images from
+     * @param imageSelector the CSS selector to locate the image elements
+     * @return a list of absolute image URLs, or an empty list if none are found or
+     *         an error occurs
+     */
+    public List<String> extractImageUrlsFromWebsite(String url, String imageSelector) {
+        try {
+            Document doc = Jsoup.connect(url).get();
+            return doc.select(imageSelector).stream()
+                    .map(img -> img.attr("abs:src"))
+                    .filter(src -> !src.isBlank())
+                    .toList();
+        } catch (IOException e) {
+            log.error("Failed to extract image URLs from '{}' with selector '{}': {}", url, imageSelector,
+                    e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
      * Extracts the absolute URL of the first PDF found by the given CSS selector on
      * the specified page.
      *
