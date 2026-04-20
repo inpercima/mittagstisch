@@ -19,7 +19,6 @@ services:
     mem_limit: 1g
     restart: unless-stopped
     volumes:
-      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
       - data-mysql:/var/lib/mysql
 volumes:
   data-mysql:

@@ -31,6 +31,3 @@ spring:
         jdbc.time_zone: UTC
         format_sql: true
     open-in-view: false
-  sql:
-    init:
-      mode: never
