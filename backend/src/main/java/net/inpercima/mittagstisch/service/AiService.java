@@ -95,7 +95,7 @@ public class AiService {
         WICHTIG:
         - content ist ein echtes JSON-Array
         - keine Strings statt Array
-        - eine Erklärung
+        - keine Erklärung
         - kein zusätzlicher Text
 
         Text:
