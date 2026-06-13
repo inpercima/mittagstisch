@@ -1,11 +1,9 @@
 package net.inpercima.mittagstisch.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -172,13 +170,13 @@ public class AiService {
         .map(url -> {
           try {
             MimeType mimeType = resolveMimeType(url);
-            return new Media(mimeType, new URL(url));
-          } catch (MalformedURLException e) {
+            return new Media(mimeType, URI.create(url));
+          } catch (IllegalArgumentException e) {
             log.warn("Skipping invalid image URL '{}': {}", url, e.getMessage());
             return null;
           }
         })
-        .filter(Objects::nonNull)
+        .filter(media -> media != null)
         .toList();
 
     UserMessage userMessage = UserMessage.builder()
@@ -189,17 +187,16 @@ public class AiService {
   }
 
   private static MimeType resolveMimeType(String url) {
-    try {
-      String path = new URL(url).getPath();
-      String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
-      return switch (ext) {
-        case "png" -> MimeTypeUtils.IMAGE_PNG;
-        case "gif" -> MimeTypeUtils.IMAGE_GIF;
-        case "webp" -> MimeType.valueOf("image/webp");
-        default -> MimeTypeUtils.IMAGE_JPEG;
-      };
-    } catch (MalformedURLException | StringIndexOutOfBoundsException e) {
+    String path = URI.create(url).getPath();
+    if (path == null || !path.contains(".")) {
       return MimeTypeUtils.IMAGE_JPEG;
     }
+    String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
+    return switch (ext) {
+      case "png" -> MimeTypeUtils.IMAGE_PNG;
+      case "gif" -> MimeTypeUtils.IMAGE_GIF;
+      case "webp" -> MimeType.valueOf("image/webp");
+      default -> MimeTypeUtils.IMAGE_JPEG;
+    };
   }
 }
