@@ -11,7 +11,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.model.Media;
+import org.springframework.ai.content.Media;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
@@ -181,7 +181,10 @@ public class AiService {
         .filter(Objects::nonNull)
         .toList();
 
-    UserMessage userMessage = new UserMessage(promptText, mediaList);
+    UserMessage userMessage = UserMessage.builder()
+        .text(promptText)
+        .media(mediaList)
+        .build();
     return new Prompt(List.of(userMessage));
   }
 
