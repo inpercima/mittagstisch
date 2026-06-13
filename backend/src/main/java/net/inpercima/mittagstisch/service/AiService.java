@@ -61,19 +61,16 @@ public class AiService {
         Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
 
         Ausgabeformat:
-        - Nutze folgendes JSON-Format für die Ausgabe:
+        - Antworte ausschließlich mit reinem JSON, ohne Erklärung, ohne Codeblock, ohne zusätzlichen Text.
+        - Nutze exakt folgendes JSON-Format:
         {{
-          today:
-          {{
-            "content": string,
-            "status": string
-          }}
-        }},
-        {{
-          tomorrow:
-          {{
-            "content": string,
-            "status": string
+          "today": {{
+            "content": [],
+            "status": "SUCCESS"
+          }},
+          "tomorrow": {{
+            "content": [],
+            "status": "SUCCESS"
           }}
         }}
 
@@ -86,15 +83,14 @@ public class AiService {
         - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
         - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
         [
-          {{ "name": string, "price": string }}
+          {{ "name": "Gerichtname", "price": "5,90 €" }}
         ]
         - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
 
         WICHTIG:
-        - content ist ein echtes JSON-Array
-        - keine Strings statt Array
-        - keine Erklärung
-        - kein zusätzlicher Text
+        - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
+        - "content" ist ein echtes JSON-Array
+        - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
 
         Text:
         {content}
@@ -129,19 +125,16 @@ public class AiService {
         Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
 
         Ausgabeformat:
-        - Nutze folgendes JSON-Format für die Ausgabe:
+        - Antworte ausschließlich mit reinem JSON, ohne Erklärung, ohne Codeblock, ohne zusätzlichen Text.
+        - Nutze exakt folgendes JSON-Format:
         {
-          today:
-          {
-            "content": string,
-            "status": string
-          }
-        },
-        {
-          tomorrow:
-          {
-            "content": string,
-            "status": string
+          "today": {
+            "content": [],
+            "status": "SUCCESS"
+          },
+          "tomorrow": {
+            "content": [],
+            "status": "SUCCESS"
           }
         }
 
@@ -154,15 +147,14 @@ public class AiService {
         - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
         - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
         [
-          { "name": string, "price": string }
+          { "name": "Gerichtname", "price": "5,90 €" }
         ]
         - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
 
         WICHTIG:
-        - content ist ein echtes JSON-Array
-        - keine Strings statt Array
-        - keine Erklärung
-        - kein zusätzlicher Text
+        - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
+        - "content" ist ein echtes JSON-Array
+        - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
         """.formatted(today, tomorrow, weekStartDate, weekEndDate,
         today, today, today, today, tomorrow);
 
