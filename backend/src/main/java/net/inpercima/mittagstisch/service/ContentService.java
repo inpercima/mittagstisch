@@ -67,20 +67,20 @@ public class ContentService {
      *
      * @param url           the URL of the web page to extract images from
      * @param imageSelector the CSS selector to locate the image elements
-     * @return a list of absolute image URLs, or an empty list if none are found or
-     *         an error occurs
+     * @return an optional containing the first absolute image URL found, or empty
+     *         if none are found or an error occurs
      */
-    public List<String> extractImageUrlsFromWebsite(String url, String imageSelector) {
+    public Optional<String> extractImageUrlsFromWebsite(String url, String imageSelector) {
         try {
             Document doc = Jsoup.connect(url).get();
             return doc.select(imageSelector).stream()
                     .map(img -> img.attr("abs:src"))
                     .filter(src -> !src.isBlank())
-                    .toList();
+                    .findFirst();
         } catch (IOException e) {
             log.error("Failed to extract image URLs from '{}' with selector '{}': {}", url, imageSelector,
                     e.getMessage());
-            return List.of();
+            return Optional.empty();
         }
     }
 

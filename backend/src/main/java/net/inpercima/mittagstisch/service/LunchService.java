@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,8 @@ public class LunchService {
 
         if (result.isEmpty()) {
             final DayOfWeek dow = today.getDayOfWeek();
-            final boolean isTuesdayToFriday = dow != DayOfWeek.MONDAY && dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY;
+            final boolean isTuesdayToFriday = dow != DayOfWeek.MONDAY && dow != DayOfWeek.SATURDAY
+                    && dow != DayOfWeek.SUNDAY;
             if (isTuesdayToFriday) {
                 result = lunchRepository.findByImportDateAndDay(today.minusDays(1), day, top);
             }
@@ -91,7 +93,7 @@ public class LunchService {
         String dishes;
         log.info("Prepare lunch for bistro '{}': {}", bistro.getName(), bistro.getUrl());
         if (bistro.getImageSelector() != null && !bistro.getImageSelector().isBlank()) {
-            List<String> imageUrls = contentService.extractImageUrlsFromWebsite(bistro.getUrl(),
+            Optional<String> imageUrls = contentService.extractImageUrlsFromWebsite(bistro.getUrl(),
                     bistro.getImageSelector());
             if (imageUrls.isEmpty()) {
                 log.warn("No images found for bistro '{}' with selector '{}'", bistro.getName(),
