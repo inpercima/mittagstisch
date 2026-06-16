@@ -32,4 +32,7 @@ public class BistroEntity {
 
     @Column
     private String documentSelector;
+
+    @Column
+    private String imageSelector;
 }

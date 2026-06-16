@@ -31,7 +31,9 @@ CREATE TABLE `bistro` (
   `id` int NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `selector` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `document_selector` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image_selector` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
