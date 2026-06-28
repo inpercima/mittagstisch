@@ -10,7 +10,7 @@ Daily lunches from bistros in western Leipzig (Plagwitz and Lindenau) automatica
 
 It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
-- `node 24.14.0` or higher in combination with
+- `node 24.16.0` or higher in combination with
   - `npm 11.9.0` or higher or
   - `pnpm 10.33.0` or higher, used in this repository
 
