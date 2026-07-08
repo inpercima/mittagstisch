@@ -27,12 +27,12 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-- `@angular/cli 21.2.7` or higher
+- `@angular/cli 22.0.5` or higher
 
 Install @angular/cli by running:
 
 ```bash
-pnpm install -g @angular/cli@21
+pnpm install -g @angular/cli@22
 ```
 
 ### Java
@@ -52,17 +52,6 @@ git clone https://github.com/inpercima/mittagstisch/
 cd mittagstisch
 ```
 
-### Read more
-
-Check the documentation for each module/component.
-Each individual document describes the basic tasks for the module.
-
-For frontend check [mittagstisch - frontend](./frontend/README.md).
-
-For backend check [mittagstisch - backend](./backend/README.md).
-
-For docker check [mittagstisch - docker](./docker/README.md).
-
 ### Install tools
 
 Some tools are both used by backend and frontend.
@@ -76,9 +65,11 @@ pnpm install
 
 ### Starting the application in development
 
-For development, you need a running MySQL instance. Start one via Docker (see [Docker Guide](./docker/README.md)) or use an external database.
+For development, you need a running MySQL instance.
+Start one via Docker (see [Docker Guide](./docker/README.md)) or use an external database.
 
-Database schema and seed data are managed by [Flyway](https://flywaydb.org/) and applied automatically on application startup (see `backend/src/main/resources/db/migration/`).
+Database schema and seed data are managed by [Flyway](https://flywaydb.org/) and applied automatically on application
+startup (see `backend/src/main/resources/db/migration/`).
 
 #### Option 1: Start everything with one command (Recommended)
 
@@ -114,9 +105,9 @@ For detailed development setup and configuration options, check:
 
 ### Access the application
 
-- **Frontend:** http://localhost:4200/
-- **Backend API:** http://localhost:8080/
-- **phpMyAdmin:** http://localhost:81 (or configured `PHPMYADMIN_PORT` in `.env`)
+- **Frontend:** [http://localhost:4200/](http://localhost:4200/)
+- **Backend API:** [http://localhost:8080/](http://localhost:8080/)
+- **phpMyAdmin:** [http://localhost:81](http://localhost:81) (or configured `PHPMYADMIN_PORT` in `.env`)
 
 ## Production Mode
 
@@ -139,7 +130,7 @@ For detailed development setup and configuration options, check:
    ./mvnw clean package -Pprod
    ```
 
-   The prod profile automatically builds the frontend via pnpm and bundles it into the JAR. This creates `mittagstisch-1.13.1.jar` in the `target/` directory.
+   The prod profile automatically builds the frontend via pnpm and bundles it into the JAR. This creates `mittagstisch-<VERSION>.jar` in the `target/` directory.
 
 ### Deployment
 
@@ -148,19 +139,18 @@ For detailed development setup and configuration options, check:
    Copy the following files to your server:
    - `.env` (Docker environment configuration)
    - `docker-compose.yml` and `docker-compose.prod.yml`
-   - `mittagstisch-1.13.1.jar` (from backend/target)
+   - `mittagstisch-<VERSION>.jar` (from backend/target)
    - `application-prod.yml` (Spring Boot production configuration)
-   - `nginx/` directory with `nginx.conf` and SSL certificates
 
 2. **Configure for your environment:**
    - Modify `.env` with your production settings
    - Update `application-prod.yml` with production database credentials and API keys
-   - Configure nginx with your domain and SSL certificates
+   - Configure nginx with your domain and SSL certificates, for this create the folder `nginx/` in `docker/` and add a `nginx.conf` file
 
 3. **Deploy and run:**
 
    ```bash
-   docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.prod.yml up -d
+   docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.prod.yml up -d --build
    ```
 
    This starts MySQL, the Spring Boot webapp (with embedded frontend), and nginx as reverse proxy.

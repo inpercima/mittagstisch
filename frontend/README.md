@@ -6,7 +6,7 @@ This guide covers the Angular frontend setup and usage for both development and 
 
 * Node.js 24.16.0 or higher
 * pnpm 11.8.0 or higher
-* Angular CLI 21.2.7 or higher
+* Angular CLI 22.0.5 or higher
 
 ## Getting started
 
@@ -78,11 +78,13 @@ pnpm build:prod
 
 This runs `ng lint` followed by `ng build` (production configuration), creating an optimized bundle in `dist/mittagstisch/browser/`.
 
-**Note**: In production deployment, the frontend is automatically built via the backend's Maven prod profile (`./mvnw clean package -Pprod`). You typically don't need to run this command separately.
+**Note**: In production deployment, the frontend is automatically built via the backend's Maven prod profile (`./mvnw clean package -Pprod`).
+You typically don't need to run this command separately.
 
 ### Deployment
 
-In production, the frontend is bundled into the Spring Boot JAR and served directly by the backend. nginx acts as a reverse proxy in front of the application (see [Docker Guide](../docker/README.md)).
+In production, the frontend is bundled into the Spring Boot JAR and served directly by the backend.
+nginx acts as a reverse proxy in front of the application (see [Docker Guide](../docker/README.md)).
 
 ## Testing
 
@@ -104,39 +106,28 @@ Change for `production mode` the option `production` to `true`.
 
 ### Table of contents
 
-- [api](#api)
-- [appname](#appname)
-- [production](#production)
-- [theme](#theme)
+* [api](#api)
+* [appname](#appname)
+* [production](#production)
 
 ### `api`
 
 Defines the URL to the backend.
 
-- default: `./api/`
-- type: `string`
+* default: `./api/`
+* type: `string`
 
 ### `appname`
 
 Applicationwide title of the app, displayed in title and toolbar.
 
-- default: `Mittagstisch`
-- type: `string`
+* default: `Mittagstisch`
+* type: `string`
 
 ### `production`
 
 Defines whether the app is in production or not.
 
-- default: `false`
-- type: `boolean`
-- values: `true`/`false`
-
-### `theme`
-
-Name of a pre-build-theme or a custom theme.
-
-- default: `azure-blue`
-- type: `string`
-- values: `rose-red`/`azure-blue`/`magenta-violet`/`cyan-orange`/`custom`
-
-To modify the custom theme just edit the colors and themes in `themes.scss`.
+* default: `false`
+* type: `boolean`
+* values: `true`/`false`
