@@ -4,9 +4,9 @@ This guide covers the Angular frontend setup and usage for both development and 
 
 ## Prerequisites
 
-* Node.js 22.20.0 or higher
-* pnpm 10.27.0 or higher
-* Angular CLI 21.1.1 or higher
+* Node.js 24.16.0 or higher
+* pnpm 11.8.0 or higher
+* Angular CLI 21.2.7 or higher
 
 ## Getting started
 
@@ -34,12 +34,10 @@ pnpm install
 
    Edit `src/environments/environment.dev.ts` to match your local setup:
    * Set `production: false`
-   * Configure `api` URL (default: `http://localhost:8080/`)
+   * Configure `api` URL (default: `./api/`)
    * Adjust other settings as needed (see [Configuration](#configuration) section)
 
 ### Running in development mode
-
-**Option 1: Development server with hot reload (Recommended)**
 
 ```bash
 pnpm start
@@ -47,20 +45,13 @@ pnpm start
 
 The application will be available at **http://localhost:4200/** and automatically reload when you make changes to the source code.
 
-**Option 2: Build for development**
+### Building for development
 
 ```bash
 pnpm build:dev
 ```
 
-This creates a development build in the `dist/` directory. You can serve it with any static file server.
-
-### Development workflow
-
-1. Start the development server: `pnpm start`
-2. Make changes to your code
-3. The browser will automatically reload with your changes
-4. Check the console for any compilation errors
+This runs `ng lint` followed by `ng build --configuration=development`, creating a development build in the `dist/` directory.
 
 ## Production Mode
 
@@ -82,22 +73,16 @@ This creates a development build in the `dist/` directory. You can serve it with
 ### Building for production
 
 ```bash
-# Build optimized production bundle
 pnpm build:prod
 ```
 
-This creates an optimized, compressed production build in the `dist/` directory with:
-* Minified code
-* Tree-shaking (removal of unused code)
-* Optimized bundle sizes
-* AOT (Ahead-of-Time) compilation
+This runs `ng lint` followed by `ng build` (production configuration), creating an optimized bundle in `dist/mittagstisch/browser/`.
+
+**Note**: In production deployment, the frontend is automatically built via the backend's Maven prod profile (`./mvnw clean package -Pprod`). You typically don't need to run this command separately.
 
 ### Deployment
 
-The production build files in `dist/` should be:
-1. Served by a web server (nginx, Apache, etc.)
-2. Configured with proper routing for Angular's router
-3. Served over HTTPS in production
+In production, the frontend is bundled into the Spring Boot JAR and served directly by the backend. nginx acts as a reverse proxy in front of the application (see [Docker Guide](../docker/README.md)).
 
 ## Testing
 
@@ -128,7 +113,7 @@ Change for `production mode` the option `production` to `true`.
 
 Defines the URL to the backend.
 
-- default: `http://localhost:8080/`
+- default: `./api/`
 - type: `string`
 
 ### `appname`
@@ -150,7 +135,7 @@ Defines whether the app is in production or not.
 
 Name of a pre-build-theme or a custom theme.
 
-- default: `rose-red`
+- default: `azure-blue`
 - type: `string`
 - values: `rose-red`/`azure-blue`/`magenta-violet`/`cyan-orange`/`custom`
 

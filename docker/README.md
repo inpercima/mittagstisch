@@ -1,6 +1,6 @@
 # Mittagstisch - docker
 
-This guide covers Docker setup and usage for running MySQL and phpMyAdmin in both development and production environments.
+This guide covers Docker setup and usage for running MySQL, phpMyAdmin (development), and nginx (production).
 
 ## Prerequisites
 
@@ -73,7 +73,7 @@ Defines the version for MySQL
 
 Defines the port for phpMyAdmin
 
-* default: `80`
+* default: `81`
 * type: `string`
 
 ### `PHPMYADMIN_VERSION`
@@ -107,7 +107,7 @@ docker logs mittagstisch_mysql
 
 ### Access services in development
 
-* **phpMyAdmin:** http://localhost (or your configured `PHPMYADMIN_PORT`)
+* **phpMyAdmin:** http://localhost:81 (or your configured `PHPMYADMIN_PORT`)
   * Server: `mysql`
   * Username: root or `MYSQL_USER`
   * Password: Generated password from logs or `MYSQL_PASSWORD`
@@ -117,6 +117,8 @@ docker logs mittagstisch_mysql
   * Port: `MYSQL_PORT` (default: 3306)
   * Username: root or `MYSQL_USER`
   * Password: From logs or `MYSQL_PASSWORD`
+
+**Note**: Database schema and seed data are managed by Flyway and applied automatically when the backend starts. You do not need to manually import SQL dumps.
 
 ### Stop development services
 
@@ -128,29 +130,61 @@ docker compose --project-name mittagstisch down
 
 ## Production Mode
 
-### Running Docker services for production
+### Architecture
 
-**Start MySQL and phpMyAdmin:**
+In production, Docker Compose runs three services:
+
+1. **MySQL** - Database server
+2. **webapp** - Spring Boot application (with embedded Angular frontend), built from the [Dockerfile](./Dockerfile)
+3. **nginx** - Reverse proxy handling HTTP/HTTPS traffic and forwarding to the webapp
+
+### Setup
+
+1. **Build the production JAR** (see [Backend Guide](../backend/README.md)):
+
+   ```bash
+   cd backend
+   ./mvnw clean package -Pprod
+   ```
+
+2. **Prepare the deployment directory** with these files:
+   - `docker-compose.yml` and `docker-compose.prod.yml`
+   - `.env` (from `default.env`, configured for production)
+   - `Dockerfile`
+   - `application-prod.yml` (configured with production credentials)
+   - `mittagstisch-1.13.1.jar` (from `backend/target/`)
+   - `nginx/nginx.conf` (nginx configuration)
+   - `nginx/certs/` (SSL certificates)
+
+3. **Configure nginx:**
+
+   Create `nginx/nginx.conf` with your domain, SSL certificates, and proxy settings to forward traffic to `webapp:8080`.
+
+### Running Docker services for production
 
 ```bash
 docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
+This starts MySQL, builds and runs the webapp container, and starts nginx as a reverse proxy.
+
+Database migrations are applied automatically by Flyway on webapp startup.
+
 ### Production considerations
 
 1. **Security:**
    * Change default passwords in `.env`
-   * Restrict phpMyAdmin access (firewall rules or disable in production)
    * Use strong MySQL passwords
+   * Configure SSL certificates for nginx
    * Consider using Docker secrets for sensitive data
 
 2. **Data persistence:**
    * Ensure volumes are properly configured for data persistence
-   * Regular database backups (see [Database Management](#database-management))
+   * Set up regular database backups
    * Monitor disk space
 
 3. **Monitoring:**
-   * Check logs regularly: `docker logs mittagstisch_mysql`
+   * Check logs: `docker logs mittagstisch_webapp` or `docker logs nginx`
    * Monitor container health: `docker ps`
    * Set up alerts for container failures
 
@@ -172,24 +206,13 @@ docker cp dump.sql mittagstisch_mysql:/dump.sql
 
 # Import the dump (you will be prompted for password)
 docker exec -it mittagstisch_mysql mysql -uroot -p mittagstisch < dump.sql
-
-# Alternative: Import without interactive prompt (less secure)
-# docker exec -i mittagstisch_mysql sh -c 'mysql -uroot -p$MYSQL_ROOT_PASSWORD mittagstisch' < dump.sql
 ```
+
+**Note**: For normal operation, Flyway handles schema creation and seed data automatically. Manual imports are only needed for restoring backups or migrating existing data.
 
 ### Export database backup
 
 ```bash
 # Export database to dump file (you will be prompted for password)
 docker exec -it mittagstisch_mysql mysqldump -uroot -p mittagstisch > backup.sql
-
-# Alternative: Export without interactive prompt (less secure)
-# docker exec mittagstisch_mysql sh -c 'mysqldump -uroot -p$MYSQL_ROOT_PASSWORD mittagstisch' > backup.sql
 ```
-
-### External database management
-
-If you manage your database outside of this project:
-* Use the provided `dump.sql` file to initialize your database
-* Configure your application to connect to the external database
-* Update `application-dev.yml` or `application-prod.yml` with external database credentials

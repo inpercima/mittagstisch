@@ -27,7 +27,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-- `@angular/cli 21.2.6` or higher
+- `@angular/cli 21.2.7` or higher
 
 Install @angular/cli by running:
 
@@ -48,7 +48,6 @@ pnpm install -g @angular/cli@21
 ### Clone project
 
 ```bash
-# clone project
 git clone https://github.com/inpercima/mittagstisch/
 cd mittagstisch
 ```
@@ -77,9 +76,11 @@ pnpm install
 
 ### Starting the application in development
 
-For development, you have multiple options to run the application:
+For development, you need a running MySQL instance. Start one via Docker (see [Docker Guide](./docker/README.md)) or use an external database.
 
-#### Option 1: Start everything with one command (Recommended for quick start)
+Database schema and seed data are managed by [Flyway](https://flywaydb.org/) and applied automatically on application startup (see `backend/src/main/resources/db/migration/`).
+
+#### Option 1: Start everything with one command (Recommended)
 
 ```bash
 pnpm start
@@ -95,7 +96,7 @@ Use two separate terminals for more control and better log visibility:
 
 ```bash
 cd backend
-./mvnw spring-boot:run -Pdev
+./mvnw
 ```
 
 **Terminal 2 - Frontend:**
@@ -115,14 +116,15 @@ For detailed development setup and configuration options, check:
 
 - **Frontend:** http://localhost:4200/
 - **Backend API:** http://localhost:8080/
-- **phpMyAdmin:** http://localhost (or configured port in `.env`)
+- **phpMyAdmin:** http://localhost:81 (or configured `PHPMYADMIN_PORT` in `.env`)
 
 ## Production Mode
 
 ### Prerequisites for production
 
 - Docker and Docker Compose installed on the server
-- Server with sufficient resources (RAM, CPU, storage)
+- nginx configuration files (see `docker/nginx/`)
+- SSL certificates for HTTPS
 
 ### Build process
 
@@ -130,14 +132,14 @@ For detailed development setup and configuration options, check:
 
    Check for the existence of `environment.prod.ts` as described in [Frontend Guide](./frontend/README.md).
 
-2. **Build the backend:**
+2. **Build the backend (includes frontend):**
 
    ```bash
    cd backend
-   ./mvnw clean package
+   ./mvnw clean package -Pprod
    ```
 
-   This creates `mittagstisch-1.0.0-SNAPSHOT.jar` in the `target` directory.
+   The prod profile automatically builds the frontend via pnpm and bundles it into the JAR. This creates `mittagstisch-1.13.1.jar` in the `target/` directory.
 
 ### Deployment
 
@@ -145,21 +147,24 @@ For detailed development setup and configuration options, check:
 
    Copy the following files to your server:
    - `.env` (Docker environment configuration)
-   - `dump.sql` (Database dump file)
    - `docker-compose.yml` and `docker-compose.prod.yml`
-   - `mittagstisch-1.0.0-SNAPSHOT.jar` (from backend/target)
+   - `mittagstisch-1.13.1.jar` (from backend/target)
    - `application-prod.yml` (Spring Boot production configuration)
+   - `nginx/` directory with `nginx.conf` and SSL certificates
 
 2. **Configure for your environment:**
    - Modify `.env` with your production settings
-   - Update `application-prod.yml` with production-specific configurations (database credentials, API keys, etc.)
+   - Update `application-prod.yml` with production database credentials and API keys
+   - Configure nginx with your domain and SSL certificates
 
 3. **Deploy and run:**
-
-   Run the Docker Compose setup as described in the [Docker Production Guide](./docker/README.md).
 
    ```bash
    docker compose --project-name mittagstisch -f docker-compose.yml -f docker-compose.prod.yml up -d
    ```
+
+   This starts MySQL, the Spring Boot webapp (with embedded frontend), and nginx as reverse proxy.
+
+   Database migrations are applied automatically by Flyway on startup.
 
 For detailed production deployment instructions, see [Docker Guide](./docker/README.md).

@@ -14,6 +14,15 @@ This guide covers the Spring Boot backend setup and usage for both development a
 cd backend
 ```
 
+## Database Migrations with Flyway
+
+Database schema and seed data are managed by [Flyway](https://flywaydb.org/). Migration scripts are located in `src/main/resources/db/migration/` and are applied automatically on application startup.
+
+- `V1__create_schema.sql` - Creates the database schema
+- `V2__seed_bistro.sql` - Seeds initial bistro data
+
+To add a new migration, create a file following the naming convention `V<number>__<description>.sql`.
+
 ## Development Mode
 
 ### Setup for development
@@ -21,7 +30,7 @@ cd backend
 1. **Create development configuration file:**
 
    ```bash
-   cp src/main/resources/application.yml src/main/resources/application-dev.yml
+   cp src/main/resources/application-dev.default.yml src/main/resources/application-dev.yml
    ```
 
    **Note**: This file will not be under version control (listed in .gitignore).
@@ -29,33 +38,20 @@ cd backend
 2. **Configure development settings:**
 
    Edit `src/main/resources/application-dev.yml` to match your local environment:
-   * Database connection settings
-   * Server port (default: 8080)
-   * Logging levels
+   * Database connection settings (URL, username, password)
+   * OpenAI API key
    * Other development-specific configurations
 
 ### Running in development mode
 
-**Recommended: Using Maven with dev profile**
-
 ```bash
-# Short command (uses dev profile by default)
+# Uses dev profile by default
 ./mvnw
-
-# Explicit dev profile
-./mvnw spring-boot:run -Pdev
 ```
 
 The backend API will be available at **http://localhost:8080/**
 
-### Development workflow
-
-1. Start the backend: `./mvnw spring-boot:run -Pdev`
-2. Make changes to your Java code
-3. Stop the server (Ctrl+C) and restart to see changes
-4. Use your IDE's debugging capabilities for better development experience
-
-**Note**: For automatic reload on code changes, consider using Spring Boot DevTools in your IDE.
+Flyway will automatically apply any pending migrations on startup.
 
 ## Production Mode
 
@@ -63,64 +59,38 @@ The backend API will be available at **http://localhost:8080/**
 
 1. **Create production configuration file:**
 
-   ```bash
-   cp src/main/resources/application.yml src/main/resources/application-prod.yml
-   ```
-
-2. **Configure production settings:**
-
    Edit `src/main/resources/application-prod.yml`:
-   * Production database connection (secure credentials)
-   * Production server settings
-   * Logging configuration for production
-   * Security settings
-   * Any production-specific environment variables
+   * Production database connection (uses `mysql` as host within Docker network)
+   * Production API keys
+   * Other production-specific settings
 
 ### Building for production
 
-**Build the JAR file:**
+The prod Maven profile builds the frontend via pnpm and bundles it into the JAR:
 
 ```bash
-# Build with tests
-./mvnw clean package
-
-# Build without tests (faster, but not recommended)
-./mvnw clean package -DskipTests
+./mvnw clean package -Pprod
 ```
 
-This creates `mittagstisch-1.0.0-SNAPSHOT.jar` in the `target/` directory.
+This:
+1. Runs `pnpm install --frozen-lockfile` in the frontend directory
+2. Runs `pnpm run build:prod` to build the Angular frontend
+3. Copies the frontend build output into `public/` in the JAR
+4. Creates `mittagstisch-1.13.1.jar` in the `target/` directory
 
 ### Running in production
 
-**Option 1: Direct JAR execution**
+**Via Docker (recommended):**
+
+The JAR and `application-prod.yml` are copied into the Docker image (see [Dockerfile](../docker/Dockerfile)). The container runs with the prod profile and connects to MySQL within the Docker network.
+
+See the [Docker Guide](../docker/README.md) for the full production deployment.
+
+**Direct JAR execution (for testing):**
 
 ```bash
-# Copy production config alongside the JAR
-cp src/main/resources/application-prod.yml target/application-prod.yml
-
-# Navigate to target directory and run
 cd target
-java -jar ./mittagstisch-1.0.0-SNAPSHOT.jar --spring.profiles.active=prod
+java -jar ./mittagstisch-1.13.1.jar --spring.profiles.active=prod
 ```
 
-**Option 2: Using Maven with prod profile (for testing production build locally)**
-
-```bash
-# Short command with prod profile
-./mvnw -Pprod
-
-# Explicit prod profile
-./mvnw spring-boot:run -Pprod
-```
-
-### Deployment
-
-For production deployment:
-1. Build the application JAR as described above
-2. Copy `mittagstisch-1.0.0-SNAPSHOT.jar` and `application-prod.yml` to your server
-3. Set up as a systemd service or use Docker (recommended)
-4. Ensure proper security configurations
-5. Use a reverse proxy (nginx, Apache) in front of the application
-6. Set up proper logging and monitoring
-
-See the [Docker Guide](../docker/README.md) for containerized deployment.
+Ensure `application-prod.yml` is in the same directory as the JAR.
