@@ -2,7 +2,7 @@
 
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
 
-Daily lunches from bistros in western Leipzig (Plagwitz and Lindenau) automatically collected and clearly displayed.
+Daily lunches from canteens and bistros in Leipzig (mainly in Plagwitz and Lindenau) are automatically recorded and clearly displayed.
 
 ## Prerequisites
 
