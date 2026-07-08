@@ -1,54 +1,96 @@
 # Mittagstisch - frontend
 
+This guide covers the Angular frontend setup and usage for both development and production environments.
+
+## Prerequisites
+
+* Node.js 24.16.0 or higher
+* pnpm 11.8.0 or higher
+* Angular CLI 21.2.7 or higher
+
 ## Getting started
 
 ```bash
-# all commands used in ./frontend
+# Navigate to frontend directory
 cd frontend
 
-# install tools and frontend dependencies
+# Install dependencies
 pnpm install
 ```
 
-Create environment file for `development mode`.
+## Development Mode
+
+### Setup for development
+
+1. **Create development environment file:**
+
+   ```bash
+   cp src/environments/environment.ts src/environments/environment.dev.ts
+   ```
+
+   **Note**: This file will not be under version control (listed in .gitignore).
+
+2. **Configure development settings:**
+
+   Edit `src/environments/environment.dev.ts` to match your local setup:
+   * Set `production: false`
+   * Configure `api` URL (default: `./api/`)
+   * Adjust other settings as needed (see [Configuration](#configuration) section)
+
+### Running in development mode
 
 ```bash
-cp src/environments/environment.ts src/environments/environment.dev.ts
-```
-
-**Note**: This file will not be under version control but listed in .gitignore.
-
-## Usage
-
-### Recommendation
-
-It is recommended to use a server to get full access of all angular.
-For the other options your app should run on a server which you like.
-
-### Run in development mode
-
-```bash
-# build, reachable on http://localhost/app/path/to/dist/
-pnpm build:dev
-
-# build and starts a server, rebuild after changes, reachable on http://localhost:4200/
 pnpm start
 ```
 
-### Package
+The application will be available at **http://localhost:4200/** and automatically reload when you make changes to the source code.
+
+### Building for development
 
 ```bash
-# build in production mode, compressed
+pnpm build:dev
+```
+
+This runs `ng lint` followed by `ng build --configuration=development`, creating a development build in the `dist/` directory.
+
+## Production Mode
+
+### Setup for production
+
+1. **Create production environment file:**
+
+   ```bash
+   cp src/environments/environment.ts src/environments/environment.prod.ts
+   ```
+
+2. **Configure production settings:**
+
+   Edit `src/environments/environment.prod.ts`:
+   * Set `production: true`
+   * Configure production `api` URL
+   * Set appropriate theme and other production-specific settings
+
+### Building for production
+
+```bash
 pnpm build:prod
 ```
 
-### Tests
+This runs `ng lint` followed by `ng build` (production configuration), creating an optimized bundle in `dist/mittagstisch/browser/`.
+
+**Note**: In production deployment, the frontend is automatically built via the backend's Maven prod profile (`./mvnw clean package -Pprod`). You typically don't need to run this command separately.
+
+### Deployment
+
+In production, the frontend is bundled into the Spring Boot JAR and served directly by the backend. nginx acts as a reverse proxy in front of the application (see [Docker Guide](../docker/README.md)).
+
+## Testing
 
 ```bash
-# test
+# Run unit tests
 ng test
 
-# e2e
+# Run end-to-end tests
 ng e2e
 ```
 
@@ -56,7 +98,7 @@ ng e2e
 
 ### General
 
-All options have to been set in the environment files but some of them do not need to be changed.
+All options have to be set in the environment files but some of them do not need to be changed.
 All defaults refer to the environment file (`environment.ts`), they are prepared in `development mode` (`environment.dev.ts`).
 Change for `production mode` the option `production` to `true`.
 
@@ -71,7 +113,7 @@ Change for `production mode` the option `production` to `true`.
 
 Defines the URL to the backend.
 
-- default: `http://localhost:8080/`
+- default: `./api/`
 - type: `string`
 
 ### `appname`
@@ -93,7 +135,7 @@ Defines whether the app is in production or not.
 
 Name of a pre-build-theme or a custom theme.
 
-- default: `rose-red`
+- default: `azure-blue`
 - type: `string`
 - values: `rose-red`/`azure-blue`/`magenta-violet`/`cyan-orange`/`custom`
 
