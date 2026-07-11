@@ -25,5 +25,4 @@ public class BistroService {
     public long count() {
         return bistroRepository.count();
     }
-
 }

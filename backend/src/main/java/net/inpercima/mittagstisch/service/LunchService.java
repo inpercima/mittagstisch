@@ -26,6 +26,7 @@ import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.LunchDto;
 import net.inpercima.mittagstisch.model.StatusEnum;
+import net.inpercima.mittagstisch.model.TypeEnum;
 import net.inpercima.mittagstisch.repository.LunchRepository;
 
 @Slf4j
@@ -92,20 +93,20 @@ public class LunchService {
             LocalDate weekEnd) {
         String dishes;
         log.info("Prepare lunch for bistro '{}': {}", bistro.getName(), bistro.getUrl());
-        if (bistro.getImageSelector() != null && !bistro.getImageSelector().isBlank()) {
+        if (bistro.getType() == TypeEnum.IMAGE) {
             Optional<String> imageUrls = contentService.extractImageUrlsFromWebsite(bistro.getUrl(),
-                    bistro.getImageSelector());
+                    bistro.getSelector());
             if (imageUrls.isEmpty()) {
                 log.warn("No images found for bistro '{}' with selector '{}'", bistro.getName(),
-                        bistro.getImageSelector());
+                        bistro.getSelector());
                 dishes = "";
             } else {
                 dishes = aiService.extractDishesFromImages(imageUrls, weekStart, weekEnd, today, tomorrow);
             }
-        } else if (bistro.getDocumentSelector() != null && !bistro.getDocumentSelector().isBlank()) {
+        } else if (bistro.getType() == TypeEnum.PDF) {
             String lunch;
             try {
-                lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getDocumentSelector());
+                lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getSelector());
             } catch (IOException e) {
                 log.error("Error extracting lunch from PDF for bistro '{}'': {}", bistro.getName(), e.getMessage());
                 lunch = "";
