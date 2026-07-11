@@ -104,14 +104,23 @@ public class LunchService {
                 dishes = aiService.extractDishesFromImages(imageUrls, weekStart, weekEnd, today, tomorrow);
             }
         } else if (bistro.getType() == TypeEnum.PDF) {
-            String lunch;
             try {
-                lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getSelector());
+                Optional<List<String>> pdfImages = contentService.extractPdfPagesAsImages(bistro.getUrl(),
+                        bistro.getSelector());
+                if (pdfImages.isPresent() && !pdfImages.get().isEmpty()) {
+                    // Use Vision API to analyze PDF as images
+                    dishes = aiService.extractDishesFromPdfImages(pdfImages.get(), weekStart, weekEnd, today, tomorrow);
+                } else {
+                    log.warn("No images extracted from PDF for bistro '{}', falling back to text extraction",
+                            bistro.getName());
+                    // Fallback to text extraction
+                    String lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getSelector());
+                    dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+                }
             } catch (IOException e) {
-                log.error("Error extracting lunch from PDF for bistro '{}'': {}", bistro.getName(), e.getMessage());
-                lunch = "";
+                log.error("Error extracting lunch from PDF for bistro '{}': {}", bistro.getName(), e.getMessage());
+                dishes = "";
             }
-            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         } else {
             String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
             dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);

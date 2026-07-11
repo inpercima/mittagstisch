@@ -1,13 +1,19 @@
 package net.inpercima.mittagstisch.service;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -106,6 +112,60 @@ public class ContentService {
                     e.getMessage());
             return "";
         }
+    }
+
+    /**
+     * Extracts PDF pages as PNG images and returns them as data URIs.
+     *
+     * @param url      the URL of the web page to search for a PDF
+     * @param selector the CSS selector to locate the PDF element
+     * @return an optional containing a list of data URIs (data:image/png;base64,...)
+     *         for each PDF page
+     * @throws IOException if the PDF cannot be downloaded or processed
+     */
+    public Optional<List<String>> extractPdfPagesAsImages(String url, String selector) throws IOException {
+        String pdfUrl = this.extractPdfUrlFromWebsite(url, selector);
+        if (pdfUrl == null || pdfUrl.isBlank()) {
+            log.warn("PDF URL is blank for url '{}' with selector '{}'", url, selector);
+            return Optional.empty();
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        byte[] pdfBytes = restTemplate.getForObject(pdfUrl, byte[].class);
+
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            log.error("PDF content is empty or could not be downloaded from: {}", pdfUrl);
+            return Optional.empty();
+        }
+
+        List<String> imageDataUris = new ArrayList<>();
+
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            int pageCount = document.getNumberOfPages();
+
+            for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+                // Render PDF page to image at 300 DPI for good quality
+                BufferedImage image = pdfRenderer.renderImageWithDPI(pageIndex, 300);
+
+                // Convert BufferedImage to PNG bytes
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, "png", baos);
+                byte[] imageBytes = baos.toByteArray();
+
+                // Convert to base64 data URI
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                String dataUri = "data:image/png;base64," + base64Image;
+                imageDataUris.add(dataUri);
+
+                log.debug("Converted PDF page {} to PNG image (size: {} bytes)", pageIndex + 1, imageBytes.length);
+            }
+        } catch (Exception e) {
+            log.error("Failed to convert PDF '{}' to images: {}", pdfUrl, e.getMessage());
+            throw new IOException("PDF to image conversion failed: " + e.getMessage(), e);
+        }
+
+        return Optional.of(imageDataUris);
     }
 
     /**
