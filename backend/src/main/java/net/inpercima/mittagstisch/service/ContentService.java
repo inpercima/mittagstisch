@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -30,11 +29,6 @@ import net.inpercima.mittagstisch.entity.LunchEntity;
 import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.StatusEnum;
-import technology.tabula.ObjectExtractor;
-import technology.tabula.Page;
-import technology.tabula.RectangularTextContainer;
-import technology.tabula.Table;
-import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 @Slf4j
 @Service
@@ -49,7 +43,7 @@ public class ContentService {
      * @return the extracted text content, or an empty string if the element is not
      *         found or an error occurs
      */
-    public String extractLunchFromWebsite(String url, String selector) {
+    public String extractContentFromWebsite(String url, String selector) {
         try {
             Document doc = Jsoup.connect(url).get();
             Element content = doc.selectFirst(selector);
@@ -68,23 +62,23 @@ public class ContentService {
     }
 
     /**
-     * Extracts absolute URLs of images found by the given CSS selector on the
-     * specified page.
+     * Extracts the absolute URL of the first image found by the given CSS selector
+     * on the specified page.
      *
-     * @param url           the URL of the web page to extract images from
-     * @param imageSelector the CSS selector to locate the image elements
+     * @param url      the URL of the web page to search for an image
+     * @param selector the CSS selector to locate the image element
      * @return an optional containing the first absolute image URL found, or empty
      *         if none are found or an error occurs
      */
-    public Optional<String> extractImageUrlsFromWebsite(String url, String imageSelector) {
+    public Optional<String> extractImageUrlFromWebsite(String url, String selector) {
         try {
             Document doc = Jsoup.connect(url).get();
-            return doc.select(imageSelector).stream()
+            return doc.select(selector).stream()
                     .map(img -> img.attr("abs:src"))
                     .filter(src -> !src.isBlank())
                     .findFirst();
         } catch (IOException e) {
-            log.error("Failed to extract image URLs from '{}' with selector '{}': {}", url, imageSelector,
+            log.error("Failed to extract image URL from '{}' with selector '{}': {}", url, selector,
                     e.getMessage());
             return Optional.empty();
         }
@@ -94,23 +88,23 @@ public class ContentService {
      * Extracts the absolute URL of the first PDF found by the given CSS selector on
      * the specified page.
      *
-     * @param url         the URL of the web page to search for a PDF
-     * @param pdfSelector the CSS selector to locate the PDF element
+     * @param url      the URL of the web page to search for a PDF
+     * @param selector the CSS selector to locate the PDF element
      * @return the absolute URL of the PDF, or an empty string if not found or an
      *         error occurs
      */
-    public String extractPdfUrlFromWebsite(String url, String pdfSelector) {
+    public Optional<String> extractPdfUrlFromWebsite(String url, String selector) {
         try {
             Document doc = Jsoup.connect(url).get();
-            Element pdf = doc.selectFirst(pdfSelector);
+            Element pdf = doc.selectFirst(selector);
             if (pdf == null) {
-                return "";
+                return Optional.empty();
             }
-            return pdf.attr("abs:href");
+            return Optional.of(pdf.attr("abs:href"));
         } catch (IOException e) {
-            log.error("Failed to extract PDF URL from '{}' with selector '{}': {}", url, pdfSelector,
+            log.error("Failed to extract PDF URL from '{}' with selector '{}': {}", url, selector,
                     e.getMessage());
-            return "";
+            return Optional.empty();
         }
     }
 
@@ -119,22 +113,25 @@ public class ContentService {
      *
      * @param url      the URL of the web page to search for a PDF
      * @param selector the CSS selector to locate the PDF element
-     * @return an optional containing a list of data URIs (data:image/png;base64,...)
+     * @return an optional containing a list of data URIs
+     *         (data:image/png;base64,...)
      *         for each PDF page
      * @throws IOException if the PDF cannot be downloaded or processed
      */
     public Optional<List<String>> extractPdfPagesAsImages(String url, String selector) throws IOException {
-        String pdfUrl = this.extractPdfUrlFromWebsite(url, selector);
-        if (pdfUrl == null || pdfUrl.isBlank()) {
+        Optional<String> pdfUrlOptional = this.extractPdfUrlFromWebsite(url, selector);
+        if (pdfUrlOptional.isEmpty()) {
             log.warn("PDF URL is blank for url '{}' with selector '{}'", url, selector);
             return Optional.empty();
+        } else {
+            log.info("Found PDF URL: {}", pdfUrlOptional.get());
         }
 
         RestTemplate restTemplate = new RestTemplate();
-        byte[] pdfBytes = restTemplate.getForObject(pdfUrl, byte[].class);
+        byte[] pdfBytes = restTemplate.getForObject(pdfUrlOptional.get(), byte[].class);
 
         if (pdfBytes == null || pdfBytes.length == 0) {
-            log.error("PDF content is empty or could not be downloaded from: {}", pdfUrl);
+            log.error("PDF content is empty or could not be downloaded from: {}", pdfUrlOptional.get());
             return Optional.empty();
         }
 
@@ -161,65 +158,11 @@ public class ContentService {
                 log.debug("Converted PDF page {} to PNG image (size: {} bytes)", pageIndex + 1, imageBytes.length);
             }
         } catch (Exception e) {
-            log.error("Failed to convert PDF '{}' to images: {}", pdfUrl, e.getMessage());
+            log.error("Failed to convert PDF '{}' to images: {}", pdfUrlOptional.get(), e.getMessage());
             throw new IOException("PDF to image conversion failed: " + e.getMessage(), e);
         }
 
         return Optional.of(imageDataUris);
-    }
-
-    /**
-     * Extracts text from a PDF document by parsing its table structure.
-     *
-     * @param pdfUrl   the URL of the PDF document to extract text from
-     * @param selector the CSS selector to locate the PDF element (not used in this
-     *                 method, but kept for consistency)
-     * @return the extracted text content with table data separated by pipes and
-     *         newlines
-     * @throws IOException if the PDF cannot be downloaded or processed
-     */
-    public String extractLunchFromPdf(String url, String selector) throws IOException {
-        String pdfUrl = this.extractPdfUrlFromWebsite(url, selector);
-        if (pdfUrl == null || pdfUrl.isBlank()) {
-            throw new IllegalArgumentException("PDF URL cannot be null or blank");
-        }
-
-        RestTemplate restTemplate = new RestTemplate();
-        byte[] pdfBytes = restTemplate.getForObject(pdfUrl, byte[].class);
-
-        if (pdfBytes == null || pdfBytes.length == 0) {
-            throw new IOException("PDF content is empty or could not be downloaded from: " + pdfUrl);
-        }
-
-        List<String> resultRows = new ArrayList<>();
-
-        try (PDDocument document = Loader.loadPDF(pdfBytes);
-                ObjectExtractor extractor = new ObjectExtractor(document)) {
-
-            Page page = extractor.extract(1);
-            SpreadsheetExtractionAlgorithm sea = new SpreadsheetExtractionAlgorithm();
-            List<Table> tables = sea.extract(page);
-
-            for (Table table : tables) {
-                for (List<RectangularTextContainer> row : table.getRows()) {
-                    String rowText = row.stream()
-                            .map(RectangularTextContainer::getText)
-                            .map(String::trim)
-                            .filter(text -> !text.isEmpty())
-                            .collect(Collectors.joining(" | "));
-
-                    if (!rowText.isEmpty()) {
-                        log.debug("Extracted table row: {}", rowText);
-                        resultRows.add(rowText);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to extract lunch from PDF '{}': {}", pdfUrl, e.getMessage());
-            throw new IOException("PDF lunch extraction failed: " + e.getMessage(), e);
-        }
-
-        return String.join("\n", resultRows);
     }
 
     /**

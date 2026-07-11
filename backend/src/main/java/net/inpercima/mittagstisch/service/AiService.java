@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -25,34 +24,8 @@ public class AiService {
 
   private final ChatClient chatClient;
 
-  public String extractDishes(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
-      LocalDate tomorrow) {
-    Prompt prompt = build(content, weekStartDate, weekEndDate, today, tomorrow);
-    return analyze(prompt);
-  }
-
-  public String extractDishesFromImages(Optional<String> imageUrl, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow) {
-    Prompt prompt = buildForImage(imageUrl, weekStartDate, weekEndDate, today, tomorrow);
-    return analyze(prompt);
-  }
-
-  public String extractDishesFromPdfImages(List<String> imageDataUris, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow) {
-    Prompt prompt = buildForPdfImages(imageDataUris, weekStartDate, weekEndDate, today, tomorrow);
-    return analyze(prompt);
-  }
-
-  private String analyze(Prompt prompt) {
-    return chatClient
-        .prompt(prompt)
-        .call().content();
-  }
-
-  private Prompt build(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
-      LocalDate tomorrow) {
-    String template = """
-        Rolle:
+  private final String PROMPT_TEXT = """
+      Rolle:
         Du bist ein Parser für Mittagsmenüs.
 
         Aufgabe:
@@ -98,12 +71,22 @@ public class AiService {
         - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
         - "content" ist ein echtes JSON-Array
         - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
+      """;
 
+  public String extractDishesFromText(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
+      LocalDate tomorrow) {
+    Prompt prompt = buildFromText(content, weekStartDate, weekEndDate, today, tomorrow);
+    return analyze(prompt);
+  }
+
+  private Prompt buildFromText(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
+      LocalDate tomorrow) {
+    String promptText = PROMPT_TEXT + """
         Text:
         {content}
         """;
 
-    PromptTemplate promptTemplate = new PromptTemplate(template);
+    PromptTemplate promptTemplate = new PromptTemplate(promptText);
     Prompt prompt = promptTemplate.create(Map.of(
         "weekStartDate", weekStartDate.toString(),
         "weekEndDate", weekEndDate.toString(),
@@ -113,66 +96,26 @@ public class AiService {
     return prompt;
   }
 
-  private Prompt buildForImage(Optional<String> imageUrl, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow) {
-    String promptText = """
-        Rolle:
-        Du bist ein Parser für Mittagsmenüs.
+  public String extractDishesFromImages(List<String> imageUrls, LocalDate weekStartDate, LocalDate weekEndDate,
+      LocalDate today, LocalDate tomorrow, MimeType mimeType) {
+    Prompt prompt = buildFromImage(imageUrls, weekStartDate, weekEndDate, today, tomorrow, mimeType);
+    return analyze(prompt);
+  }
 
-        Aufgabe:
-        Extrahiere aus den gegebenen Bildern die Mittagsgerichte für für {today} und {tomorrow}.
-        Ermittle dazu die gültige Wocheninformation, die unterschiedlich auf den Bildern stehen kann, z.B.:
-        - "Speiseplan vom 01.12.-05.12.2025"
-        - Mo 16.2., Di 17.2.
-        - Mittwoch, 25. Februar 2026
-        Speichere den Anfang der Woche als weekStartDate und das Ende der Woche als weekEndDate ab, um zu prüfen, ob die Woche aktuell, veraltet oder in der Zukunft liegt.
-        Ist das nicht ermittelbar, setze weekStartDate auf {weekStartDate} und weekEndDate auf {weekEndDate}.
-
-        Die Tage sind benannt als:
-        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
-
-        Ausgabeformat:
-        - Antworte ausschließlich mit reinem JSON, ohne Erklärung, ohne Codeblock, ohne zusätzlichen Text.
-        - Nutze exakt folgendes JSON-Format:
-        {{
-          "today": {{
-            "content": [],
-            "status": "SUCCESS"
-          }},
-          "tomorrow": {{
-            "content": [],
-            "status": "SUCCESS"
-          }}
-        }}
-
-        Status-Regeln:
-        - wenn {today} > weekEndDate → OUTDATED
-        - wenn {today} < weekStartDate → NEXT_WEEK
-        - wenn weekStartDate ≤ {today} ≤ weekEndDate → Woche ist aktuell → weiter prüfen
-        - suche den Abschnitt für {today}
-        - suche den Abschnitt für {tomorrow}
-        - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
-        - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
-        [
-          {{ "name": "Gerichtname", "price": "5,90 €" }}
-        ]
-        - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
-
-        WICHTIG:
-        - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
-        - "content" ist ein echtes JSON-Array
-        - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
-        """
+  private Prompt buildFromImage(List<String> images, LocalDate weekStartDate, LocalDate weekEndDate,
+      LocalDate today, LocalDate tomorrow, MimeType mimeType) {
+    String promptText = PROMPT_TEXT
         .formatted(today, tomorrow, weekStartDate, weekEndDate,
             today, today, today, today, tomorrow);
 
-    List<Media> mediaList = imageUrl.stream()
-        .map(url -> {
+    List<Media> mediaList = images.stream()
+        .map(value -> {
           try {
-            MimeType mimeType = resolveMimeType(url);
-            return new Media(mimeType, URI.create(url));
+            final URI uri = URI.create(value);
+            final MimeType resolvedMimeType = mimeType != null ? mimeType : resolveMimeType(uri);
+            return new Media(resolvedMimeType, uri);
           } catch (IllegalArgumentException e) {
-            log.warn("Skipping invalid image URL '{}': {}", url, e.getMessage());
+            log.warn("Skipping invalid image URL '{}': {}", value, e.getMessage());
             return null;
           }
         })
@@ -186,80 +129,14 @@ public class AiService {
     return new Prompt(List.of(userMessage));
   }
 
-  private Prompt buildForPdfImages(List<String> imageDataUris, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow) {
-    String promptText = """
-        Rolle:
-        Du bist ein Parser für Mittagsmenüs.
-
-        Aufgabe:
-        Extrahiere aus den gegebenen PDF-Bildern die Mittagsgerichte für {today} und {tomorrow}.
-        Ermittle dazu die gültige Wocheninformation, die unterschiedlich auf den Bildern stehen kann, z.B.:
-        - "Speiseplan vom 01.12.-05.12.2025"
-        - Mo 16.2., Di 17.2.
-        - Mittwoch, 25. Februar 2026
-        Speichere den Anfang der Woche als weekStartDate und das Ende der Woche als weekEndDate ab, um zu prüfen, ob die Woche aktuell, veraltet oder in der Zukunft liegt.
-        Ist das nicht ermittelbar, setze weekStartDate auf {weekStartDate} und weekEndDate auf {weekEndDate}.
-
-        Die Tage sind benannt als:
-        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
-
-        Ausgabeformat:
-        - Antworte ausschließlich mit reinem JSON, ohne Erklärung, ohne Codeblock, ohne zusätzlichen Text.
-        - Nutze exakt folgendes JSON-Format:
-        {{
-          "today": {{
-            "content": [],
-            "status": "SUCCESS"
-          }},
-          "tomorrow": {{
-            "content": [],
-            "status": "SUCCESS"
-          }}
-        }}
-
-        Status-Regeln:
-        - wenn {today} > weekEndDate → OUTDATED
-        - wenn {today} < weekStartDate → NEXT_WEEK
-        - wenn weekStartDate ≤ {today} ≤ weekEndDate → Woche ist aktuell → weiter prüfen
-        - suche den Abschnitt für {today}
-        - suche den Abschnitt für {tomorrow}
-        - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
-        - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
-        [
-          {{ "name": "Gerichtname", "price": "5,90 €" }}
-        ]
-        - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
-
-        WICHTIG:
-        - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
-        - "content" ist ein echtes JSON-Array
-        - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
-        """
-        .formatted(today, tomorrow, weekStartDate, weekEndDate,
-            today, today, today, today, tomorrow);
-
-    List<Media> mediaList = imageDataUris.stream()
-        .map(dataUri -> {
-          try {
-            return new Media(MimeTypeUtils.IMAGE_PNG, dataUri);
-          } catch (IllegalArgumentException e) {
-            log.warn("Skipping invalid image data URI: {}", e.getMessage());
-            return null;
-          }
-        })
-        .filter(java.util.Objects::nonNull)
-        .toList();
-
-    UserMessage userMessage = UserMessage.builder()
-        .text(promptText)
-        .media(mediaList)
-        .build();
-    return new Prompt(List.of(userMessage));
+  private String analyze(Prompt prompt) {
+    return chatClient
+        .prompt(prompt)
+        .call().content();
   }
 
-  private static MimeType resolveMimeType(String url) {
-    String path = URI.create(url).getPath();
+  private static MimeType resolveMimeType(URI uri) {
+    String path = uri.getPath();
     if (path == null || !path.contains(".")) {
       return MimeTypeUtils.IMAGE_JPEG;
     }

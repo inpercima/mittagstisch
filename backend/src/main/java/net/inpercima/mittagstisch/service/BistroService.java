@@ -18,6 +18,10 @@ public class BistroService {
         return bistroRepository.findAll();
     }
 
+    public List<BistroEntity> findAllUnlocked() {
+        return bistroRepository.findByLockedFalse();
+    }
+
     public BistroEntity findById(Long id) {
         return bistroRepository.findById(id).orElse(null);
     }
