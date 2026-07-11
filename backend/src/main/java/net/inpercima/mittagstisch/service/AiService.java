@@ -176,7 +176,7 @@ public class AiService {
             return null;
           }
         })
-        .filter(media -> media != null)
+        .filter(java.util.Objects::nonNull)
         .toList();
 
     UserMessage userMessage = UserMessage.builder()
@@ -248,7 +248,7 @@ public class AiService {
             return null;
           }
         })
-        .filter(media -> media != null)
+        .filter(java.util.Objects::nonNull)
         .toList();
 
     UserMessage userMessage = UserMessage.builder()
