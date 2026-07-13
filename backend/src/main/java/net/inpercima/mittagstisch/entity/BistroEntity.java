@@ -36,4 +36,7 @@ public class BistroEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TypeEnum type;
+
+    @Column
+    private boolean locked;
 }

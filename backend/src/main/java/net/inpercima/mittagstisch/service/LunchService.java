@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -85,7 +86,7 @@ public class LunchService {
         final LocalDate tomorrow = today.plusDays(1);
         final LocalDate weekStartDate = today.with(DayOfWeek.MONDAY);
         final LocalDate weekEndDate = today.with(DayOfWeek.FRIDAY);
-        bistroService.findAll()
+        bistroService.findAllUnlocked()
                 .forEach(bistro -> importBistroLunches(bistro, today, tomorrow, weekStartDate, weekEndDate));
     }
 
@@ -94,27 +95,35 @@ public class LunchService {
         String dishes;
         log.info("Prepare lunch for bistro '{}': {}", bistro.getName(), bistro.getUrl());
         if (bistro.getType() == TypeEnum.IMAGE) {
-            Optional<String> imageUrls = contentService.extractImageUrlsFromWebsite(bistro.getUrl(),
+            Optional<String> imageUrl = contentService.extractImageUrlFromWebsite(bistro.getUrl(),
                     bistro.getSelector());
-            if (imageUrls.isEmpty()) {
+            if (imageUrl.isEmpty()) {
                 log.warn("No images found for bistro '{}' with selector '{}'", bistro.getName(),
                         bistro.getSelector());
                 dishes = "";
             } else {
-                dishes = aiService.extractDishesFromImages(imageUrls, weekStart, weekEnd, today, tomorrow);
+                dishes = aiService.extractDishesFromImages(imageUrl.stream().toList(), weekStart, weekEnd, today,
+                        tomorrow, null);
             }
         } else if (bistro.getType() == TypeEnum.PDF) {
-            String lunch;
             try {
-                lunch = contentService.extractLunchFromPdf(bistro.getUrl(), bistro.getSelector());
+                Optional<List<String>> pdfImages = contentService.extractPdfPagesAsImages(bistro.getUrl(),
+                        bistro.getSelector());
+                if (pdfImages.isPresent() && !pdfImages.get().isEmpty()) {
+                    dishes = aiService.extractDishesFromImages(pdfImages.get(), weekStart, weekEnd, today, tomorrow,
+                            MimeTypeUtils.IMAGE_PNG);
+                } else {
+                    log.warn("No images extracted from PDF for bistro '{}' with selector '{}'", bistro.getName(),
+                            bistro.getSelector());
+                    dishes = "";
+                }
             } catch (IOException e) {
-                log.error("Error extracting lunch from PDF for bistro '{}'': {}", bistro.getName(), e.getMessage());
-                lunch = "";
+                log.error("Error extracting lunch from PDF for bistro '{}': {}", bistro.getName(), e.getMessage());
+                dishes = "";
             }
-            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
         } else {
-            String lunch = contentService.extractLunchFromWebsite(bistro.getUrl(), bistro.getSelector());
-            dishes = aiService.extractDishes(lunch, weekStart, weekEnd, today, tomorrow);
+            String content = contentService.extractContentFromWebsite(bistro.getUrl(), bistro.getSelector());
+            dishes = aiService.extractDishesFromText(content, weekStart, weekEnd, today, tomorrow);
         }
         List<LunchEntity> lunches = new ArrayList<>();
 
