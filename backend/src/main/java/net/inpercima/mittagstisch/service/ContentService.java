@@ -3,9 +3,12 @@ package net.inpercima.mittagstisch.service;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
@@ -96,7 +99,7 @@ public class ContentService {
     public Optional<String> extractPdfUrlFromWebsite(String url, String selector) {
         try {
             Document doc = Jsoup.connect(url).get();
-            Element pdf = doc.selectFirst(selector);
+            Element pdf = doc.selectFirst(replaceKwPlaceholder(selector));
             if (pdf == null) {
                 return Optional.empty();
             }
@@ -106,6 +109,19 @@ public class ContentService {
                     e.getMessage());
             return Optional.empty();
         }
+    }
+
+    private static String getCurrentWeekRange() {
+        int currentWeek = LocalDate.now().get(WeekFields.of(Locale.GERMANY).weekOfWeekBasedYear());
+
+        int fromWeek = (currentWeek % 2 == 0) ? currentWeek : currentWeek - 1;
+        int toWeek = fromWeek + 1;
+
+        return "KW " + fromWeek + " bis " + toWeek;
+    }
+
+    private static String replaceKwPlaceholder(String selector) {
+        return selector.replace("{KW}", getCurrentWeekRange());
     }
 
     /**
