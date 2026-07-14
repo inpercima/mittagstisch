@@ -28,28 +28,130 @@ public class AiService {
       Rolle:
         Du bist ein Parser für Mittagsmenüs.
 
-        Aufgabe:
-        Extrahiere aus dem gegebenen Text die Mittagsgerichte für {today} und {tomorrow}.
-        Ermittle dazu die gültige Wocheninformation, die unterschiedlich auf den Webseiten stehen kann, z.B.:
-        - "Speiseplan vom 01.12.-05.12.2025"
+      Aufgabe:
+        Extrahiere aus dem gegebenen Dokument die Mittagsgerichte für {today} und {tomorrow}.
+
+        Ermittle zunächst die gültige Woche. Diese kann unterschiedlich angegeben sein, beispielsweise:
+
+        - Speiseplan vom 01.12. - 05.12.2025
+        - 13.07. - 17.07.2026
         - Mo 16.2., Di 17.2.
         - Mittwoch, 25. Februar 2026
-        Speichere den Anfang der Woche als weekStartDate und das Ende der Woche als weekEndDate ab, um zu prüfen, ob die Woche aktuell, veraltet oder in der Zukunft liegt.
-        Ist das nicht ermittelbar, setze weekStartDate auf {weekStartDate} und weekEndDate auf {weekEndDate}.
 
-        Die Tage sind benannt als:
-        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
+        Speichere den Beginn der Woche als "weekStartDate" und das Ende als "weekEndDate".
 
-        Was gilt als Gericht:
-        - Nur vollständige Mahlzeiten/Hauptgänge sind als eigenständige Gerichte zu erfassen.
-        - Wenn ein Menü aus mehreren Komponenten besteht (z.B. Suppe + Hauptgang + Dessert), fasse diese zu EINEM Eintrag zusammen. Trenne die Komponenten mit " | " im "name"-Feld.
-        - Dessert, Nachtisch, Nachspeise sind KEINE eigenständigen Gerichte, sondern Bestandteil eines Menüs.
-        - Beilagen (z.B. "Salat", "Brot") sind ebenfalls KEINE eigenständigen Gerichte.
-        - Getränke sind KEINE Gerichte.
+        Falls kein Wochenzeitraum eindeutig bestimmbar ist, verwende:
 
-        Ausgabeformat:
-        - Antworte ausschließlich mit reinem JSON, ohne Erklärung, ohne Codeblock, ohne zusätzlichen Text.
-        - Nutze exakt folgendes JSON-Format:
+        weekStartDate = {weekStartDate}
+        weekEndDate = {weekEndDate}
+
+        Die Wochentage können ausgeschrieben oder abgekürzt sein:
+
+        Montag, Dienstag, Mittwoch, Donnerstag, Freitag
+        oder
+        Mo, Di, Mi, Do, Fr
+
+        Wenn lediglich ein Datum angegeben ist und anschließend Wochentage folgen, berechne den passenden Wochentag.
+
+        --------------------------------------------------
+        DOKUMENTANALYSE
+        --------------------------------------------------
+
+        Bevor Gerichte extrahiert werden, analysiere zuerst ausschließlich die Struktur des Dokuments.
+
+        Bestimme zunächst, ob der Speiseplan aufgebaut ist als
+
+        - Tabelle
+        - Raster (Grid)
+        - Karten-/Kachellayout
+        - Zeilen
+        - Spalten
+
+        Ermittle anschließend die Bereiche der einzelnen Wochentage.
+
+        Jeder Wochentag besitzt einen eigenen räumlichen Bereich.
+
+        Erst nachdem sämtliche Tagesbereiche erkannt wurden, beginne mit der Extraktion.
+
+        Die visuelle Position ist wichtiger als die OCR-Lesereihenfolge.
+
+        Das Dokument darf NICHT als Fließtext interpretiert werden.
+
+        Ordne Gerichte ausschließlich anhand ihrer Position zu.
+
+        Dabei gelten folgende Regeln:
+
+        - Ein Gericht gehört immer zu dem Wochentag, in dessen Bereich es sich befindet.
+        - Bei Tabellen gehören alle Gerichte einer Spalte zu diesem Tag.
+        - Bei Tabellen mit Zeilen und Spalten gehören alle Gerichte innerhalb der jeweiligen Zelle zu genau einem Tag.
+        - Bei Grid- oder Kachellayouts gehören alle Kacheln derselben Zeile zum gleichen Wochentag.
+        - Ein Zeilenwechsel im OCR-Text bedeutet NICHT automatisch einen Wechsel zum nächsten Tag.
+        - Falls OCR-Reihenfolge und sichtbares Layout voneinander abweichen, ist ausschließlich das sichtbare Layout maßgeblich.
+        - Lies immer zuerst den vollständigen Bereich eines Tages bis zum rechten oder unteren Rand und wechsle erst danach zum nächsten Tagesbereich.
+
+        --------------------------------------------------
+        EXTRAKTION
+        --------------------------------------------------
+
+        Führe die folgenden Schritte in genau dieser Reihenfolge aus:
+
+        1. Ermittle den Wochenzeitraum.
+        2. Analysiere das Layout.
+        3. Ermittle sämtliche Tagesbereiche.
+        4. Extrahiere ALLE Gerichte aller gefundenen Tage.
+        5. Ordne jedes Gericht genau einem Tag zu.
+        6. Extrahiere anschließend Name und Preis.
+        7. Gib im JSON ausschließlich die Gerichte für {today} und {tomorrow} zurück.
+
+        --------------------------------------------------
+        WAS GILT ALS GERICHT
+        --------------------------------------------------
+
+        Ein Gericht ist genau eine vollständige Hauptmahlzeit.
+
+        Dazu gehören beispielsweise:
+
+        - Schnitzel mit Kartoffeln
+        - Pasta mit Tomatensoße
+        - Gulasch mit Knödeln
+
+        Nicht als eigenständige Gerichte gelten:
+
+        - Dessert
+        - Nachtisch
+        - Nachspeise
+        - Salat
+        - Brot
+        - Getränke
+        - Obst
+        - Beilagen
+
+        Wenn ein Menü aus mehreren Bestandteilen besteht (z.B. Hauptgericht + Dessert + Brot), fasse alles zu EINEM Eintrag zusammen.
+
+        Verbinde die Bestandteile mit
+
+        " | "
+
+        Beispiel:
+
+        "Sächsische Kartoffelsuppe mit Wurzelgemüse und Bockwurstscheiben | Brot | Dessert"
+
+        Ein Tag kann beliebig viele Gerichte enthalten.
+
+        Extrahiere alle Gerichte innerhalb des jeweiligen Tagesbereichs.
+
+        --------------------------------------------------
+        AUSGABEFORMAT
+        --------------------------------------------------
+
+        Antworte ausschließlich mit reinem JSON.
+
+        Kein Markdown.
+        Kein Codeblock.
+        Keine Erklärung.
+
+        Nutze exakt folgendes Format:
+
         {{
           "today": {{
             "content": [],
@@ -61,25 +163,42 @@ public class AiService {
           }}
         }}
 
-        Status-Regeln:
+      Status-Regeln:
+
         - wenn {today} > weekEndDate → OUTDATED
         - wenn {today} < weekStartDate → NEXT_WEEK
-        - wenn weekStartDate ≤ {today} ≤ weekEndDate → Woche ist aktuell → weiter prüfen
-        - suche den Abschnitt für {today}
-        - suche den Abschnitt für {tomorrow}
-        - wenn der jeweilige Abschnitt gefunden wurde, extrahiere die Gerichte für diesen Tag.
-        - gib im Feld "content" eine Liste der Gerichte im folgenden JSON-Format zurück und setze den Status auf "SUCCESS"
-        [
-          {{ "name": "Gerichtname", "price": "5,90 €" }}
-        ]
-        - wenn kein Abschnitt gefunden wurde, gib im Feld "content" ein leeres Array [] zurück und setze den Status auf "NO_DATA"
+        - wenn weekStartDate ≤ {today} ≤ weekEndDate → Woche aktuell
 
-        WICHTIG:
-        - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
-        - "content" ist ein echtes JSON-Array
-        - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
-        - Dessert/Nachtisch niemals als eigenständigen Eintrag in "content" aufnehmen
-        - Jeder Eintrag in "content" repräsentiert genau eine vollständige Mahlzeit (Hauptgericht bzw. komplettes Menü)
+        Suche anschließend den Bereich für {today} und {tomorrow}.
+
+        Falls der Bereich gefunden wurde:
+
+        [
+          {{
+            "name": "Gerichtname",
+            "price": "5,90 €"
+          }}
+        ]
+
+        Status = SUCCESS
+
+        Falls kein Bereich gefunden wurde:
+
+        content = []
+
+        Status = NO_DATA
+
+        --------------------------------------------------
+        WICHTIG
+        --------------------------------------------------
+
+        - Gib ausschließlich gültiges JSON zurück.
+        - content ist immer ein JSON-Array.
+        - Alle JSON-Keys stehen in doppelten Anführungszeichen.
+        - Jedes Gericht darf genau EINEM Wochentag zugeordnet werden.
+        - Ein Gericht darf niemals mehreren Tagen zugeordnet werden.
+        - Die visuelle Position ist wichtiger als die OCR-Reihenfolge.
+        - Extrahiere niemals Dessert, Salat, Brot oder Getränke als eigenständige Gerichte.
       """;
 
   public String extractDishesFromText(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,

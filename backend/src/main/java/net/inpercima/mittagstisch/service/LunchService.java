@@ -55,11 +55,6 @@ public class LunchService {
                 if (day == DayEnum.TODAY) {
                     // After midnight, yesterday's TOMORROW data represents today's menu
                     result = lunchRepository.findByImportDateAndDay(today.minusDays(1), DayEnum.TOMORROW, top);
-                    if (result.isEmpty()) {
-                        result = lunchRepository.findByImportDateAndDay(today.minusDays(1), DayEnum.TODAY, top);
-                    }
-                } else {
-                    result = lunchRepository.findByImportDateAndDay(today.minusDays(1), day, top);
                 }
             }
         }
