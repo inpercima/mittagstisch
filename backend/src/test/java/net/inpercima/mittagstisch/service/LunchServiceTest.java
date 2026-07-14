@@ -40,7 +40,8 @@ class LunchServiceTest {
 
     @ParameterizedTest(name = "buildStatusMessage({0}, {1}) on {2} -> \"{3}\"")
     @MethodSource("statusMessageCases")
-    void buildStatusMessage_shouldReturnExpectedMessage(StatusEnum status, DayEnum day, LocalDate today, String expected) {
+    void buildStatusMessage_shouldReturnExpectedMessage(StatusEnum status, DayEnum day, LocalDate today,
+            String expected) {
         LocalDate tomorrow = today.plusDays(1);
         assertThat(lunchService.buildStatusMessage(status, day, today, tomorrow)).isEqualTo(expected);
     }
@@ -78,7 +79,8 @@ class LunchServiceTest {
             assertThat(result).hasSize(1);
             assertThat(result.get(0).importDate()).isEqualTo(thursday);
             // yesterday should not be queried since today returned data
-            verify(lunchRepository, never()).findByImportDateAndDay(eq(thursday.minusDays(1)), any(DayEnum.class), any(Pageable.class));
+            verify(lunchRepository, never()).findByImportDateAndDay(eq(thursday.minusDays(1)), any(DayEnum.class),
+                    any(Pageable.class));
         }
     }
 
@@ -127,7 +129,7 @@ class LunchServiceTest {
         return Stream.of(
                 Arguments.of(LocalDate.of(2026, 3, 30)), // Monday
                 Arguments.of(LocalDate.of(2026, 3, 28)), // Saturday
-                Arguments.of(LocalDate.of(2026, 3, 29))  // Sunday
+                Arguments.of(LocalDate.of(2026, 3, 29)) // Sunday
         );
     }
 
@@ -155,35 +157,31 @@ class LunchServiceTest {
             // carry-over path was tried
             verify(lunchRepository).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TOMORROW), any(Pageable.class));
             // yesterday+TODAY should not be queried since carry-over was sufficient
-            verify(lunchRepository, never()).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TODAY), any(Pageable.class));
+            verify(lunchRepository, never()).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TODAY),
+                    any(Pageable.class));
         }
     }
 
     @Test
-    void getDataByDay_fallsBackToYesterdayToday_whenBothTodayAndCarryOverEmpty() {
+    void getDataByDay_returnsEmpty_whenBothTodayAndCarryOverEmpty() {
         LocalDate thursday = LocalDate.of(2026, 3, 26); // Thursday
         LocalDate wednesday = thursday.minusDays(1);
-        LunchEntity entity = buildLunchEntity(wednesday);
 
         when(bistroService.count()).thenReturn(1L);
         when(lunchRepository.findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class)))
-                .thenAnswer(invocation -> {
-                    LocalDate date = invocation.getArgument(0);
-                    DayEnum day = invocation.getArgument(1);
-                    return wednesday.equals(date) && day == DayEnum.TODAY ? List.of(entity) : List.of();
-                });
+                .thenReturn(List.of());
 
         try (MockedStatic<LocalDate> mockedDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             mockedDate.when(LocalDate::now).thenReturn(thursday);
 
             var result = lunchService.getDataByDay(DayEnum.TODAY);
 
-            assertThat(result).hasSize(1);
-            assertThat(result.get(0).importDate()).isEqualTo(wednesday);
+            assertThat(result).isEmpty();
             // carry-over was tried and was empty
             verify(lunchRepository).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TOMORROW), any(Pageable.class));
-            // then fell back to yesterday+TODAY
-            verify(lunchRepository).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TODAY), any(Pageable.class));
+            // no second fallback to yesterday+TODAY is performed
+            verify(lunchRepository, never()).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TODAY),
+                    any(Pageable.class));
         }
     }
 
