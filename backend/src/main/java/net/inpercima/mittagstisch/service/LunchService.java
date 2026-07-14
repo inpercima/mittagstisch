@@ -52,7 +52,15 @@ public class LunchService {
             final boolean isTuesdayToFriday = dow != DayOfWeek.MONDAY && dow != DayOfWeek.SATURDAY
                     && dow != DayOfWeek.SUNDAY;
             if (isTuesdayToFriday) {
-                result = lunchRepository.findByImportDateAndDay(today.minusDays(1), day, top);
+                if (day == DayEnum.TODAY) {
+                    // After midnight, yesterday's TOMORROW data represents today's menu
+                    result = lunchRepository.findByImportDateAndDay(today.minusDays(1), DayEnum.TOMORROW, top);
+                    if (result.isEmpty()) {
+                        result = lunchRepository.findByImportDateAndDay(today.minusDays(1), DayEnum.TODAY, top);
+                    }
+                } else {
+                    result = lunchRepository.findByImportDateAndDay(today.minusDays(1), day, top);
+                }
             }
         }
 
