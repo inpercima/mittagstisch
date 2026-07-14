@@ -232,9 +232,12 @@ public class AiService {
 
   private Prompt buildFromImage(List<String> images, LocalDate weekStartDate, LocalDate weekEndDate,
       LocalDate today, LocalDate tomorrow, MimeType mimeType) {
-    String promptText = PROMPT_TEXT
-        .formatted(today, tomorrow, weekStartDate, weekEndDate,
-            today, today, today, today, tomorrow);
+    PromptTemplate promptTemplate = new PromptTemplate(PROMPT_TEXT);
+    Prompt textPrompt = promptTemplate.create(Map.of(
+        "weekStartDate", weekStartDate.toString(),
+        "weekEndDate", weekEndDate.toString(),
+        "today", today.toString(),
+        "tomorrow", tomorrow.toString()));
 
     List<Media> mediaList = images.stream()
         .map(value -> {
@@ -251,7 +254,7 @@ public class AiService {
         .toList();
 
     UserMessage userMessage = UserMessage.builder()
-        .text(promptText)
+        .text(textPrompt.getContents())
         .media(mediaList)
         .build();
     return new Prompt(List.of(userMessage));
