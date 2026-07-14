@@ -131,6 +131,62 @@ class LunchServiceTest {
         );
     }
 
+    @Test
+    void getDataByDay_returnsCarryOver_whenTodayEmptyAndYesterdayTomorrowHasData() {
+        LocalDate thursday = LocalDate.of(2026, 3, 26); // Thursday
+        LocalDate wednesday = thursday.minusDays(1);
+        LunchEntity entity = buildLunchEntity(wednesday);
+
+        when(bistroService.count()).thenReturn(1L);
+        when(lunchRepository.findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class)))
+                .thenAnswer(invocation -> {
+                    LocalDate date = invocation.getArgument(0);
+                    DayEnum day = invocation.getArgument(1);
+                    return wednesday.equals(date) && day == DayEnum.TOMORROW ? List.of(entity) : List.of();
+                });
+
+        try (MockedStatic<LocalDate> mockedDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            mockedDate.when(LocalDate::now).thenReturn(thursday);
+
+            var result = lunchService.getDataByDay(DayEnum.TODAY);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).importDate()).isEqualTo(wednesday);
+            // carry-over path was tried
+            verify(lunchRepository).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TOMORROW), any(Pageable.class));
+            // yesterday+TODAY should not be queried since carry-over was sufficient
+            verify(lunchRepository, never()).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TODAY), any(Pageable.class));
+        }
+    }
+
+    @Test
+    void getDataByDay_fallsBackToYesterdayToday_whenBothTodayAndCarryOverEmpty() {
+        LocalDate thursday = LocalDate.of(2026, 3, 26); // Thursday
+        LocalDate wednesday = thursday.minusDays(1);
+        LunchEntity entity = buildLunchEntity(wednesday);
+
+        when(bistroService.count()).thenReturn(1L);
+        when(lunchRepository.findByImportDateAndDay(any(LocalDate.class), any(DayEnum.class), any(Pageable.class)))
+                .thenAnswer(invocation -> {
+                    LocalDate date = invocation.getArgument(0);
+                    DayEnum day = invocation.getArgument(1);
+                    return wednesday.equals(date) && day == DayEnum.TODAY ? List.of(entity) : List.of();
+                });
+
+        try (MockedStatic<LocalDate> mockedDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            mockedDate.when(LocalDate::now).thenReturn(thursday);
+
+            var result = lunchService.getDataByDay(DayEnum.TODAY);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).importDate()).isEqualTo(wednesday);
+            // carry-over was tried and was empty
+            verify(lunchRepository).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TOMORROW), any(Pageable.class));
+            // then fell back to yesterday+TODAY
+            verify(lunchRepository).findByImportDateAndDay(eq(wednesday), eq(DayEnum.TODAY), any(Pageable.class));
+        }
+    }
+
     private static LunchEntity buildLunchEntity(LocalDate importDate) {
         BistroEntity bistro = new BistroEntity();
         bistro.setName("TestBistro");
