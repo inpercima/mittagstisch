@@ -40,6 +40,13 @@ public class AiService {
         Die Tage sind benannt als:
         Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder abgekürzt Mo, Di, Mi, Do, Fr
 
+        Was gilt als Gericht:
+        - Nur vollständige Mahlzeiten/Hauptgänge sind als eigenständige Gerichte zu erfassen.
+        - Wenn ein Menü aus mehreren Komponenten besteht (z.B. Suppe + Hauptgang + Dessert), fasse diese zu EINEM Eintrag zusammen. Trenne die Komponenten mit " | " im "name"-Feld.
+        - Dessert, Nachtisch, Nachspeise sind KEINE eigenständigen Gerichte, sondern Bestandteil eines Menüs.
+        - Beilagen (z.B. "Salat", "Brot") sind ebenfalls KEINE eigenständigen Gerichte.
+        - Getränke sind KEINE Gerichte.
+
         Ausgabeformat:
         - Antworte ausschließlich mit reinem JSON, ohne Erklärung, ohne Codeblock, ohne zusätzlichen Text.
         - Nutze exakt folgendes JSON-Format:
@@ -71,6 +78,8 @@ public class AiService {
         - Gib ausschließlich reines JSON zurück, kein Markdown, kein Codeblock
         - "content" ist ein echtes JSON-Array
         - alle JSON-Keys müssen in doppelten Anführungszeichen stehen
+        - Dessert/Nachtisch niemals als eigenständigen Eintrag in "content" aufnehmen
+        - Jeder Eintrag in "content" repräsentiert genau eine vollständige Mahlzeit (Hauptgericht bzw. komplettes Menü)
       """;
 
   public String extractDishesFromText(String content, LocalDate weekStartDate, LocalDate weekEndDate, LocalDate today,
