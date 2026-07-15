@@ -12,9 +12,11 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.content.Media;
 import org.springframework.stereotype.Service;
+import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -431,7 +433,7 @@ public class AiService {
         return Optional.of(cropBox);
       }
       log.warn("Received invalid crop box: {}", response);
-    } catch (Exception e) {
+    } catch (JsonProcessingException e) {
       log.warn("Failed to parse crop box from response '{}': {}", response, e.getMessage());
     }
     return Optional.empty();
@@ -504,7 +506,7 @@ public class AiService {
       if (semicolon > 5) {
         try {
           return MimeType.valueOf(value.substring(5, semicolon));
-        } catch (Exception e) {
+        } catch (InvalidMimeTypeException e) {
           // fall through to default
         }
       }
@@ -512,7 +514,7 @@ public class AiService {
     }
     try {
       return resolveMimeTypeFromUri(URI.create(value));
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       return MimeTypeUtils.IMAGE_JPEG;
     }
   }
