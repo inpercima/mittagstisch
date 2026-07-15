@@ -125,7 +125,7 @@ public class LunchService {
                                 return dataUri;
                             });
                     dishes = aiService.extractDishesFromImages(List.of(imageToSend), weekStart, weekEnd, today,
-                            tomorrow, null);
+                            tomorrow, null, true);
                 } catch (IOException e) {
                     log.error("Failed to download image for bistro '{}': {}", bistro.getName(), e.getMessage());
                     dishes = "";
@@ -137,7 +137,7 @@ public class LunchService {
                         bistro.getSelector());
                 if (pdfImages.isPresent() && !pdfImages.get().isEmpty()) {
                     dishes = aiService.extractDishesFromImages(pdfImages.get(), weekStart, weekEnd, today, tomorrow,
-                            MimeTypeUtils.IMAGE_PNG);
+                            MimeTypeUtils.IMAGE_PNG, false);
                 } else {
                     log.warn("No images extracted from PDF for bistro '{}' with selector '{}'", bistro.getName(),
                             bistro.getSelector());
