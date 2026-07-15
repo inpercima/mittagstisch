@@ -25,6 +25,7 @@ import net.inpercima.mittagstisch.entity.LunchEntity;
 import net.inpercima.mittagstisch.model.BistroDto;
 import net.inpercima.mittagstisch.model.CropBox;
 import net.inpercima.mittagstisch.model.DayEnum;
+import net.inpercima.mittagstisch.model.ImageSourceType;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.LunchDto;
 import net.inpercima.mittagstisch.model.StatusEnum;
@@ -125,7 +126,7 @@ public class LunchService {
                                 return dataUri;
                             });
                     dishes = aiService.extractDishesFromImages(List.of(imageToSend), weekStart, weekEnd, today,
-                            tomorrow, null, true);
+                            tomorrow, null, ImageSourceType.CROPPED);
                 } catch (IOException e) {
                     log.error("Failed to download image for bistro '{}': {}", bistro.getName(), e.getMessage());
                     dishes = "";
@@ -137,7 +138,7 @@ public class LunchService {
                         bistro.getSelector());
                 if (pdfImages.isPresent() && !pdfImages.get().isEmpty()) {
                     dishes = aiService.extractDishesFromImages(pdfImages.get(), weekStart, weekEnd, today, tomorrow,
-                            MimeTypeUtils.IMAGE_PNG, false);
+                            MimeTypeUtils.IMAGE_PNG, ImageSourceType.FULL_PAGE);
                 } else {
                     log.warn("No images extracted from PDF for bistro '{}' with selector '{}'", bistro.getName(),
                             bistro.getSelector());
