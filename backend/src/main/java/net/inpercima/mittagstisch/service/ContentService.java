@@ -1,6 +1,7 @@
 package net.inpercima.mittagstisch.service;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.entity.LunchEntity;
+import net.inpercima.mittagstisch.model.CropBox;
 import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.StatusEnum;
@@ -122,6 +124,76 @@ public class ContentService {
 
     private static String replaceKwPlaceholder(String selector) {
         return selector.replace("{KW}", getCurrentWeekRange());
+    }
+
+    /**
+     * Downloads an image from the given URL and returns it as a base64-encoded
+     * data URI (e.g. {@code data:image/jpeg;base64,…}).
+     *
+     * @param url the absolute URL of the image to download
+     * @return the data URI string
+     * @throws IOException if the image cannot be downloaded or is empty
+     */
+    public String downloadImageAsDataUri(String url) throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        byte[] imageBytes = restTemplate.getForObject(url, byte[].class);
+
+        if (imageBytes == null || imageBytes.length == 0) {
+            throw new IOException("Image content is empty or could not be downloaded from: " + url);
+        }
+
+        String mimeType = resolveMimeTypeFromUrl(url);
+        String base64 = Base64.getEncoder().encodeToString(imageBytes);
+        return "data:" + mimeType + ";base64," + base64;
+    }
+
+    /**
+     * Crops a base64-encoded data URI image according to the given {@link CropBox}
+     * (coordinates expressed as percentages 0–100 of the original image dimensions)
+     * and returns the result as a new data URI.
+     *
+     * @param dataUri the source image data URI (data:image/…;base64,…)
+     * @param cropBox the crop region as percentages
+     * @return the cropped image as a data URI
+     * @throws IOException if the image cannot be decoded or encoded
+     */
+    public String cropDataUri(String dataUri, CropBox cropBox) throws IOException {
+        int commaIndex = dataUri.indexOf(',');
+        String header = dataUri.substring(0, commaIndex);
+        byte[] imageBytes = Base64.getDecoder().decode(dataUri.substring(commaIndex + 1));
+
+        BufferedImage original = ImageIO.read(new ByteArrayInputStream(imageBytes));
+        if (original == null) {
+            throw new IOException("Could not decode image from data URI");
+        }
+
+        int x = (int) (original.getWidth() * cropBox.xStart() / 100.0);
+        int y = (int) (original.getHeight() * cropBox.yStart() / 100.0);
+        int w = (int) (original.getWidth() * (cropBox.xEnd() - cropBox.xStart()) / 100.0);
+        int h = (int) (original.getHeight() * (cropBox.yEnd() - cropBox.yStart()) / 100.0);
+
+        // Clamp to image bounds
+        w = Math.max(1, Math.min(w, original.getWidth() - x));
+        h = Math.max(1, Math.min(h, original.getHeight() - y));
+
+        BufferedImage cropped = original.getSubimage(x, y, w, h);
+
+        String format = header.contains("png") ? "png" : "jpeg";
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(cropped, format, baos);
+
+        String base64Cropped = Base64.getEncoder().encodeToString(baos.toByteArray());
+        log.debug("Cropped image from {}x{} to {}x{} (crop box: {})",
+                original.getWidth(), original.getHeight(), w, h, cropBox);
+        return header + "," + base64Cropped;
+    }
+
+    private static String resolveMimeTypeFromUrl(String url) {
+        String lower = url.toLowerCase();
+        if (lower.contains(".png")) return "image/png";
+        if (lower.contains(".gif")) return "image/gif";
+        if (lower.contains(".webp")) return "image/webp";
+        return "image/jpeg";
     }
 
     /**
