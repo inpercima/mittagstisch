@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.entity.BistroEntity;
 import net.inpercima.mittagstisch.entity.LunchEntity;
 import net.inpercima.mittagstisch.model.BistroDto;
+import net.inpercima.mittagstisch.model.CropBox;
 import net.inpercima.mittagstisch.model.DayEnum;
 import net.inpercima.mittagstisch.model.DishDto;
 import net.inpercima.mittagstisch.model.LunchDto;
@@ -105,8 +106,30 @@ public class LunchService {
                         bistro.getSelector());
                 dishes = "";
             } else {
-                dishes = aiService.extractDishesFromImages(imageUrl.stream().toList(), weekStart, weekEnd, today,
-                        tomorrow, null);
+                try {
+                    String dataUri = contentService.downloadImageAsDataUri(imageUrl.get());
+                    Optional<CropBox> cropBox = aiService.extractCropBox(dataUri, today, tomorrow, null);
+                    String imageToSend = cropBox
+                            .map(box -> {
+                                try {
+                                    return contentService.cropDataUri(dataUri, box);
+                                } catch (IOException e) {
+                                    log.warn("Failed to crop image for bistro '{}', using full image: {}",
+                                            bistro.getName(), e.getMessage());
+                                    return dataUri;
+                                }
+                            })
+                            .orElseGet(() -> {
+                                log.warn("No crop box determined for bistro '{}', using full image",
+                                        bistro.getName());
+                                return dataUri;
+                            });
+                    dishes = aiService.extractDishesFromImages(List.of(imageToSend), weekStart, weekEnd, today,
+                            tomorrow, null);
+                } catch (IOException e) {
+                    log.error("Failed to download image for bistro '{}': {}", bistro.getName(), e.getMessage());
+                    dishes = "";
+                }
             }
         } else if (bistro.getType() == TypeEnum.PDF) {
             try {
