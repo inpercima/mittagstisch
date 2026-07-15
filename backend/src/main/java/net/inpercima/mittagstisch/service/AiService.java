@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.model.CropBox;
+import net.inpercima.mittagstisch.model.ImageSourceType;
 
 @Slf4j
 @Service
@@ -551,8 +552,8 @@ public class AiService {
   }
 
   public String extractDishesFromImages(List<String> imageUrls, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow, MimeType mimeType, boolean isCropped) {
-    Prompt prompt = buildFromImage(imageUrls, weekStartDate, weekEndDate, today, tomorrow, mimeType, isCropped);
+      LocalDate today, LocalDate tomorrow, MimeType mimeType, ImageSourceType imageSourceType) {
+    Prompt prompt = buildFromImage(imageUrls, weekStartDate, weekEndDate, today, tomorrow, mimeType, imageSourceType);
     return analyze(prompt);
   }
 
@@ -617,8 +618,8 @@ public class AiService {
   }
 
   private Prompt buildFromImage(List<String> images, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow, MimeType mimeType, boolean isCropped) {
-    String promptText = isCropped ? PROMPT_IMAGE : PROMPT_PDF;
+      LocalDate today, LocalDate tomorrow, MimeType mimeType, ImageSourceType imageSourceType) {
+    String promptText = imageSourceType == ImageSourceType.CROPPED ? PROMPT_IMAGE : PROMPT_PDF;
     PromptTemplate promptTemplate = new PromptTemplate(promptText);
     Prompt textPrompt = promptTemplate.create(Map.of(
         "weekStartDate", weekStartDate.toString(),

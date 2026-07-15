@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -190,7 +192,7 @@ public class ContentService {
 
     private static String resolveMimeTypeFromUrl(String url) {
         try {
-            String path = new java.net.URI(url).getPath();
+            String path = new URI(url).getPath();
             if (path != null && path.contains(".")) {
                 String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
                 return switch (ext) {
@@ -200,7 +202,7 @@ public class ContentService {
                     default -> "image/jpeg";
                 };
             }
-        } catch (java.net.URISyntaxException e) {
+        } catch (URISyntaxException e) {
             log.warn("Could not parse URL '{}' for MIME type resolution: {}", url, e.getMessage());
         }
         return "image/jpeg";
