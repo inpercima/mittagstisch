@@ -189,10 +189,20 @@ public class ContentService {
     }
 
     private static String resolveMimeTypeFromUrl(String url) {
-        String lower = url.toLowerCase();
-        if (lower.contains(".png")) return "image/png";
-        if (lower.contains(".gif")) return "image/gif";
-        if (lower.contains(".webp")) return "image/webp";
+        try {
+            String path = new java.net.URI(url).getPath();
+            if (path != null && path.contains(".")) {
+                String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
+                return switch (ext) {
+                    case "png" -> "image/png";
+                    case "gif" -> "image/gif";
+                    case "webp" -> "image/webp";
+                    default -> "image/jpeg";
+                };
+            }
+        } catch (java.net.URISyntaxException e) {
+            log.warn("Could not parse URL '{}' for MIME type resolution: {}", url, e.getMessage());
+        }
         return "image/jpeg";
     }
 
