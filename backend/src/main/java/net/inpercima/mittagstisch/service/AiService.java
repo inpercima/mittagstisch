@@ -367,6 +367,162 @@ public class AiService {
       """;
 
   // -----------------------------------------------------------------------
+  // Prompt for PDF-based bistros (receives full-page images; no pre-cropping)
+  // -----------------------------------------------------------------------
+  private final String PROMPT_PDF = """
+      Rolle:
+        Du bist ein Parser für Mittagsmenüs.
+
+      Aufgabe:
+        Das Bild zeigt einen Speiseplan. Extrahiere die Mittagsgerichte für {today} und {tomorrow}.
+
+        Ermittle zunächst den Wochenzeitraum. Dieser kann unterschiedlich angegeben sein, beispielsweise:
+
+        - Speiseplan vom 01.12. - 05.12.2025
+        - 13.07. - 17.07.2026
+        - Mo 16.2., Di 17.2.
+        - Mittwoch, 25. Februar 2026
+
+        Speichere den Beginn der Woche als "weekStartDate" und das Ende als "weekEndDate".
+
+        Falls kein Wochenzeitraum eindeutig bestimmbar ist, verwende:
+
+        weekStartDate = {weekStartDate}
+        weekEndDate = {weekEndDate}
+
+        Die Wochentage können ausgeschrieben oder abgekürzt sein:
+
+        Montag, Dienstag, Mittwoch, Donnerstag, Freitag
+        oder
+        Mo, Di, Mi, Do, Fr
+
+        --------------------------------------------------
+        BILDANALYSE
+        --------------------------------------------------
+
+        Analysiere die Struktur des gesamten Speiseplans:
+
+        - Tabelle (Spalten pro Tag oder Zeilen pro Tag)
+        - Raster (Grid)
+        - Karten-/Kachellayout
+
+        Ermittle die Bereiche aller Wochentage. Erst danach beginne mit der Extraktion.
+
+        Die visuelle Position ist wichtiger als die OCR-Lesereihenfolge.
+
+        Ordne Gerichte ausschließlich anhand ihrer Position zu:
+
+        - Bei Tabellen mit Spalten pro Tag gehören alle Gerichte einer Spalte zu diesem Tag.
+        - Bei Tabellen oder Grids mit Zeilen pro Tag gehören alle Gerichte einer Zeile zu diesem Tag.
+        - Ein Zeilenwechsel im OCR-Text bedeutet NICHT automatisch einen Wechsel zum nächsten Tag.
+
+        --------------------------------------------------
+        EXTRAKTION
+        --------------------------------------------------
+
+        Führe die folgenden Schritte in genau dieser Reihenfolge aus:
+
+        1. Ermittle den Wochenzeitraum.
+        2. Analysiere das Layout.
+        3. Ermittle sämtliche Tagesbereiche.
+        4. Extrahiere ALLE Gerichte aller gefundenen Tage.
+        5. Ordne jedes Gericht genau einem Tag zu.
+        6. Extrahiere Name und Preis.
+        7. Gib im JSON ausschließlich die Gerichte für {today} und {tomorrow} zurück.
+
+        --------------------------------------------------
+        WAS GILT ALS GERICHT
+        --------------------------------------------------
+
+        Ein Gericht ist genau eine vollständige Hauptmahlzeit.
+
+        Dazu gehören beispielsweise:
+
+        - Schnitzel mit Kartoffeln
+        - Pasta mit Tomatensoße
+        - Gulasch mit Knödeln
+
+        Nicht als eigenständige Gerichte gelten:
+
+        - Dessert
+        - Nachtisch
+        - Nachspeise
+        - Salat
+        - Brot
+        - Getränke
+        - Obst
+        - Beilagen
+
+        Wenn ein Menü aus mehreren Bestandteilen besteht (z.B. Hauptgericht + Dessert + Brot), fasse alles zu EINEM Eintrag zusammen.
+
+        Verbinde die Bestandteile mit
+
+        " | "
+
+        Beispiel:
+
+        "Sächsische Kartoffelsuppe mit Wurzelgemüse und Bockwurstscheiben | Brot | Dessert"
+
+        --------------------------------------------------
+        AUSGABEFORMAT
+        --------------------------------------------------
+
+        Antworte ausschließlich mit reinem JSON.
+
+        Kein Markdown.
+        Kein Codeblock.
+        Keine Erklärung.
+
+        Nutze exakt folgendes Format:
+
+        {{
+          "today": {{
+            "content": [],
+            "status": "SUCCESS"
+          }},
+          "tomorrow": {{
+            "content": [],
+            "status": "SUCCESS"
+          }}
+        }}
+
+      Status-Regeln:
+
+        - wenn {today} > weekEndDate → OUTDATED
+        - wenn {today} < weekStartDate → NEXT_WEEK
+        - wenn weekStartDate ≤ {today} ≤ weekEndDate → Woche aktuell
+
+        Falls der Bereich für einen Tag gefunden wurde:
+
+        [
+          {{
+            "name": "Gerichtname",
+            "price": "5,90 €"
+          }}
+        ]
+
+        Status = SUCCESS
+
+        Falls kein Bereich gefunden wurde:
+
+        content = []
+
+        Status = NO_DATA
+
+        --------------------------------------------------
+        WICHTIG
+        --------------------------------------------------
+
+        - Gib ausschließlich gültiges JSON zurück.
+        - content ist immer ein JSON-Array.
+        - Alle JSON-Keys stehen in doppelten Anführungszeichen.
+        - Jedes Gericht darf genau EINEM Wochentag zugeordnet werden.
+        - Ein Gericht darf niemals mehreren Tagen zugeordnet werden.
+        - Die visuelle Position ist wichtiger als die OCR-Reihenfolge.
+        - Extrahiere niemals Dessert, Salat, Brot oder Getränke als eigenständige Gerichte.
+      """;
+
+  // -----------------------------------------------------------------------
   // Prompt for the crop-analysis pre-step (IMAGE type only)
   // -----------------------------------------------------------------------
   private final String PROMPT_CROP = """
@@ -395,8 +551,8 @@ public class AiService {
   }
 
   public String extractDishesFromImages(List<String> imageUrls, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow, MimeType mimeType) {
-    Prompt prompt = buildFromImage(imageUrls, weekStartDate, weekEndDate, today, tomorrow, mimeType);
+      LocalDate today, LocalDate tomorrow, MimeType mimeType, boolean isCropped) {
+    Prompt prompt = buildFromImage(imageUrls, weekStartDate, weekEndDate, today, tomorrow, mimeType, isCropped);
     return analyze(prompt);
   }
 
@@ -461,8 +617,9 @@ public class AiService {
   }
 
   private Prompt buildFromImage(List<String> images, LocalDate weekStartDate, LocalDate weekEndDate,
-      LocalDate today, LocalDate tomorrow, MimeType mimeType) {
-    PromptTemplate promptTemplate = new PromptTemplate(PROMPT_IMAGE);
+      LocalDate today, LocalDate tomorrow, MimeType mimeType, boolean isCropped) {
+    String promptText = isCropped ? PROMPT_IMAGE : PROMPT_PDF;
+    PromptTemplate promptTemplate = new PromptTemplate(promptText);
     Prompt textPrompt = promptTemplate.create(Map.of(
         "weekStartDate", weekStartDate.toString(),
         "weekEndDate", weekEndDate.toString(),

@@ -167,8 +167,8 @@ public class ContentService {
             throw new IOException("Could not decode image from data URI");
         }
 
-        int x = (int) (original.getWidth() * cropBox.xStart() / 100.0);
-        int y = (int) (original.getHeight() * cropBox.yStart() / 100.0);
+        int x = Math.max(0, Math.min((int) (original.getWidth() * cropBox.xStart() / 100.0), original.getWidth() - 1));
+        int y = Math.max(0, Math.min((int) (original.getHeight() * cropBox.yStart() / 100.0), original.getHeight() - 1));
         int w = (int) (original.getWidth() * (cropBox.xEnd() - cropBox.xStart()) / 100.0);
         int h = (int) (original.getHeight() * (cropBox.yEnd() - cropBox.yStart()) / 100.0);
 
