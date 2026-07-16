@@ -21,6 +21,72 @@ spring:
           model: gpt-5-nano
           # Only the default (1) value is supported.
           temperature: 1
+          response-format:
+            type: json_schema
+            json-schema:
+              name: DishExtractionResponse
+              strict: true
+              schema:
+                type: object
+                properties:
+                  today:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            price:
+                              type: string
+                          required:
+                            - name
+                            - price
+                          additionalProperties: false
+                      status:
+                        type: string
+                        enum:
+                          - SUCCESS
+                          - NO_DATA
+                          - OUTDATED
+                          - NEXT_WEEK
+                    required:
+                      - content
+                      - status
+                    additionalProperties: false
+                  tomorrow:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            price:
+                              type: string
+                          required:
+                            - name
+                            - price
+                          additionalProperties: false
+                      status:
+                        type: string
+                        enum:
+                          - SUCCESS
+                          - NO_DATA
+                          - OUTDATED
+                          - NEXT_WEEK
+                    required:
+                      - content
+                      - status
+                    additionalProperties: false
+                required:
+                  - today
+                  - tomorrow
+                additionalProperties: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
