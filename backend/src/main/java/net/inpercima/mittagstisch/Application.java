@@ -50,6 +50,9 @@ public class Application {
 
     @Bean
     ChatClient chatClient(ChatModel chatModel) {
-        return ChatClient.builder(chatModel).build();
+        return ChatClient.builder(chatModel)
+                .defaultOptions(org.springframework.ai.chat.prompt.ChatOptions.builder()
+                        .build())
+                .build();
     }
 }
