@@ -4,7 +4,7 @@ This guide covers the Spring Boot backend setup and usage for both development a
 
 ## Prerequisites
 
-- JDK 21 or higher
+- JDK 25 or higher
 - Maven (included via Maven Wrapper - mvnw)
 
 ## Getting started
@@ -97,3 +97,11 @@ java -jar ./mittagstisch-<VERSION>.jar --spring.profiles.active=prod
 ```
 
 Ensure `application-prod.yml` is in the same directory as the JAR.
+
+## Updates
+
+TO update the maven wrapper run following command and set the new version:
+
+```bash
+./mvnw wrapper:wrapper -Dmaven=3.9.16
+```

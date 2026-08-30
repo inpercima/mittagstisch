@@ -12,12 +12,12 @@ It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/n
 
 - `node 24.16.0` or higher in combination with
   - `npm 11.13.0` or higher or
-  - `pnpm 11.8.0` or higher, used in this repository
+  - `pnpm 11.24.0` or higher, used in this repository
 
 Install pnpm by running:
 
 ```bash
-npm install -g pnpm@11.8.0
+npm install -g pnpm@11.24.0
 ```
 
 ### Info for npm and pnpm
@@ -27,7 +27,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-- `@angular/cli 22.0.5` or higher
+- `@angular/cli 22.1.6` or higher
 
 Install @angular/cli by running:
 
@@ -37,7 +37,7 @@ pnpm install -g @angular/cli@22
 
 ### Java
 
-- `jdk 21` or higher
+- `jdk 25` or higher
 
 ### Docker (when running services within docker)
 
