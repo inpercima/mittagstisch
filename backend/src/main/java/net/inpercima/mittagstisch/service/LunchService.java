@@ -137,8 +137,29 @@ public class LunchService {
                 Optional<List<String>> pdfImages = contentService.extractPdfPagesAsImages(bistro.getUrl(),
                         bistro.getSelector());
                 if (pdfImages.isPresent() && !pdfImages.get().isEmpty()) {
-                    dishes = aiService.extractDishesFromImages(pdfImages.get(), weekStart, weekEnd, today, tomorrow,
-                            MimeTypeUtils.IMAGE_PNG, ImageSourceType.FULL_PAGE);
+                    List<String> croppedImages = new ArrayList<>();
+                    for (String pageDataUri : pdfImages.get()) {
+                        Optional<CropBox> cropBox = aiService.extractCropBox(pageDataUri, today, tomorrow,
+                                MimeTypeUtils.IMAGE_PNG);
+                        String imageToSend = cropBox
+                                .map(box -> {
+                                    try {
+                                        return contentService.cropDataUri(pageDataUri, box);
+                                    } catch (IOException e) {
+                                        log.warn("Failed to crop PDF page for bistro '{}', using full page: {}",
+                                                bistro.getName(), e.getMessage());
+                                        return pageDataUri;
+                                    }
+                                })
+                                .orElseGet(() -> {
+                                    log.warn("No crop box determined for PDF page of bistro '{}', using full page",
+                                            bistro.getName());
+                                    return pageDataUri;
+                                });
+                        croppedImages.add(imageToSend);
+                    }
+                    dishes = aiService.extractDishesFromImages(croppedImages, weekStart, weekEnd, today, tomorrow,
+                            MimeTypeUtils.IMAGE_PNG, ImageSourceType.CROPPED);
                 } else {
                     log.warn("No images extracted from PDF for bistro '{}' with selector '{}'", bistro.getName(),
                             bistro.getSelector());
