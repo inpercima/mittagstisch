@@ -13,7 +13,6 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.content.Media;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -428,7 +427,8 @@ public class AiService {
         .map(value -> {
           try {
             final URI uri = URI.create(value);
-            final MimeType resolvedMimeType = mimeType != null ? mimeType : ContentService.resolveMimeTypeFromValue(value);
+            final MimeType resolvedMimeType = mimeType != null ? mimeType
+                : ContentService.resolveMimeTypeFromValue(value);
             return new Media(resolvedMimeType, uri);
           } catch (IllegalArgumentException e) {
             log.warn("Skipping invalid image URL '{}': {}", value, e.getMessage());
