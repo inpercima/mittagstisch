@@ -439,7 +439,7 @@ public class ContentService {
     private static String normalizePrice(String price) {
         return Optional.ofNullable(price)
                 .filter(p -> !p.isBlank())
-                .map(String::trim)
+                .map(p -> p.trim())
                 .map(p -> p.replaceAll("\\s*[\\.,]?\\s*[.–-]\\s*(€)?\\s*$", ",00 €"))
                 .map(p -> p.replaceAll("(\\d)\\s*€", "$1 €"))
                 .orElse("");
