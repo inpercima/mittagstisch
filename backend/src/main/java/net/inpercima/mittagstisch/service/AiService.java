@@ -12,7 +12,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.content.Media;
 import org.springframework.stereotype.Service;
-import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
@@ -571,7 +570,7 @@ public class AiService {
         "today", today.toString(),
         "tomorrow", tomorrow.toString()));
 
-    MimeType resolvedMimeType = mimeType != null ? mimeType : resolveMimeTypeFromValue(imageDataUri);
+    MimeType resolvedMimeType = mimeType != null ? mimeType : ContentService.resolveMimeTypeFromValue(imageDataUri);
     URI uri = URI.create(imageDataUri);
     Media media = new Media(resolvedMimeType, uri);
 
@@ -631,7 +630,7 @@ public class AiService {
         .map(value -> {
           try {
             final URI uri = URI.create(value);
-            final MimeType resolvedMimeType = mimeType != null ? mimeType : resolveMimeTypeFromValue(value);
+            final MimeType resolvedMimeType = mimeType != null ? mimeType : ContentService.resolveMimeTypeFromValue(value);
             return new Media(resolvedMimeType, uri);
           } catch (IllegalArgumentException e) {
             log.warn("Skipping invalid image URL '{}': {}", value, e.getMessage());
@@ -652,42 +651,5 @@ public class AiService {
     return chatClient
         .prompt(prompt)
         .call().content();
-  }
-
-  /**
-   * Resolves the MIME type from either a data URI ({@code data:image/png;base64,…})
-   * or a plain URL by inspecting the file extension.
-   */
-  private static MimeType resolveMimeTypeFromValue(String value) {
-    if (value != null && value.startsWith("data:")) {
-      int semicolon = value.indexOf(';');
-      if (semicolon > 5) {
-        try {
-          return MimeType.valueOf(value.substring(5, semicolon));
-        } catch (InvalidMimeTypeException e) {
-          // fall through to default
-        }
-      }
-      return MimeTypeUtils.IMAGE_JPEG;
-    }
-    try {
-      return resolveMimeTypeFromUri(URI.create(value));
-    } catch (IllegalArgumentException e) {
-      return MimeTypeUtils.IMAGE_JPEG;
-    }
-  }
-
-  private static MimeType resolveMimeTypeFromUri(URI uri) {
-    String path = uri.getPath();
-    if (path == null || !path.contains(".")) {
-      return MimeTypeUtils.IMAGE_JPEG;
-    }
-    String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
-    return switch (ext) {
-      case "png" -> MimeTypeUtils.IMAGE_PNG;
-      case "gif" -> MimeTypeUtils.IMAGE_GIF;
-      case "webp" -> MimeType.valueOf("image/webp");
-      default -> MimeTypeUtils.IMAGE_JPEG;
-    };
   }
 }

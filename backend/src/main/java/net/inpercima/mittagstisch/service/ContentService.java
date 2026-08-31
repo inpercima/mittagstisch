@@ -6,6 +6,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.springframework.util.InvalidMimeTypeException;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -144,7 +148,7 @@ public class ContentService {
             throw new IOException("Image content is empty or could not be downloaded from: " + url);
         }
 
-        String mimeType = resolveMimeTypeFromUrl(url);
+        MimeType mimeType = resolveMimeTypeFromValue(url);
         String base64 = Base64.getEncoder().encodeToString(imageBytes);
         return "data:" + mimeType + ";base64," + base64;
     }
@@ -190,22 +194,33 @@ public class ContentService {
         return header + "," + base64Cropped;
     }
 
-    private static String resolveMimeTypeFromUrl(String url) {
+    static MimeType resolveMimeTypeFromValue(String value) {
+        if (value != null && value.startsWith("data:")) {
+            int semicolon = value.indexOf(';');
+            if (semicolon > 5) {
+                try {
+                    return MimeType.valueOf(value.substring(5, semicolon));
+                } catch (InvalidMimeTypeException e) {
+                    // fall through to default
+                }
+            }
+            return MimeTypeUtils.IMAGE_JPEG;
+        }
         try {
-            String path = new URI(url).getPath();
+            String path = new URI(value).getPath();
             if (path != null && path.contains(".")) {
                 String ext = path.substring(path.lastIndexOf('.') + 1).toLowerCase();
                 return switch (ext) {
-                    case "png" -> "image/png";
-                    case "gif" -> "image/gif";
-                    case "webp" -> "image/webp";
-                    default -> "image/jpeg";
+                    case "png" -> MimeTypeUtils.IMAGE_PNG;
+                    case "gif" -> MimeTypeUtils.IMAGE_GIF;
+                    case "webp" -> MimeType.valueOf("image/webp");
+                    default -> MimeTypeUtils.IMAGE_JPEG;
                 };
             }
-        } catch (URISyntaxException e) {
-            log.warn("Could not parse URL '{}' for MIME type resolution: {}", url, e.getMessage());
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            log.warn("Could not parse value '{}' for MIME type resolution: {}", value, e.getMessage());
         }
-        return "image/jpeg";
+        return MimeTypeUtils.IMAGE_JPEG;
     }
 
     /**
