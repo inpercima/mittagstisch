@@ -31,3 +31,10 @@ spring:
         jdbc.time_zone: UTC
         format_sql: true
     open-in-view: false
+
+# Image storage configuration
+mittagstisch:
+  image:
+    storage:
+      path: ${user.home}/.mittagstisch/cropped-images
+      enabled: true

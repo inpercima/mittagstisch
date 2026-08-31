@@ -113,7 +113,9 @@ public class LunchService {
                     String imageToSend = cropBox
                             .map(box -> {
                                 try {
-                                    return contentService.cropDataUri(dataUri, box);
+                                    String croppedImage = contentService.cropDataUri(dataUri, box);
+                                    contentService.saveCroppedImage(croppedImage, bistro.getName(), null);
+                                    return croppedImage;
                                 } catch (IOException e) {
                                     log.warn("Failed to crop image for bistro '{}', using full image: {}",
                                             bistro.getName(), e.getMessage());
@@ -138,13 +140,17 @@ public class LunchService {
                         bistro.getSelector());
                 if (pdfImages.isPresent() && !pdfImages.get().isEmpty()) {
                     List<String> croppedImages = new ArrayList<>();
+                    int pageIndex = 0;
                     for (String pageDataUri : pdfImages.get()) {
+                        final int currentPageNumber = pageIndex + 1;
                         Optional<CropBox> cropBox = aiService.extractCropBox(pageDataUri, today, tomorrow,
                                 MimeTypeUtils.IMAGE_PNG);
                         String imageToSend = cropBox
                                 .map(box -> {
                                     try {
-                                        return contentService.cropDataUri(pageDataUri, box);
+                                        String croppedImage = contentService.cropDataUri(pageDataUri, box);
+                                        contentService.saveCroppedImage(croppedImage, bistro.getName(), currentPageNumber);
+                                        return croppedImage;
                                     } catch (IOException e) {
                                         log.warn("Failed to crop PDF page for bistro '{}', using full page: {}",
                                                 bistro.getName(), e.getMessage());
@@ -157,6 +163,7 @@ public class LunchService {
                                     return pageDataUri;
                                 });
                         croppedImages.add(imageToSend);
+                        pageIndex++;
                     }
                     dishes = aiService.extractDishesFromImages(croppedImages, weekStart, weekEnd, today, tomorrow,
                             MimeTypeUtils.IMAGE_PNG, ImageSourceType.CROPPED);

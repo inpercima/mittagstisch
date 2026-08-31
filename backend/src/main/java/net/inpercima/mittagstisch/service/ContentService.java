@@ -6,7 +6,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -22,6 +27,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,6 +46,12 @@ import net.inpercima.mittagstisch.model.StatusEnum;
 @Slf4j
 @Service
 public class ContentService {
+
+    @Value("${mittagstisch.image.storage.path:${user.home}/.mittagstisch/cropped-images}")
+    private String imageStoragePath;
+
+    @Value("${mittagstisch.image.storage.enabled:true}")
+    private boolean imageStorageEnabled;
 
     /**
      * Extracts text content from a web page specified by the given URL and CSS
@@ -188,6 +200,61 @@ public class ContentService {
         log.debug("Cropped image from {}x{} to {}x{} (crop box: {})",
                 original.getWidth(), original.getHeight(), w, h, cropBox);
         return header + "," + base64Cropped;
+    }
+
+    /**
+     * Saves a base64-encoded data URI image to disk for debugging or archival purposes.
+     * Creates the storage directory if it doesn't exist.
+     * File naming: {bistroName}_{date}_{timestamp}.{extension}
+     *
+     * @param dataUri    the image data URI to save
+     * @param bistroName the name of the bistro (used in filename)
+     * @param pageNumber optional page number for PDF pages (null for single images)
+     * @throws IOException if the image cannot be saved
+     */
+    public void saveCroppedImage(String dataUri, String bistroName, Integer pageNumber) throws IOException {
+        if (!imageStorageEnabled) {
+            log.debug("Image storage is disabled, skipping save for bistro '{}'", bistroName);
+            return;
+        }
+
+        try {
+            // Parse data URI
+            int commaIndex = dataUri.indexOf(',');
+            if (commaIndex == -1) {
+                throw new IOException("Invalid data URI format");
+            }
+
+            String header = dataUri.substring(0, commaIndex);
+            byte[] imageBytes = Base64.getDecoder().decode(dataUri.substring(commaIndex + 1));
+
+            // Determine file extension
+            String extension = header.contains("png") ? "png" : "jpg";
+
+            // Create storage directory
+            Path storageDir = Paths.get(imageStoragePath);
+            if (!Files.exists(storageDir)) {
+                Files.createDirectories(storageDir);
+                log.info("Created image storage directory: {}", storageDir);
+            }
+
+            // Generate filename
+            String sanitizedBistroName = bistroName.replaceAll("[^a-zA-Z0-9-_]", "_");
+            String date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
+            String pageInfo = pageNumber != null ? "_page" + pageNumber : "";
+            String filename = String.format("%s_%s_%s%s.%s", 
+                    sanitizedBistroName, date, timestamp, pageInfo, extension);
+
+            // Save image
+            Path imagePath = storageDir.resolve(filename);
+            Files.write(imagePath, imageBytes);
+
+            log.info("Saved cropped image to: {}", imagePath);
+        } catch (Exception e) {
+            log.error("Failed to save cropped image for bistro '{}': {}", bistroName, e.getMessage());
+            // Don't throw exception - saving images is optional and shouldn't break the main flow
+        }
     }
 
     private static String resolveMimeTypeFromUrl(String url) {
