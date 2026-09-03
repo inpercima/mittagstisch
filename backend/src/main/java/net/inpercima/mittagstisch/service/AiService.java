@@ -59,9 +59,59 @@ public class AiService {
 
         Die Wochentage können ausgeschrieben oder abgekürzt sein:
 
-        Montag, Dienstag, Mittwoch, Donnerstag, Freitag
-        oder
-        Mo, Di, Mi, Do, Fr
+        Montag, Dienstag, Mittwoch, Donnerstag, Freitag oder Mo, Di, Mi, Do, Fr
+      """;
+
+  private static final String FRAGMENT_LAYOUT = """
+
+        --------------------------------------------------
+        DOKUMENT- UND LAYOUTANALYSE
+        --------------------------------------------------
+
+        Analysiere zunächst die Struktur des Speiseplans, bevor du Gerichte extrahierst.
+
+        Der Speiseplan kann beispielsweise aufgebaut sein als:
+
+        - Tabelle
+        - Raster (Grid)
+        - Karten-/Kachellayout
+        - Zeilen
+        - Spalten
+
+        Ermittle die räumlichen Bereiche der einzelnen Wochentage.
+
+        Jeder Wochentag besitzt einen eigenen räumlichen Bereich.
+
+        Die visuelle Position ist wichtiger als die OCR-Lesereihenfolge.
+        Das Dokument darf nicht als Fließtext interpretiert werden.
+
+        Ordne Gerichte ausschließlich anhand ihrer Position zu:
+
+        - Ein Gericht gehört immer zu dem Wochentag, in dessen Bereich es sich befindet.
+        - Bei Tabellen gehören alle Gerichte einer Spalte zu diesem Tag.
+        - Bei Tabellen oder Grids mit Zeilen pro Tag gehören alle Gerichte einer Zeile zu diesem Tag.
+        - Bei Tabellen mit Zeilen und Spalten gehören alle Gerichte innerhalb der jeweiligen Zelle zu genau einem Tag.
+        - Bei Grid- oder Kachellayouts gehören alle Kacheln derselben Zeile zum gleichen Wochentag.
+        - Ein Zeilenwechsel im OCR-Text bedeutet nicht automatisch einen Wechsel zum nächsten Tag.
+        - Falls OCR-Reihenfolge und sichtbares Layout voneinander abweichen, ist ausschließlich das sichtbare Layout maßgeblich.
+        - Lies immer zuerst den vollständigen Bereich eines Tages bis zum rechten oder unteren Rand und wechsle erst danach zum nächsten Tagesbereich.
+      """;
+
+  private static final String FRAGMENT_EXTRAKTION = """
+
+        --------------------------------------------------
+        EXTRAKTION
+        --------------------------------------------------
+
+        Führe die folgenden Schritte in genau dieser Reihenfolge aus:
+
+        1. Ermittle den Wochenzeitraum.
+        2. Analysiere das Layout.
+        3. Ermittle die Bereiche der Wochentage.
+        4. Extrahiere alle Gerichte der gefundenen Tagesbereiche.
+        5. Ordne jedes Gericht genau einem Wochentag zu.
+        6. Extrahiere Name und Preis.
+        7. Gib ausschließlich die Gerichte für {today} und {tomorrow} zurück.
       """;
 
   private static final String FRAGMENT_WAS_GILT_ALS_GERICHT = """
@@ -89,15 +139,19 @@ public class AiService {
         - Obst
         - Beilagen
 
-        Wenn ein Menü aus mehreren Bestandteilen besteht (z.B. Hauptgericht + Dessert + Brot), fasse alles zu EINEM Eintrag zusammen.
+        Wenn ein Menü aus mehreren Bestandteilen besteht (z.B. Hauptgericht + Dessert + Brot),
+        fasse alles zu EINEM Eintrag zusammen.
 
-        Verbinde die Bestandteile mit
+        Verbinde die Bestandteile mit:
 
         " | "
 
         Beispiel:
 
         "Sächsische Kartoffelsuppe mit Wurzelgemüse und Bockwurstscheiben | Brot | Dessert"
+
+        Ein Tag kann beliebig viele Gerichte enthalten.
+        Extrahiere alle Gerichte innerhalb des jeweiligen Tagesbereichs.
       """;
 
   private static final String FRAGMENT_AUSGABEFORMAT = """
@@ -125,7 +179,7 @@ public class AiService {
           }}
         }}
 
-      Status-Regeln:
+        Status-Regeln:
 
         - wenn {today} > weekEndDate → OUTDATED
         - wenn {today} < weekStartDate → NEXT_WEEK
@@ -160,172 +214,80 @@ public class AiService {
         - Alle JSON-Keys stehen in doppelten Anführungszeichen.
         - Jedes Gericht darf genau EINEM Wochentag zugeordnet werden.
         - Ein Gericht darf niemals mehreren Tagen zugeordnet werden.
-        - Die visuelle Position ist wichtiger als die OCR-Reihenfolge.
+        - Die visuelle Position ist wichtiger als die OCR-Lesereihenfolge.
         - Extrahiere niemals Dessert, Salat, Brot oder Getränke als eigenständige Gerichte.
       """;
 
   // -----------------------------------------------------------------------
   // Prompt for TEXT-based bistros
   // -----------------------------------------------------------------------
+
   private final String PROMPT_TEXT = FRAGMENT_ROLLE + """
 
       Aufgabe:
         Extrahiere aus dem gegebenen Dokument die Mittagsgerichte für {today} und {tomorrow}.
+
       """ + FRAGMENT_WOCHENZEITRAUM + """
 
-        Wenn lediglich ein Datum angegeben ist und anschließend Wochentage folgen, berechne den passenden Wochentag.
-      """ + FRAGMENT_TAGNAMEN + """
-
-        --------------------------------------------------
-        DOKUMENTANALYSE
-        --------------------------------------------------
-
-        Bevor Gerichte extrahiert werden, analysiere zuerst ausschließlich die Struktur des Dokuments.
-
-        Bestimme zunächst, ob der Speiseplan aufgebaut ist als
-
-        - Tabelle
-        - Raster (Grid)
-        - Karten-/Kachellayout
-        - Zeilen
-        - Spalten
-
-        Ermittle anschließend die Bereiche der einzelnen Wochentage.
-
-        Jeder Wochentag besitzt einen eigenen räumlichen Bereich.
-
-        Erst nachdem sämtliche Tagesbereiche erkannt wurden, beginne mit der Extraktion.
-
-        Die visuelle Position ist wichtiger als die OCR-Lesereihenfolge.
-
-        Das Dokument darf NICHT als Fließtext interpretiert werden.
-
-        Ordne Gerichte ausschließlich anhand ihrer Position zu.
-
-        Dabei gelten folgende Regeln:
-
-        - Ein Gericht gehört immer zu dem Wochentag, in dessen Bereich es sich befindet.
-        - Bei Tabellen gehören alle Gerichte einer Spalte zu diesem Tag.
-        - Bei Tabellen mit Zeilen und Spalten gehören alle Gerichte innerhalb der jeweiligen Zelle zu genau einem Tag.
-        - Bei Grid- oder Kachellayouts gehören alle Kacheln derselben Zeile zum gleichen Wochentag.
-        - Ein Zeilenwechsel im OCR-Text bedeutet NICHT automatisch einen Wechsel zum nächsten Tag.
-        - Falls OCR-Reihenfolge und sichtbares Layout voneinander abweichen, ist ausschließlich das sichtbare Layout maßgeblich.
-        - Lies immer zuerst den vollständigen Bereich eines Tages bis zum rechten oder unteren Rand und wechsle erst danach zum nächsten Tagesbereich.
-
-        --------------------------------------------------
-        EXTRAKTION
-        --------------------------------------------------
-
-        Führe die folgenden Schritte in genau dieser Reihenfolge aus:
-
-        1. Ermittle den Wochenzeitraum.
-        2. Analysiere das Layout.
-        3. Ermittle sämtliche Tagesbereiche.
-        4. Extrahiere ALLE Gerichte aller gefundenen Tage.
-        5. Ordne jedes Gericht genau einem Tag zu.
-        6. Extrahiere anschließend Name und Preis.
-        7. Gib im JSON ausschließlich die Gerichte für {today} und {tomorrow} zurück.
-      """ + FRAGMENT_WAS_GILT_ALS_GERICHT + """
-
-        Ein Tag kann beliebig viele Gerichte enthalten.
-
-        Extrahiere alle Gerichte innerhalb des jeweiligen Tagesbereichs.
-      """ + FRAGMENT_AUSGABEFORMAT + """
-
-        Suche anschließend den Bereich für {today} und {tomorrow}.
-      """ + FRAGMENT_WICHTIG;
+      Wenn lediglich ein Datum angegeben ist und anschließend Wochentage folgen,
+      berechne den passenden Wochentag.
+      """ + FRAGMENT_TAGNAMEN
+      + FRAGMENT_LAYOUT
+      + FRAGMENT_EXTRAKTION
+      + FRAGMENT_WAS_GILT_ALS_GERICHT
+      + FRAGMENT_AUSGABEFORMAT
+      + FRAGMENT_WICHTIG;
 
   // -----------------------------------------------------------------------
-  // Shared image analysis layout rules (used by PROMPT_IMAGE and PROMPT_PDF)
+  // Prompt for IMAGE-based bistros
+  // Receives a pre-cropped image showing only today and tomorrow.
   // -----------------------------------------------------------------------
-  private static final String FRAGMENT_BILDANALYSE_LAYOUT = """
 
-        - Tabelle (Spalten pro Tag oder Zeilen pro Tag)
-        - Raster (Grid)
-        - Karten-/Kachellayout
-
-        Die visuelle Position ist wichtiger als die OCR-Lesereihenfolge.
-
-        Ordne Gerichte ausschließlich anhand ihrer Position zu:
-
-        - Bei Tabellen mit Spalten pro Tag gehören alle Gerichte einer Spalte zu diesem Tag.
-        - Bei Tabellen oder Grids mit Zeilen pro Tag gehören alle Gerichte einer Zeile zu diesem Tag.
-        - Ein Zeilenwechsel im OCR-Text bedeutet NICHT automatisch einen Wechsel zum nächsten Tag.
-      """;
-
-  // -----------------------------------------------------------------------
-  // Prompt for IMAGE-based bistros (receives a pre-cropped image showing
-  // only today and tomorrow)
-  // -----------------------------------------------------------------------
   private final String PROMPT_IMAGE = FRAGMENT_ROLLE + """
 
       Aufgabe:
-        Das Bild zeigt einen Ausschnitt eines Speiseplans mit den Gerichten für {today} und {tomorrow}.
-      """ + FRAGMENT_WOCHENZEITRAUM + FRAGMENT_TAGNAMEN + """
+        Das Bild zeigt einen Ausschnitt eines Speiseplans mit den Gerichten
+        für {today} und {tomorrow}.
 
-        --------------------------------------------------
-        BILDANALYSE
-        --------------------------------------------------
-
-        Analysiere die Struktur des Bildausschnitts:
-      """ + FRAGMENT_BILDANALYSE_LAYOUT + """
-
-        Ermittle die Bereiche für {today} und {tomorrow}.
-
-        --------------------------------------------------
-        EXTRAKTION
-        --------------------------------------------------
-
-        Führe die folgenden Schritte in genau dieser Reihenfolge aus:
-
-        1. Ermittle den Wochenzeitraum.
-        2. Analysiere das Layout.
-        3. Ermittle die Bereiche für {today} und {tomorrow}.
-        4. Extrahiere alle Gerichte beider Tage.
-        5. Ordne jedes Gericht genau einem Tag zu.
-        6. Extrahiere Name und Preis.
-      """ + FRAGMENT_WAS_GILT_ALS_GERICHT + FRAGMENT_AUSGABEFORMAT + FRAGMENT_WICHTIG;
+      """ + FRAGMENT_WOCHENZEITRAUM
+      + FRAGMENT_TAGNAMEN
+      + FRAGMENT_LAYOUT
+      + FRAGMENT_EXTRAKTION
+      + FRAGMENT_WAS_GILT_ALS_GERICHT
+      + FRAGMENT_AUSGABEFORMAT
+      + FRAGMENT_WICHTIG;
 
   // -----------------------------------------------------------------------
-  // Prompt for PDF-based bistros (receives full-page images; no pre-cropping)
+  // Prompt for PDF-based bistros
+  // Receives full-page images; no pre-cropping.
   // -----------------------------------------------------------------------
+
   private final String PROMPT_PDF = FRAGMENT_ROLLE + """
 
       Aufgabe:
-        Das Bild zeigt einen Speiseplan. Extrahiere die Mittagsgerichte für {today} und {tomorrow}.
-      """ + FRAGMENT_WOCHENZEITRAUM + FRAGMENT_TAGNAMEN + """
+        Das Dokument zeigt einen Speiseplan mit den Gerichten
+        für {today} und {tomorrow}.
 
-        --------------------------------------------------
-        BILDANALYSE
-        --------------------------------------------------
-
-        Analysiere die Struktur des gesamten Speiseplans:
-      """ + FRAGMENT_BILDANALYSE_LAYOUT + """
-
-        Ermittle die Bereiche aller Wochentage. Erst danach beginne mit der Extraktion.
-
-        --------------------------------------------------
-        EXTRAKTION
-        --------------------------------------------------
-
-        Führe die folgenden Schritte in genau dieser Reihenfolge aus:
-
-        1. Ermittle den Wochenzeitraum.
-        2. Analysiere das Layout.
-        3. Ermittle sämtliche Tagesbereiche.
-        4. Extrahiere ALLE Gerichte aller gefundenen Tage.
-        5. Ordne jedes Gericht genau einem Tag zu.
-        6. Extrahiere Name und Preis.
-        7. Gib im JSON ausschließlich die Gerichte für {today} und {tomorrow} zurück.
-      """ + FRAGMENT_WAS_GILT_ALS_GERICHT + FRAGMENT_AUSGABEFORMAT + FRAGMENT_WICHTIG;
+      """ + FRAGMENT_WOCHENZEITRAUM
+      + FRAGMENT_TAGNAMEN
+      + FRAGMENT_LAYOUT
+      + FRAGMENT_EXTRAKTION
+      + FRAGMENT_WAS_GILT_ALS_GERICHT
+      + FRAGMENT_AUSGABEFORMAT
+      + FRAGMENT_WICHTIG;
 
   // -----------------------------------------------------------------------
   // Prompt for the crop-analysis pre-step (IMAGE and PDF types)
   // -----------------------------------------------------------------------
+
   private final String PROMPT_CROP = """
       Analysiere den Speiseplan im Bild.
-      Ermittle die Position des Bereichs, der die Gerichte für {today} und {tomorrow} enthält.
-      Gib die Koordinaten als ganzzahlige Prozentsätze der Bildgröße zurück (0 = links/oben, 100 = rechts/unten).
+
+      Ermittle die Position des Bereichs, der die Gerichte für {today} und {tomorrow}
+      enthält.
+
+      Gib die Koordinaten als ganzzahlige Prozentsätze der Bildgröße zurück
+      (0 = links/oben, 100 = rechts/unten).
 
       Antworte ausschließlich mit reinem JSON, kein Markdown, kein Codeblock:
 
