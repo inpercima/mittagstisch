@@ -18,7 +18,7 @@ spring:
     openai:
       chat:
         options:
-          model: gpt-5-nano
+          model: gpt-5.6-luna
           # Only the default (1) value is supported.
           temperature: 1
   datasource:
