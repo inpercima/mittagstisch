@@ -26,6 +26,17 @@ To add a new migration, create a file following the naming convention `V<number>
 
 ## Development Mode
 
+### Playwright browser
+
+The backend uses Playwright with Chromium to extract content rendered by JavaScript.
+On a local Linux machine, install Chromium and its system dependencies once from this directory:
+
+```bash
+./mvnw org.codehaus.mojo:exec-maven-plugin:3.5.0:java \
+  -Dexec.mainClass=com.microsoft.playwright.CLI \
+  -Dexec.args="install --with-deps chromium"
+```
+
 ### Setup for development
 
 1. **Create development configuration file:**
