@@ -14,14 +14,16 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
+
     steps:
+      - name: Checkout
       - uses: actions/checkout@v7
 
-      - name: Set up JDK 25
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           java-version: "25"
           distribution: "temurin"
 
-      - name: Run maven verify
+      - name: Install and build
         run: ./mvnw verify
