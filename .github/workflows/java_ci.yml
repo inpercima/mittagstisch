@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/java:v1.64.0-noble
 
     defaults:
       run:
@@ -17,13 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-      - uses: actions/checkout@v7
-
-      - name: Set up JDK
-        uses: actions/setup-java@v6
-        with:
-          java-version: "25"
-          distribution: "temurin"
+        uses: actions/checkout@v7
 
       - name: Install and build
         run: ./mvnw verify

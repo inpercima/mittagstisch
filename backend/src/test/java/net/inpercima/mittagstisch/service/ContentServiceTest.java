@@ -3,6 +3,9 @@ package net.inpercima.mittagstisch.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -14,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpServer;
 
 import net.inpercima.mittagstisch.entity.LunchEntity;
 import net.inpercima.mittagstisch.model.DayEnum;
@@ -23,6 +27,45 @@ class ContentServiceTest {
 
     private final ContentService contentService = new ContentService();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    void extractContentFromWebsite_shouldWaitForJavaScriptRenderedContent() throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            byte[] response = """
+                    <!doctype html>
+                    <html>
+                      <body>
+                        <main>
+                          <script>
+                            window.setTimeout(() => {
+                              const section = document.createElement('section');
+                              section.id = 'mittagstisch';
+                              section.innerHTML = '<p>Gericht aus JavaScript</p><img src="/image.png">';
+                              document.querySelector('main').append(section);
+                            }, 200);
+                          </script>
+                        </main>
+                      </body>
+                    </html>
+                    """.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
+            exchange.sendResponseHeaders(200, response.length);
+            try (OutputStream responseBody = exchange.getResponseBody()) {
+                responseBody.write(response);
+            }
+        });
+        server.start();
+
+        try {
+            String content = contentService.extractContentFromWebsite(
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/",
+                    "main section#mittagstisch");
+            assertThat(content).isEqualTo("Gericht aus JavaScript");
+        } finally {
+            server.stop(0);
+        }
+    }
 
     @ParameterizedTest(name = "normalizes \"{0}\" to \"{1}\" (stringifiedContent={2})")
     @MethodSource("normalizePriceCases")
