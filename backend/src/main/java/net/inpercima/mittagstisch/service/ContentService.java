@@ -33,6 +33,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.TimeoutError;
+import com.microsoft.playwright.options.WaitForSelectorState;
+import com.microsoft.playwright.options.WaitUntilState;
 
 import lombok.extern.slf4j.Slf4j;
 import net.inpercima.mittagstisch.entity.LunchEntity;
@@ -45,6 +54,9 @@ import net.inpercima.mittagstisch.model.StatusEnum;
 @Service
 public class ContentService {
 
+    private static final double PAGE_LOAD_TIMEOUT_MS = 15_000;
+    private static final double SELECTOR_TIMEOUT_MS = 5_000;
+
     /**
      * Extracts text content from a web page specified by the given URL and CSS
      * selector.
@@ -55,19 +67,28 @@ public class ContentService {
      *         found or an error occurs
      */
     public String extractContentFromWebsite(String url, String selector) {
-        try {
-            Document doc = Jsoup.connect(url).get();
-            Element content = doc.selectFirst(selector);
-            if (content == null) {
-                log.warn("No content found for selector '{}' on page '{}'.", selector, url);
+        try (Playwright playwright = Playwright.create();
+                Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true))) {
+            Page page = browser.newPage();
+            page.setDefaultNavigationTimeout(PAGE_LOAD_TIMEOUT_MS);
+            page.navigate(url, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
+
+            Locator content = page.locator(selector).first();
+            try {
+                content.waitFor(new Locator.WaitForOptions()
+                        .setState(WaitForSelectorState.ATTACHED)
+                        .setTimeout(SELECTOR_TIMEOUT_MS));
+            } catch (TimeoutError e) {
+                log.warn("No content found for selector '{}' on rendered page '{}' within {} ms.", selector, url,
+                        SELECTOR_TIMEOUT_MS);
                 return "";
             }
+            content.locator("img, picture, source, script, style")
+                    .evaluateAll("elements => elements.forEach(element => element.remove())");
 
-            content.select("img, picture, source, script, style").remove();
-
-            return content.wholeText().replaceAll("\\n{2,}", "\n").trim();
-        } catch (IOException e) {
-            log.error("Failed to extract content from '{}' with selector '{}': {}", url, selector, e.getMessage());
+            return content.innerText().replaceAll("\\n{2,}", "\n").trim();
+        } catch (PlaywrightException e) {
+            log.error("Failed to extract rendered content from '{}' with selector '{}'.", url, selector, e);
             return "";
         }
     }
@@ -174,7 +195,8 @@ public class ContentService {
         }
 
         int x = Math.max(0, Math.min((int) (original.getWidth() * cropBox.xStart() / 100.0), original.getWidth() - 1));
-        int y = Math.max(0, Math.min((int) (original.getHeight() * cropBox.yStart() / 100.0), original.getHeight() - 1));
+        int y = Math.max(0,
+                Math.min((int) (original.getHeight() * cropBox.yStart() / 100.0), original.getHeight() - 1));
         int w = (int) (original.getWidth() * (cropBox.xEnd() - cropBox.xStart()) / 100.0);
         int h = (int) (original.getHeight() * (cropBox.yEnd() - cropBox.yStart()) / 100.0);
 

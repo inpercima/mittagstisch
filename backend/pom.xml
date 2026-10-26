@@ -78,9 +78,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.htmlunit</groupId>
-      <artifactId>htmlunit</artifactId>
-      <version>5.6.0</version>
+      <groupId>com.microsoft.playwright</groupId>
+      <artifactId>playwright</artifactId>
+      <version>${playwright.version}</version>
     </dependency>
 
     <dependency>
@@ -107,6 +107,7 @@
 
   <properties>
     <lombok.version>1.18.48</lombok.version>
+    <playwright.version>1.64.0</playwright.version>
     <java.version>25</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
