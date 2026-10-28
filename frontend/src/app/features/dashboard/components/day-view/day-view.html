@@ -1,42 +1,56 @@
 @if(lunches().length) {
-<div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
+<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
   @for (lunch of lunches(); track lunch) {
   <div
-    class="h-full flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900/70 backdrop-blur shadow-sm hover:shadow-md transition-all duration-300 p-6"
-    [ngClass]=" lunch.status | statusBoxClass"
+    class="relative h-full flex flex-col overflow-hidden rounded-3xl border border-[#e8e2d7] border-t-4 bg-[#fffdf8] p-5 shadow-[0_8px_24px_rgba(70,50,25,0.07)] dark:border-slate-700 dark:bg-slate-900 sm:p-6"
+    [ngClass]="lunch.status | statusBoxClass"
   >
-    <!-- Header -->
-    <div class="flex items-start justify-between gap-4">
-      <a
-        class="text-lg font-semibold text-slate-800 dark:text-slate-100 hover:underline"
-        target="_blank"
-        rel="noopener noreferrer"
-        [href]="lunch.bistro.url"
-      >
-        {{ lunch.bistro.name }}
-      </a>
+    <img
+      src="/plate-illustration.svg"
+      alt=""
+      aria-hidden="true"
+      class="pointer-events-none absolute -bottom-3 -right-2 z-0 h-auto w-42 opacity-[0.3] dark:opacity-[0.1]"
+    />
+
+    <div class="relative z-10 flex items-start justify-between gap-3">
+      <div class="flex min-w-0 items-start gap-2 text-lg font-bold tracking-tight">
+        <span
+          class="material-icons mt-0.5 shrink-0 text-[18px] text-amber-800 dark:text-amber-300"
+          aria-hidden="true"
+        >
+          restaurant
+        </span>
+        <a
+          class="min-w-0 break-words text-slate-900 hover:underline dark:text-slate-50"
+          target="_blank"
+          rel="noopener noreferrer"
+          [href]="lunch.bistro.url"
+        >
+          {{ lunch.bistro.name }}
+        </a>
+      </div>
 
       <span
-        class="text-xs font-medium px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
-        [ngClass]=" lunch.status | statusTextClass"
+        class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap"
+        [ngClass]="lunch.status | statusTextClass"
       >
         {{ lunch.status | statusText }}
       </span>
     </div>
 
-    <!-- Dishes -->
-    <ul class="mt-4 flex-1 divide-y divide-slate-200 dark:divide-slate-700">
+    @if (lunch.dishes.length) {
+    <ul class="relative z-10 mt-4 flex-1 divide-y divide-[#eee8de] dark:divide-slate-800">
       @for (dish of lunch.dishes; track dish) {
-      <li class="py-3 flex items-start justify-between gap-4">
-        <!-- Name -->
-        <span class="text-sm text-slate-700 dark:text-slate-300 leading-snug">
+      <li class="flex items-start justify-between gap-4 py-3">
+        <span
+          class="min-w-0 break-words text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+        >
           {{ dish.name }}
         </span>
 
-        <!-- Price -->
         @if(dish.price) {
         <span
-          class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap"
+          class="shrink-0 text-base font-bold tabular-nums text-slate-900 dark:text-slate-50 whitespace-nowrap"
         >
           {{ dish.price }}
         </span>
@@ -44,11 +58,27 @@
       </li>
       }
     </ul>
+    } @else {
+    <div
+      class="relative z-10 mt-5 flex flex-1 items-start gap-2 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-sm leading-relaxed text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+      role="note"
+    >
+      <span
+        class="material-icons mt-0.5 shrink-0 text-base text-amber-800 dark:text-amber-300"
+        aria-hidden="true"
+      >
+        info_outline
+      </span>
+      <p>Für diesen Tag liegen derzeit keine Speiseinformationen vor.</p>
+    </div>
+    }
 
-    <!-- Footer -->
-    <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
-      <p class="text-xs text-slate-400 dark:text-slate-500">
-        Aktualisiert am {{ lunch.importDate | date: 'dd.MM.yyyy' }}
+    <div class="relative z-10 mt-3 flex min-h-24 items-end pt-3 dark:border-slate-800">
+      <p
+        class="flex max-w-[9rem] items-start gap-1.5 text-xs leading-relaxed text-slate-600 dark:text-slate-400"
+      >
+        <span class="material-icons mt-px shrink-0 text-sm" aria-hidden="true">calendar_today</span>
+        <span>Aktualisiert am {{ lunch.importDate | date: 'dd.MM.yyyy' }}</span>
       </p>
     </div>
   </div>
