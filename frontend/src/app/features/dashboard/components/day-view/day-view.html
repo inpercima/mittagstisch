@@ -1,14 +1,14 @@
 @if(lunches().length) {
-<div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
+<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
   @for (lunch of lunches(); track lunch) {
   <div
-    class="h-full flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900/70 backdrop-blur shadow-sm hover:shadow-md transition-all duration-300 p-6"
-    [ngClass]=" lunch.status | statusBoxClass"
+    class="h-full flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 border-t-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 p-5 sm:p-6"
+    [ngClass]="lunch.status | statusBoxClass"
   >
     <!-- Header -->
-    <div class="flex items-start justify-between gap-4">
+    <div class="flex items-start justify-between gap-3">
       <a
-        class="text-lg font-semibold text-slate-800 dark:text-slate-100 hover:underline"
+        class="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-50 hover:underline break-words min-w-0"
         target="_blank"
         rel="noopener noreferrer"
         [href]="lunch.bistro.url"
@@ -17,26 +17,26 @@
       </a>
 
       <span
-        class="text-xs font-medium px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
-        [ngClass]=" lunch.status | statusTextClass"
+        class="shrink-0 text-xs font-medium px-2.5 py-0.5 rounded-full ring-1 ring-inset whitespace-nowrap"
+        [ngClass]="lunch.status | statusTextClass"
       >
         {{ lunch.status | statusText }}
       </span>
     </div>
 
     <!-- Dishes -->
-    <ul class="mt-4 flex-1 divide-y divide-slate-200 dark:divide-slate-700">
+    <ul class="mt-4 flex-1 divide-y divide-slate-100 dark:divide-slate-800">
       @for (dish of lunch.dishes; track dish) {
       <li class="py-3 flex items-start justify-between gap-4">
         <!-- Name -->
-        <span class="text-sm text-slate-700 dark:text-slate-300 leading-snug">
+        <span class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 min-w-0 break-words">
           {{ dish.name }}
         </span>
 
         <!-- Price -->
         @if(dish.price) {
         <span
-          class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap"
+          class="shrink-0 text-base font-bold tabular-nums text-slate-900 dark:text-slate-50 whitespace-nowrap"
         >
           {{ dish.price }}
         </span>
@@ -46,8 +46,8 @@
     </ul>
 
     <!-- Footer -->
-    <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
-      <p class="text-xs text-slate-400 dark:text-slate-500">
+    <div class="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
+      <p class="text-xs text-slate-500 dark:text-slate-400">
         Aktualisiert am {{ lunch.importDate | date: 'dd.MM.yyyy' }}
       </p>
     </div>

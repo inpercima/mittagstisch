@@ -7,13 +7,13 @@ export class StatusBoxClassPipe implements PipeTransform {
   transform(status: string): string {
     switch (status) {
       case 'SUCCESS':
-        return 'bg-emerald-50';
+        return 'border-t-emerald-400';
       case 'NO_DATA':
-        return 'bg-red-50';
+        return 'border-t-red-400';
       case 'NEXT_WEEK':
-        return 'bg-blue-50';
+        return 'border-t-blue-400';
       case 'OUTDATED':
-        return 'bg-amber-50';
+        return 'border-t-amber-400';
       default:
         return '';
     }
