@@ -3,7 +3,6 @@ import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LunchModel } from '../../models/lunch.model';
-import { StatusBoxClassPipe } from '../pipes/status-box-class.pipe';
 import { StatusTextClassPipe } from '../pipes/status-text-class.pipe';
 import { StatusTextPipe } from '../pipes/status-text.pipe';
 import { DayViewService } from './day-view.service';
@@ -11,7 +10,7 @@ import { DayViewService } from './day-view.service';
 @Component({
   selector: 'app-day-view',
   templateUrl: './day-view.html',
-  imports: [NgClass, DatePipe, StatusTextPipe, StatusBoxClassPipe, StatusTextClassPipe],
+  imports: [NgClass, DatePipe, StatusTextPipe, StatusTextClassPipe],
 })
 export class DayView implements OnInit {
   readonly #route = inject(ActivatedRoute);
