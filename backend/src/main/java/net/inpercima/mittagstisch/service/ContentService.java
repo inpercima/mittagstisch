@@ -6,10 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.springframework.util.InvalidMimeTypeException;
-import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -27,6 +23,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
+import org.springframework.util.InvalidMimeTypeException;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -86,7 +85,7 @@ public class ContentService {
             content.locator("img, picture, source, script, style")
                     .evaluateAll("elements => elements.forEach(element => element.remove())");
 
-            return content.innerText().replaceAll("\\n{2,}", "\n").trim();
+            return content.textContent().replaceAll("\\n{2,}", "\n").trim();
         } catch (PlaywrightException e) {
             log.error("Failed to extract rendered content from '{}' with selector '{}'.", url, selector, e);
             return "";
