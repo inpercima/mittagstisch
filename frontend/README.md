@@ -4,7 +4,7 @@ This guide covers the Angular frontend setup and usage for both development and 
 
 ## Prerequisites
 
-* Node.js 24.16.0 or higher
+* Node.js 26.13.1 or higher
 * pnpm 11.8.0 or higher
 * Angular CLI 22.0.5 or higher
 
