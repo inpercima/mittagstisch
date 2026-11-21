@@ -19,19 +19,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup pnpm
+        uses: pnpm/setup@v3
         with:
-          version: 11
+          cache: true
+          require-lockfile: true
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: frontend/pnpm-lock.yaml
-
-      - name: Install and Build
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm build:prod
+      - name: Build
+        run: pnpm build:prod

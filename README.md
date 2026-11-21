@@ -10,14 +10,14 @@ Daily lunches from canteens and bistros in Leipzig (mainly in Plagwitz and Linde
 
 It's recommended to use [nvm (Node version Manager)](https://github.com/nvm-sh/nvm).
 
-- `node 24.16.0` or higher in combination with
-  - `npm 11.13.0` or higher or
-  - `pnpm 11.24.0` or higher, used in this repository
+- `node 26.13.1` or higher in combination with
+  - `npm 11.20.0` or higher or
+  - `pnpm 12.21.0` or higher, used in this repository
 
 Install pnpm by running:
 
 ```bash
-npm install -g pnpm@11.24.0
+npm install -g pnpm@12.21.0
 ```
 
 ### Info for npm and pnpm
@@ -27,7 +27,7 @@ You can also use `npm` for your local work but changes will be made by `pnpm` on
 
 ### Angular CLI
 
-- `@angular/cli 22.1.6` or higher
+- `@angular/cli 22.3.0` or higher
 
 Install @angular/cli by running:
 
